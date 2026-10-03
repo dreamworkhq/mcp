@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dreamworkhq/dreamwork",
+  "title": "Dreamwork",
+  "description": "Job search, application materials, and application tracking for AI assistants.",
+  "repository": {
+    "url": "https://github.com/dreamworkhq/mcp",
+    "source": "github",
+    "subfolder": "apps/mcp"
+  },
+  "version": "1.4.3",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.dreamworkhq.com/mcp"
+    }
+  ]
+}

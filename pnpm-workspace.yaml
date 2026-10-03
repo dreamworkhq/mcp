@@ -1,0 +1,7 @@
+packages:
+  - apps/mcp
+  - packages/api-contracts
+  - packages/assistant-contracts
+
+ignoredBuiltDependencies:
+  - esbuild

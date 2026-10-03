@@ -1,0 +1,58 @@
+{
+  "name": "@dreamworkhq/mcp",
+  "version": "1.4.3",
+  "description": "Dreamwork MCP server — AI job search agent with auto-apply",
+  "mcpName": "io.github.ponder-surveys/dreamwork",
+  "type": "module",
+  "bin": {
+    "dreamwork-mcp": "dist/stdio.js"
+  },
+  "files": [
+    "dist/stdio.js",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsx src/stdio.ts",
+    "build": "node scripts/build.mjs",
+    "stdio": "tsx src/stdio.ts",
+    "check": "tsc --noEmit",
+    "docs": "tsx scripts/generate-tool-docs.ts",
+    "test": "node ../../scripts/run-node-tests.mjs tsx-mcp -- test/**/*.test.ts",
+    "test:targeted": "node ../../scripts/run-node-tests.mjs tsx-mcp --",
+    "test:package": "node scripts/verify-package.mjs",
+    "prepublishOnly": "npm run check && npm test && npm run build && npm run test:package"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "job-search",
+    "ai-agent",
+    "dreamwork",
+    "auto-apply"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dreamworkhq/mcp.git",
+    "directory": "apps/mcp"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "4.4.2"
+  },
+  "devDependencies": {
+    "@jobless/api-contracts": "workspace:*",
+    "@jobless/assistant-contracts": "workspace:*",
+    "@types/node": "^25.6.0",
+    "esbuild": "0.27.7",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  },
+  "homepage": "https://www.dreamworkhq.com/agents",
+  "bugs": {
+    "url": "https://github.com/dreamworkhq/mcp/issues"
+  }
+}

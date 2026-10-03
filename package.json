@@ -1,0 +1,16 @@
+{
+  "name": "dreamwork-mcp-source",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.23.0",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "check": "pnpm --filter @dreamworkhq/mcp check",
+    "test": "pnpm --filter @dreamworkhq/mcp test",
+    "build": "pnpm --filter @dreamworkhq/mcp build",
+    "test:package": "pnpm --filter @dreamworkhq/mcp test:package",
+    "docs": "pnpm --filter @dreamworkhq/mcp docs"
+  }
+}
