@@ -124,7 +124,7 @@ export const autopilotActions = [
       description:
         "Sets Autopilot on, off or paused after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval. Pause preserves configuration and stops sending; off clears the schedule. Daily and monthly limits remain determined by the plan.",
       readOnlyHint: false,
-      openWorldHint: false,
+      openWorldHint: true,
       destructiveHint: true,
     },
   }),

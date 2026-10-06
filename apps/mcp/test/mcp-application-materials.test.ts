@@ -148,3 +148,52 @@ test("an account outside the Applications rollout is told so, not handed a malfo
     await server.close();
   }
 });
+
+
+test("application material read exposes draft edit targets without the rest of the pack", async () => {
+  const originalFetch = globalThis.fetch;
+  const answer = {
+    id: "synthetic-prose-question",
+    questionText: "Describe a project.",
+    generatedAnswer: "I built a fictional demo.\nIt used a queue.",
+    type: "textarea",
+  };
+  let draftAnswers: unknown = [{
+    ...answer,
+    approved: false,
+    required: true,
+    privateExtra: "not-a-draft-answer-field",
+  }];
+  globalThis.fetch = (async () => new Response(JSON.stringify({
+    ...materials(4),
+    answers: draftAnswers,
+    record: { unrelated: "not-a-material-field" },
+  }), { status: 200, headers: { "content-type": "application/json" } })) as typeof fetch;
+  const server = createMcpServer(new ApiClient("https://api.example.test", "sk_test"));
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  const client = new Client({ name: "draft-answers-test", version: "0.0.0" });
+  try {
+    await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+    const read = () => client.callTool({
+      name: "get_application_materials",
+      arguments: { applicationId: APPLICATION_ID },
+    });
+    const result = await read();
+    const expected = { ...materials(4, null), answers: [answer] };
+    assert.deepEqual(result.structuredContent, expected);
+    assert.deepEqual(JSON.parse((result.content as Array<{ text: string }>)[0]!.text), expected);
+
+    draftAnswers = [];
+    assert.deepEqual((await read()).structuredContent, { ...materials(4, null), answers: [] });
+
+    draftAnswers = [{ ...answer, generatedAnswer: 42 }];
+    const malformed = await read();
+    assert.equal(malformed.isError, true);
+    assert.equal(malformed.structuredContent, undefined);
+    assert.doesNotMatch(JSON.stringify(malformed.content), /synthetic-prose-question|not-a-material-field/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    await client.close();
+    await server.close();
+  }
+});

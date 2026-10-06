@@ -1,6 +1,6 @@
 {
-  "version": "1.4.3",
-  "sourceCommit": "196d2ec420a71e6d39a87c6b5c37f2ebd753bb41",
+  "version": "1.4.4",
+  "sourceCommit": "1d1feaa85a48dad9195c1507ea642a1008e01f74",
   "managedFiles": [
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
@@ -21,6 +21,7 @@
     "apps/mcp/src/client.ts",
     "apps/mcp/src/install-id.ts",
     "apps/mcp/src/mcp.ts",
+    "apps/mcp/src/openai.ts",
     "apps/mcp/src/prompts.ts",
     "apps/mcp/src/stdio.ts",
     "apps/mcp/src/version.ts",
@@ -98,6 +99,7 @@
     "packages/assistant-contracts/src/jobFunctions.ts",
     "packages/assistant-contracts/src/listingFilters.ts",
     "packages/assistant-contracts/src/matchFilterCost.ts",
+    "packages/assistant-contracts/src/mcp-resources.ts",
     "packages/assistant-contracts/src/receipt.ts",
     "packages/assistant-contracts/src/registry.ts",
     "packages/assistant-contracts/src/turn.ts",

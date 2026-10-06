@@ -18,6 +18,13 @@ import { isoDateTime, uuidString } from "./common.js";
 
 const remoteEligibilityConfidence = z.enum(["high", "low"]);
 
+const verifiedSalaryIsOte = z
+  .boolean()
+  .nullable()
+  .describe(
+    "Verified pay type of a source-provided salary: true for OTE, false for base pay. Null when no verified verdict exists, including every estimate.",
+  );
+
 /** Public browse listing card (`mapPublicListingRow` over the list select). */
 export const publicListingSchema = responseComponent(
   z.object({
@@ -45,7 +52,7 @@ export const publicListingSchema = responseComponent(
     salaryPeriod: z.string().nullable(),
     salaryLocalMin: z.int().nullable(),
     salaryLocalMax: z.int().nullable(),
-    salaryIsOte: z.boolean().nullable(),
+    salaryIsOte: verifiedSalaryIsOte,
     department: z.string().nullable(),
     sourceUrl: z.string().nullable(),
     platform: z.string(),
@@ -185,6 +192,7 @@ export const recommendedListingSchema = responseComponent(
     salaryPeriod: z.string().nullable(),
     salaryLocalMin: z.int().nullable(),
     salaryLocalMax: z.int().nullable(),
+    salaryIsOte: verifiedSalaryIsOte,
     department: z.string().nullable(),
     sourceUrl: z.string().nullable(),
     platform: z.string().nullable(),

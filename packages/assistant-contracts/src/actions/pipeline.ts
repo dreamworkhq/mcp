@@ -34,7 +34,7 @@ export const pipelineActions = [
     risk: "read",
     title: "Read the pipeline",
     description:
-      "Read every role the person has saved, applied to, or heard back about, as board cards with their column, the application id when one exists, and when each last moved. Use it for \"what have I applied to\", \"what is still sending\", and to find the application id another action needs. Report `total` as the number and list `cards`, which `complete` says may be only the first `limit`; `counts` covers every column whatever the filter. The column is display state — `get_application_status` is the only action that checks whether an employer received, read or replied to anything.",
+      "Read every role the person has saved, applied to, or heard back about, as board cards with their column, the application id when one exists, and when each was last updated. Use it for \"what have I applied to\", \"what is still sending\", and to find the application id another action needs. Report `total` as the number and list `cards`, which `complete` says may be only the first `limit`; `counts` covers every column whatever the filter. The column is display state — `get_application_status` is the only action that checks whether an employer received, read or replied to anything.",
     input: z.object({
       status: pipelineStatusSchema.optional(),
       limit: z.int().min(1).max(100).default(50),
@@ -67,7 +67,7 @@ export const pipelineActions = [
     mcp: {
       expose: true,
       description:
-        "Returns saved and applied roles as board cards with column, application id and last-moved time. total and counts cover all matching records; complete identifies whether cards are truncated by limit. Column values describe board state and do not establish employer receipt or response.",
+        "Returns saved and applied roles as board cards with column, application id and last-updated time. total and counts cover all matching records; complete identifies whether cards are truncated by limit. Column values describe board state and do not establish employer receipt or response.",
       readOnlyHint: true,
       openWorldHint: false,
     },

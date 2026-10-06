@@ -8,19 +8,19 @@
     "source": "github",
     "subfolder": "apps/mcp"
   },
-  "version": "1.4.3",
+  "version": "1.4.4",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@dreamworkhq/mcp",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
           "name": "DREAMWORK_API_KEY",
-          "description": "Your Dreamwork API key (sk_...)",
+          "description": "Dreamwork agent key (sk_...) for account tools; public job browsing works without a key",
           "isRequired": false,
           "isSecret": true
         },

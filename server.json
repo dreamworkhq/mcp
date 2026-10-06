@@ -8,7 +8,7 @@
     "source": "github",
     "subfolder": "apps/mcp"
   },
-  "version": "1.4.3",
+  "version": "1.4.4",
   "remotes": [
     {
       "type": "streamable-http",

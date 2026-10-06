@@ -59,9 +59,9 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_inbox` | read | Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. |
 | `get_job` | read | Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. |
 | `get_pack_status` | read | Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. |
-| `get_pipeline` | read | Returns saved and applied roles as board cards with column, application id and last-moved time. |
+| `get_pipeline` | read | Returns saved and applied roles as board cards with column, application id and last-updated time. |
 | `get_preferences` | read | Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, seniority, AI-role interest and cover-letter settings. |
-| `get_task` | read | Returns one account-owned assistant ledger entry by taskId, including action, arguments, status, receipt and error code. |
+| `get_task` | read | Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. |
 | `get_unread_reminders` | read | Returns unread recruiter-message and thread counts, oldest unread time and recent message previews with thread, company, role and kind. |
 | `get_updates_since` | read | Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. |
 | `get_usage` | read | Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time. |
@@ -98,7 +98,7 @@ Tools that call a product route directly, with no registry action behind them. `
 | `browse_listings` | `GET /listings` | Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. |
 | `generate_outreach` | `POST /outreach/generate` | Generates a personalized outreach-email draft for the specified contact and job. |
 | `generate_resume` | `POST /applications/:id/resume` | Generates a tailored resume for the specified account-owned application and returns its result. |
-| `get_application_materials` | `GET /applications/:id/pack` | Returns one account-owned application's default and tailored resume contents, cover letter, selected variant, inclusion, lock state and optimistic revision. |
+| `get_application_materials` | `GET /applications/:id/pack` | Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. |
 | `get_generated_resumes` | `GET /applications/:id/resumes` | Returns tailored resumes generated for the specified account-owned application. |
 | `get_listing` | `GET /listings/:id` | Returns full details of a platform job listing identified by id. |
 | `get_platform_context` | `MCP context` | Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach, escalation and interview capabilities, plus its product context. |

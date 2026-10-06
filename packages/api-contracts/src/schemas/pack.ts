@@ -46,6 +46,16 @@ export const packAssetsRequestSchema = z.object({
   assets: z.array(packAssetSchema).min(1).max(3).optional(),
 });
 
+/** Draft answer fields needed to identify and review a scoped prose edit. */
+export const packDraftAnswerSchema = z.object({
+  id: z.string(),
+  questionText: z.string(),
+  generatedAnswer: z.string(),
+  type: z.string(),
+});
+
+export type PackDraftAnswer = z.infer<typeof packDraftAnswerSchema>;
+
 /** Where a scoped refine is allowed to change text. */
 export const refineScopeSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("paragraph"), index: z.number().int().min(0) }),

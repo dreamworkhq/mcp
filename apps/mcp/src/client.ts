@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { MCP_RESOURCE_HEADER } from "@jobless/assistant-contracts";
 
 function errorValueToMessage(value: unknown): string | null {
   if (typeof value === "string" && value.length > 0) return value;
@@ -88,6 +89,8 @@ export class ApiClient {
      * turn, for as long as the host is willing to wait.
      */
     private timeoutMs: number = DEFAULT_REQUEST_TIMEOUT_MS,
+    /** Hosted sessions bind every API request to the audience they advertised. */
+    private resource?: string,
   ) {}
 
   /** Whether the client has a valid auth token. */
@@ -141,6 +144,7 @@ export class ApiClient {
     if (this.token) {
       headers.Authorization = `Bearer ${this.token}`;
     }
+    if (this.resource) headers[MCP_RESOURCE_HEADER] = this.resource;
 
     let res: Response;
     try {

@@ -321,7 +321,7 @@ export const statusActions = [
     risk: "read",
     title: "Read one entry in the record of what ran",
     description:
-      "Read one entry in the assistant's own ledger by task id: which action ran, its arguments, its current status, the receipt it produced, and any error code. This is how queued work is followed to completion. The id comes from the receipt the action returned.",
+      "Read one entry in the assistant's own ledger by task id: which action ran, its current status, the receipt it produced, any error code, and its creation and update times. This is how queued work is followed to completion. The id comes from the receipt the action returned.",
     input: z.object({
       taskId: z.string(),
     }),
@@ -342,7 +342,7 @@ export const statusActions = [
     mcp: {
       expose: true,
       description:
-        "Returns one account-owned assistant ledger entry by taskId, including action, arguments, status, receipt and error code. Queued work can be followed through its recorded status.",
+        "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. Queued work can be followed through its recorded status.",
       readOnlyHint: true,
       openWorldHint: false,
     },

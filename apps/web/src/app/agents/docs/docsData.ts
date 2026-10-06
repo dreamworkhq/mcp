@@ -534,7 +534,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_application_materials",
-    purpose: "Returns one account-owned application's default and tailored resume contents, cover letter, selected variant, inclusion, lock state and optimistic revision.",
+    purpose: "Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type.",
     calls: "GET /applications/:id/pack",
   },
   {
@@ -594,7 +594,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_pipeline",
-    purpose: "Returns saved and applied roles as board cards with column, application id and last-moved time.",
+    purpose: "Returns saved and applied roles as board cards with column, application id and last-updated time.",
     calls: "POST /assistant/actions/get_pipeline",
   },
   {
@@ -619,7 +619,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_task",
-    purpose: "Returns one account-owned assistant ledger entry by taskId, including action, arguments, status, receipt and error code.",
+    purpose: "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times.",
     calls: "POST /assistant/actions/get_task",
   },
   {

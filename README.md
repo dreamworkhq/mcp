@@ -31,6 +31,11 @@ This server is a thin gateway: it calls the Dreamwork API over HTTPS and holds n
 
 No install step is required — MCP clients run it on demand with `npx`. The examples below use `npx -y @dreamworkhq/mcp`.
 
+No key or account is needed to start. Without `DREAMWORK_API_KEY` the server
+runs in free guest mode, where your agent can search and read every listing.
+The `env` blocks below are optional; add a key when you want the account
+tools (see [Guest mode and agent keys](#guest-mode-and-agent-keys)).
+
 ## Configure
 
 ### Claude Desktop
@@ -83,22 +88,26 @@ claude mcp add --transport http dreamwork https://mcp.dreamworkhq.com/mcp \
   --header "Authorization: Bearer sk_..."
 ```
 
-## Authentication
+## Guest mode and agent keys
 
-Generate an agent key from your Dreamwork profile: sign in at
+**Guest mode (free, no account).** With no key set, the server starts in guest
+mode and exposes the public, read-only tools: `browse_listings`, `get_listing`,
+`get_platform_context`, and `get_upgrade_link`. The server tells the agent it is
+in guest mode, so the agent can say what works now. Account tools answer with a
+short "No agent key" message that lists the steps to get one.
+
+**Agent key (free account).** Matches ranked against your resume, saved jobs,
+tailored materials, the pipeline, recruiter mail, and applying need an agent
+key. Any Dreamwork account can generate one, including the free plan. Your plan
+sets the key's rate limit and usage allowances. Sign in at
 [dreamworkhq.com](https://www.dreamworkhq.com), open your **profile → Agent key**
-section (or use the **Get your agent key** button on the Agents page), then set it
-as `DREAMWORK_API_KEY` (format `sk_...`).
+section (or use the **Get a key** button on the Agents page), then set it as
+`DREAMWORK_API_KEY` (format `sk_...`) and restart your MCP client.
 
 When you generate a key you choose what it may do: read, write, apply, send
 mail. New keys get read and write, so a key made without a decision cannot
 submit an application or mail a recruiter. Pick the narrowest set that lets
 your agent work.
-
-**Guest mode:** with no key set, the server still starts and exposes the public,
-read-only tools (`browse_listings`, `get_listing`, `get_platform_context`,
-`get_upgrade_link`).
-Account tools return a short "No agent key" message until a key is set.
 
 ## Environment variables
 

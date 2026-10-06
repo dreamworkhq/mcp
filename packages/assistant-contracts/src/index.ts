@@ -33,6 +33,7 @@ export {
 } from "./action.js";
 
 export { ASSISTANT_EVENTS, type AssistantEventName } from "./events.js";
+export { openAiMcpResource, mcpResourceAllowed, MCP_RESOURCE_HEADER } from "./mcp-resources.js";
 
 export {
   contextEnvelopeSchema,

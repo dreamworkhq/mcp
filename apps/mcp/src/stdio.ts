@@ -18,7 +18,7 @@ const TOKEN =
 
 if (!TOKEN) {
   console.error(
-    "[mcp-stdio] No DREAMWORK_API_KEY set — running in guest mode.",
+    "[mcp-stdio] No DREAMWORK_API_KEY set — running in free guest mode.",
   );
   console.error(
     "[mcp-stdio] Browse public listings freely. Set DREAMWORK_API_KEY to unlock pipeline, resume, apply, and outreach tools.",
