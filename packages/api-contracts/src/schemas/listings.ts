@@ -286,6 +286,32 @@ export const recommendedListingsResponseSchema = responseComponent(
      * the profile has no embedding.
      */
     poolFresh: z.boolean(),
+    /**
+     * What the rows are, in one field. "final": ranked, the pool built for
+     * the current profile. "provisional": ranked rows from the first pass of
+     * a build that is still running; the final pool keeps them in this order
+     * and adds rows after them, so totals and `poolVersion` are not final yet
+     * (`semantic` is true and `poolFresh` false). "building": no rows yet
+     * because a pool is being built (`poolStatus: "pending"`, or an
+     * `awaitRanked` request whose build has nothing to show). "fallback":
+     * newest-first rows, not ranked. "refreshing": a ranked pool of an older
+     * profile version, which the rebuild replaces. "provisional" and the
+     * `awaitRanked` "building" are sent only when first-pass serving is on.
+     */
+    ranking: z.enum([
+      "final",
+      "provisional",
+      "building",
+      "fallback",
+      "refreshing",
+    ]),
+    /**
+     * Milliseconds the answering API replica has been answering an
+     * `awaitRanked` request for this pool with "building"; 0 for every
+     * other response. The server stops after 60 seconds and sends the
+     * newest-first page, so a client deadline belongs below that.
+     */
+    rankingBuildingMs: z.int(),
     hiddenByEligibility: z
       .int()
       .describe(
@@ -426,6 +452,11 @@ export const recommendedListingsQuery = {
     .string()
     .describe(
       `Escape hatch that disables the work-eligibility filter. ${truthy}`,
+    ),
+  awaitRanked: z
+    .string()
+    .describe(
+      'Send "1" to get no rows (ranking "building") instead of newest-first rows while a ranked pool is being built. Ignored for a search, for a sort other than relevance, and unless first-pass serving is on.',
     ),
   minSalary: z
     .int()

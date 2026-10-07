@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // MCP stdio entrypoint: stdout carries exclusively JSON-RPC protocol frames;
 // every application log goes to stderr. Configuration comes from the host
-// environment (the MCP client config's `env` block) — no .env loader runs in
+// environment (the MCP client config's `env` block). No .env loader runs in
 // the published artifact, so no dependency can print a banner onto stdout.
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ApiClient } from "./client.js";
@@ -18,10 +18,10 @@ const TOKEN =
 
 if (!TOKEN) {
   console.error(
-    "[mcp-stdio] No DREAMWORK_API_KEY set — running in free guest mode.",
+    "[mcp-stdio] No DREAMWORK_API_KEY set. Running in free guest mode.",
   );
   console.error(
-    "[mcp-stdio] Browse public listings freely. Set DREAMWORK_API_KEY to unlock pipeline, resume, apply, and outreach tools.",
+    "[mcp-stdio] Public listings work without a key. Set DREAMWORK_API_KEY to use the pipeline, resume, apply, and outreach tools.",
   );
 }
 

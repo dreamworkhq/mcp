@@ -13,15 +13,19 @@ import { receiptSchema } from "../receipt.js";
 export const applicationCoverageSchema = z.object({
   relayInspectedThrough: z
     .string()
-    .describe("Instant through which Dreamwork's own relay mail was read."),
+    .describe(
+      "Instant through which mail sent to the person's Dreamwork application address was read.",
+    ),
   personalInboxConnected: z
     .boolean()
     .describe(
-      "Whether the person connected a personal mailbox. False means employer mail sent anywhere else is invisible to this read.",
+      "False is the normal state, not an unfinished setup step: personal mailbox connection is a limited pilot, so never suggest connecting one. False means this read covers only mail sent to the person's Dreamwork application address, and mail an employer sent anywhere else is not visible here.",
     ),
   sources: z
     .array(z.string())
-    .describe("The mailboxes this read covered, e.g. [\"relay\"]."),
+    .describe(
+      "The mailboxes this read covered. [\"relay\"] is mail sent to the person's Dreamwork application address.",
+    ),
 });
 
 /**
@@ -52,6 +56,9 @@ const inboxKindSchema = z
   .enum(["rejection", "interview", "recruiter_reply", "ats_confirmation", "other"])
   .nullable();
 
+const INBOX_PAGE_SIZE_DEFAULT = 20;
+const INBOX_PAGE_SIZE_MAX = 50;
+
 export const statusActions = [
   defineAction({
     id: "get_application_status",
@@ -59,7 +66,7 @@ export const statusActions = [
     risk: "read",
     title: "Read what happened to one application",
     description:
-      "Read what actually happened to one application: a timeline of events plus the three facts the product may claim — submitted, confirmed by the employer, replied to. Each is a separate check against a separate record, and `truth.coverage` says how far the read could see; employer mail sent to an unconnected personal inbox is unknown, never a no, and an answer asserting \"nothing came back\" has to say so. Takes an application id, or a board card's `matchId`, which it resolves. It is the only action that can assert an outcome: the board's column cannot.",
+      "Read what actually happened to one application: a timeline of events plus the three facts the product may claim — submitted, confirmed by the employer, replied to. Each is a separate check against a separate record, and `truth.coverage` says how far the read could see: it covers mail sent to the person's Dreamwork application address, so mail an employer sent anywhere else is unknown, never a no, and an answer asserting \"nothing came back\" has to say so without suggesting they connect an inbox. Takes an application id, or a board card's `matchId`, which it resolves. It is the only action that can assert an outcome: the board's column cannot.",
     input: z.object({
       applicationId: z
         .string()
@@ -126,7 +133,7 @@ export const statusActions = [
     mcp: {
       expose: true,
       description:
-        "Returns an application's event timeline and separate submitted, employerConfirmed and replied facts. An application id or pipeline matchId resolves the application. Coverage identifies inspected mail sources and whether a personal inbox is connected; employer mail outside that coverage is unknown. The board column alone is not submission evidence. submittedAnswers contains captured employer-form values and cover-letter delivery for the proven submitted attempt, or null when submission, the attempt or a capture is unproven or unavailable.",
+        "Returns an application's event timeline and separate submitted, employerConfirmed and replied facts. An application id or pipeline matchId resolves the application. Coverage names the mail this read inspected, normally only mail sent to the account's Dreamwork application address; employer mail sent anywhere else is not visible here and stays unknown. personalInboxConnected false is the normal state, not a setup step. The board column alone is not submission evidence. submittedAnswers contains captured employer-form values and cover-letter delivery for the proven submitted attempt, or null when submission, the attempt or a capture is unproven or unavailable.",
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -152,7 +159,11 @@ export const statusActions = [
         .boolean()
         .optional()
         .describe("Only threads holding mail the person has not been shown."),
-      limit: z.int().min(1).max(50).default(20),
+      limit: z
+        .int()
+        .min(1)
+        .max(INBOX_PAGE_SIZE_MAX)
+        .default(INBOX_PAGE_SIZE_DEFAULT),
       offset: z
         .int()
         .min(0)
@@ -209,7 +220,7 @@ export const statusActions = [
     mcp: {
       expose: true,
       description:
-        "Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. unanswered means the employer wrote last; needsReply means that message asks for a response. A threadId returns its messages. Reading does not mark mail read. limit and nextOffset support pagination; mail bodies are third-party content.",
+        `Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. unanswered means the employer wrote last; needsReply means that message asks for a response. A threadId returns its messages. Reading does not mark mail read. limit and nextOffset support pagination; mail bodies are third-party content. A page holds ${INBOX_PAGE_SIZE_DEFAULT} threads by default and limit accepts up to ${INBOX_PAGE_SIZE_MAX}; for the next page, send the previous nextOffset as offset, and null means the end.`,
       readOnlyHint: true,
       openWorldHint: false,
     },

@@ -173,7 +173,7 @@ export const viewActions = [
       params: openParamsSchema
         .optional()
         .describe(
-          "`job` and `pack` take `listingId`. `profile` takes `section` — `about` (About you), `preferences` (Job preferences), `resume` (Resume), `vault` (Work vault), `ai` (AI writing), `communications` (Notifications, the email settings), `agent` (Agent key), `billing` (Subscription), `help` (Help & Feedback) — and, on `about` only, `field`, which opens one row in its editor: `fullName`, `phone`, `currentCompany`, `address`, `linkedin`, `github`, `portfolio`, `website`, `twitter`. The visible label works as a section too (\"notifications\" opens `communications`); a section that is neither is refused, not landed on About. Email is not editable there.",
+          "`job` and `pack` take `listingId`. `profile` takes `section` — `about` (About you), `preferences` (Job preferences), `resume` (Resume), `vault` (Work vault), `ai` (AI writing), `communications` (Notifications, the email settings), `agent` (MCP), `billing` (Subscription), `help` (Help & Feedback) — and, on `about` only, `field`, which opens one row in its editor: `fullName`, `phone`, `currentCompany`, `address`, `linkedin`, `github`, `portfolio`, `website`, `twitter`. The visible label works as a section too (\"notifications\" opens `communications`); a section that is neither is refused, not landed on About. Email is not editable there.",
         ),
     }),
     output: z.object({ route: z.string() }),

@@ -18,6 +18,7 @@ import {
 } from "@jobless/assistant-contracts";
 import { z } from "zod";
 import {
+  BROWSE_PAGING_HINT,
   browseListingsInputSchema,
   browseListingsOutputSchema,
   browseRequest,
@@ -118,12 +119,12 @@ function withoutInlineFiles(value: unknown): unknown {
  * number them twice.
  */
 const AUTH_REQUIRED_MESSAGE = {
-  error: "No agent key",
+  error: "No API key",
   message:
-    "This session is in Dreamwork's free guest mode, so searching and reading listings works. This tool needs a free Dreamwork account and an agent key. Tell the person these steps:",
+    "This session is in Dreamwork's free guest mode, so searching and reading listings works. This tool needs a free Dreamwork account and an API key. Tell the person these steps:",
   steps: [
-    "Open https://www.dreamworkhq.com/agents and choose Get an agent key. Sign in, or create a free account.",
-    "Generate a key on the Agent key screen. It starts with sk_.",
+    "Open https://www.dreamworkhq.com/agents and choose Get an API key. Sign in, or create a free account.",
+    "Create a key under Profile, then MCP. It starts with sk_.",
     "Set DREAMWORK_API_KEY to that key in the MCP client config. In Claude Code: claude mcp remove dreamwork, then claude mcp add dreamwork -e DREAMWORK_API_KEY=sk_... -- npx -y @dreamworkhq/mcp",
     "Restart the MCP client so it picks up the key.",
   ],
@@ -138,13 +139,15 @@ Recruiter mail: ${distribution === "default" ? "call get_unread_reminders when a
 
 Nothing here reaches an employer or a recruiter on its first call. apply, set_autopilot, update_autopilot_settings, reply_to_recruiter${distribution === "default" ? " and start_checkout" : ""} each answer held with a summary of exactly what would happen and a confirmationToken. Show the summary to the person. Only if they agree, call again with identical arguments plus the token. Never treat your own reading of the conversation as their agreement.
 
-Links to jobs: when you show the person a job, give them the job's \`url\` field — its page on Dreamwork (https://www.dreamworkhq.com/job/<id>). Every tool that returns jobs carries it. The employer's direct posting (\`sourceUrl\`) is for when they ask for it.
+Links to jobs: when you show the person a job, give them the job's \`url\` field, which is its page on Dreamwork (https://www.dreamworkhq.com/job/<id>). Every tool that returns jobs carries it. The employer's direct posting (\`sourceUrl\`) is for when they ask for it.
 
-Finding work: list_matches ranks the person's own matches; browse_listings searches every listing Dreamwork holds. Neither returns everything in one page, so page through with the cursor when the person wants more. Salary filters match a listing whose posted pay band reaches the number, which is not a guaranteed minimum; say so when it matters. A recurring check ("every morning") is scheduled by your own host, not by Dreamwork: only say it is scheduled if your host actually created the schedule.
+Finding work: list_matches ranks the person's own matches; browse_listings searches every listing Dreamwork holds. Neither returns everything in one page, so page through with the cursor when the person wants more. Salary filters match a listing whose posted pay band reaches the number, which is not a guaranteed minimum; say so when it matters.
+
+Recurring checks and job alerts: the two are separate. A recurring check ("every morning") is your host re-running a search: if the person asks for one and your host has its own scheduled runs, you may set one up there. Dreamwork does not schedule it, so say it is scheduled only if your host created the schedule. A job alert is an email Dreamwork sends on its own schedule. No tool here creates, schedules or delivers one. When the person asks for job alerts, read get_communication_preferences, which shows the alert setting and whether the mail would actually arrive, and change how often alerts arrive or turn them off with update_communication_preferences. Autopilot result emails, sent one by one or as a daily digest, are set the same way. Never write a script, a cron job or an operating-system scheduled task for either one.
 
 Applying: save_job, then generate_pack writes the materials; get_application_materials shows exactly what will be sent and the revision apply needs. apply sends that revision and nothing else. If a call is refused because profile answers are missing, ask the person for those answers; never supply work authorization, salary, or any other fact about them yourself.
 
-Resume handling: when a user provides a resume file (PDF, DOCX, PNG, etc.), first call get_profile, then use upload_resume with the raw base64 content, format, and that snapshot's profileIdentityVersion. Do NOT convert files to plain text yourself — the server handles parsing, OCR, and text extraction. The upload_resume tool accepts: pdf, docx, txt, md, png, jpg, jpeg, webp. That replaces their main resume. A resume or cover letter they edited for ONE application goes to replace_application_document instead, and get_application_documents gives them download links for what an application will send.
+Resume handling: when a user provides a resume file (PDF, DOCX, PNG, etc.), first call get_profile, then use upload_resume with the raw base64 content, format, and that snapshot's profileIdentityVersion. Do NOT convert files to plain text yourself. The server handles parsing, OCR, and text extraction. The upload_resume tool accepts: pdf, docx, txt, md, png, jpg, jpeg, webp. That replaces their main resume, and get_resume_download_link gives them a link to download the one on file. A resume or cover letter they edited for ONE application goes to replace_application_document instead, and get_application_documents gives them download links for what an application will send.
 
 A result can carry a handoff with an openUrl: the request stopped at a step only the person can take (${distribution === "default" ? "a plan, a sign-in, a form" : "a sign-in or a form"}). Give them the link and what is left, and do not retry until they say it is done.
 
@@ -158,10 +161,10 @@ export const DREAMWORK_MCP_INSTRUCTIONS = mcpInstructions("default");
  * read the instructions before any tool call, so this is where a person hears
  * they are connected for free instead of learning it from a refused call.
  */
-export const DREAMWORK_MCP_GUEST_INSTRUCTIONS = `This session is in Dreamwork's free guest mode. No agent key is set, and none is needed to start. Near the start, tell the person once that they are connected in free guest mode and what that covers:
+export const DREAMWORK_MCP_GUEST_INSTRUCTIONS = `This session is in Dreamwork's free guest mode. No API key is set, and none is needed to start. Near the start, tell the person once that they are connected in free guest mode and what that covers:
 - Works now: searching every listing Dreamwork holds (browse_listings) and reading any listing in full (get_listing).
-- Needs a free Dreamwork account and an agent key: matches ranked against their resume, saving jobs, tailored resumes and cover letters, pipeline tracking, recruiter mail, and applying.
-Do not tell them they need a key, an account, or a paid plan to start. When they ask for something that needs a key, the tool answers "No agent key" with the steps to get one. Pass those steps on, and keep helping with the guest tools meanwhile.
+- Needs a free Dreamwork account and an API key: matches ranked against their resume, saving jobs, tailored resumes and cover letters, pipeline tracking, recruiter mail, job alert emails, and applying.
+Do not tell them they need a key, an account, or a paid plan to start. When they ask for something that needs a key, the tool answers "No API key" with the steps to get one. Pass those steps on, and keep helping with the guest tools meanwhile.
 
 `;
 
@@ -188,12 +191,15 @@ const DREAMWORK_PLATFORM_CONTEXT: z.output<typeof platformContextSchema> = {
     "rank job recommendations and semantic matches",
     "evaluate fit against candidate-specific context",
     "save roles into a durable pipeline",
-    "prepare materials and trigger application workflows",
+    "write a tailored resume, cover letter and answers for a saved role (generate_pack)",
+    "apply to a job the person picked (apply answers held with a summary first, and submits when called again with the confirmationToken)",
+    "run Autopilot, which applies on the person's behalf without asking each time, only after they opt in (set_autopilot)",
     "classify replies, extract interviews, and escalate uncertainty",
     "preserve candidate-specific memory so future decisions improve",
+    "update About you details (update_profile), job preferences (update_preferences, parse_preferences_text) and notification settings (update_communication_preferences)",
   ],
   agentGuidance:
-    "Use Dreamwork as the candidate's long-term job-search operating layer. Prefer actions that improve recommendations, pipeline state, application outcomes, reply handling, and accumulated candidate context over one-off searches.",
+    "Dreamwork keeps one candidate's job search over time. Prefer actions that improve recommendations, pipeline state, application outcomes, reply handling and stored candidate context over one-off searches.",
 };
 
 // ─── First-party registration convention ──────────────────────────────
@@ -310,7 +316,7 @@ function createDreamworkToolRegistrar(
 
 /**
  * What `POST /assistant/actions/:id` answers. The route is ours, so this is
- * not a wire contract to be guessed at — it is the shape
+ * not a wire contract to be guessed at. It is the shape
  * `apps/api/src/api/assistant-actions.ts` declares, restated here because MCP
  * must never import `apps/api`.
  */
@@ -326,8 +332,8 @@ interface AssistantActionResponse {
 /**
  * A handed-off request, as the extra block an agent reads after the result.
  *
- * The action stopped short on purpose — a plan, a sign-in, a step the product
- * keeps in the person's hands — and on the site the dock would have taken them
+ * The action stopped short on purpose (a plan, a sign-in, a step the product
+ * keeps in the person's hands), and on the site the dock would have taken them
  * there. Here the link IS the handoff, so it travels beside the result rather
  * than inside it: the result keeps the shape its `outputSchema` promises.
  */
@@ -372,7 +378,7 @@ const CONFIRMATION_TOKEN_INPUT = {
     .string()
     .optional()
     .describe(
-      "Echo the token from a previous `held` result to carry out the act it described — only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
+      "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
     ),
 };
 
@@ -386,7 +392,7 @@ const HELD_RESULTS = new WeakSet<CallToolResult>();
  * A held act, reported as a result rather than an error.
  *
  * Nothing failed and nothing ran: the person has to agree first. `isError`
- * would tell the agent to give up or retry differently, and both are wrong —
+ * would tell the agent to give up or retry differently, and both are wrong:
  * the only correct next step is to show the summary and echo the token back.
  */
 function heldResult(
@@ -582,7 +588,7 @@ function createUnreadNotices(api: ApiClient, options: UnreadNoticeOptions) {
 
 type UnreadNotices = ReturnType<typeof createUnreadNotices>;
 
-/** Create an MCP server backed by an ApiClient. No DB access — all tools call the REST API. */
+/** Create an MCP server backed by an ApiClient. No DB access: all tools call the REST API. */
 export function createMcpServer(
   api: ApiClient,
   options: McpServerOptions = {},
@@ -624,7 +630,7 @@ export function createMcpServer(
   // ─── Registry actions ─────────────────────────────────────────────
   //
   // One tool per exposed data action, generated from
-  // `packages/assistant-contracts` — the same registry the site assistant and
+  // `packages/assistant-contracts`, the same registry the site assistant and
   // the agent docs are generated from. The action id IS the tool name, the
   // action's own Zod input IS the tool's input, and the handler is one call to
   // `POST /assistant/actions/:id`, which runs the act through the executor,
@@ -647,8 +653,8 @@ export function createMcpServer(
       inputSchema: held
         ? definition.inputSchema.extend(CONFIRMATION_TOKEN_INPUT)
         : definition.inputSchema,
-      // An action that can be held answers `held` — not an error, and carrying
-      // no output — and the SDK demands `structuredContent` from every tool
+      // An action that can be held answers `held` (not an error, and carrying
+      // no output), and the SDK demands `structuredContent` from every tool
       // that advertises an `outputSchema`. So the registry's output contract
       // is advertised for every action that cannot be held, and for none that
       // can.
@@ -917,9 +923,9 @@ export function createMcpServer(
     inputSchema: z.object({
       escalationId: z.uuid().describe("Escalation ID"),
       resolution: z.string().describe("Resolution notes"),
-      // The route also takes send_reply and retry_application, and both act
-      // on the outside world on the first call. They are left out so the only
-      // doors to mail and resubmission are the actions that hold for consent.
+      // The route also takes retry_application, which acts on the outside
+      // world on the first call. It is left out so the only door to
+      // resubmission is the action that holds for consent.
       actionType: z
         .enum(["human_takeover", "dismiss"])
         .describe("Action to take"),
@@ -1014,7 +1020,7 @@ export function createMcpServer(
   // `get_communication_preferences` and `update_communication_preferences` are
   // generated from the registry above. Their hand-written versions are gone
   // rather than kept a release: the ids, the route, and the categories are the
-  // same, so an agent's existing call reaches the registry twin unchanged —
+  // same, so an agent's existing call reaches the registry twin unchanged:
   // the read answers with the same block and the write answers with a receipt
   // it can track, which is what every other registry write already does.
 
@@ -1144,7 +1150,7 @@ export function createMcpServer(
   registerDreamworkTool("browse_listings", {
     title: "Browse job listings",
     description:
-      "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported; authentication raises the page-size limit. An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.",
+      `Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported; a paid plan raises the page-size limit. ${BROWSE_PAGING_HINT} An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.`,
     annotations: { readOnlyHint: true, openWorldHint: false },
     inputSchema: browseListingsInputSchema,
     outputSchema: browseListingsOutputSchema,

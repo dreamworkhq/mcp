@@ -16,7 +16,7 @@ const pkgRoot = resolve(__dirname, "..");
 // not silently drift. package.json is the single source of truth: the publish
 // workflow verifies it against the mcp-v* tag, src/version.ts feeds it into the
 // initialize handshake, and server.json (the MCP registry manifest) must track
-// it in-repo so the synced publish artifact starts from a consistent state.
+// it in-repo because the public export publishes that file's versions as-is.
 
 function readJson(path: string): Record<string, unknown> {
   return JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;

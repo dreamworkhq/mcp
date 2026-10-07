@@ -55,7 +55,7 @@ export const DOC_PAGES: DocPage[] = [
     title: "Quickstart",
     eyebrow: "Start",
     summary:
-      "Get an agent key, run the MCP package, and make the first HTTP request against Dreamwork.",
+      "Add the MCP package to your agent, then add a key when it should tailor, apply, and track.",
   },
   {
     slug: "authentication",
@@ -250,7 +250,7 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
       {
         method: "GET",
         path: "/jobs",
-        description: "List added jobs with optional status and limit filters.",
+        description: "List added jobs with optional status, listingId and limit filters.",
         status: "stable",
       },
       {
@@ -349,7 +349,7 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
         method: "POST",
         path: "/escalations/:id/resolve",
         description:
-          "Resolve an escalation with a reply, retry, human takeover, or dismissal.",
+          "Resolve an escalation with a retry, human takeover, or dismissal.",
         status: "stabilizing",
       },
     ],
@@ -611,6 +611,11 @@ export const MCP_TOOLS: McpTool[] = [
     name: "get_profile",
     purpose: "Returns the authenticated account's profile, resume text, preferences and profileIdentityVersion snapshot.",
     calls: "GET /profile",
+  },
+  {
+    name: "get_resume_download_link",
+    purpose: "Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type.",
+    calls: "POST /assistant/actions/get_resume_download_link",
   },
   {
     name: "get_stats",

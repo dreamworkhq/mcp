@@ -8,9 +8,9 @@ Dreamwork exposes an MCP tool catalog that lets AI agents operate a person's job
 
 **MCP package:** `npx -y @dreamworkhq/mcp` in stdio mode.
 
-**Hosted endpoint:** `https://mcp.dreamworkhq.com/mcp` over Streamable HTTP. claude.ai, Claude Desktop, and ChatGPT connectors sign in with OAuth; clients that set headers can send an agent key as a bearer. `docs/MCP_HOSTED.md` has the details.
+**Hosted endpoint:** `https://mcp.dreamworkhq.com/mcp` over Streamable HTTP. claude.ai, Claude Desktop, and ChatGPT connectors sign in with OAuth; clients that set headers can send an API key as a bearer. `docs/MCP_HOSTED.md` has the details.
 
-**Auth:** The stdio package takes a Dreamwork agent key that starts with `sk_`, passed as `DREAMWORK_API_KEY` in the MCP client config.
+**Auth:** The stdio package takes a Dreamwork API key that starts with `sk_`, passed as `DREAMWORK_API_KEY` in the MCP client config.
 
 **Key scopes:** a key carries a subset of `read`, `write`, `apply`, and `send`, chosen when you generate it in Dreamwork.
 
@@ -18,7 +18,7 @@ Dreamwork exposes an MCP tool catalog that lets AI agents operate a person's job
 
 `write` is the floor for changing anything at all. A key without it is refused on every request that is not a `GET`, `HEAD`, or `OPTIONS`, so a `read` key cannot rewrite a profile, generate a pack, or move the board by any path. The two exceptions are `POST /assistant/actions/:id` and `POST /assistant/turns`, which price each action individually and refuse the write ones on their own.
 
-New keys default to read and write, so a key generated without a decision cannot submit or send. Keys created before scopes existed keep everything they could already do; nothing is taken away by the upgrade.
+The profile page preselects all four scopes when a person creates a key, and they uncheck what the agent should not do. A `POST /settings/api-key` that names no scopes still gets read and write, so a key made that way cannot submit or send. Keys created before scopes existed keep everything they could already do; nothing is taken away by the upgrade.
 
 Key lifecycle is session-only: a key cannot read, create, or revoke keys, rotate the session token, or delete the account. Nor can it upgrade a subscription to Dreamer at list price (`POST /billing/upgrade-to-dreamer`), which charges the card on file immediately. Those answer 403 `{"error":"session_required"}`.
 
@@ -61,6 +61,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_pack_status` | read | Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. |
 | `get_pipeline` | read | Returns saved and applied roles as board cards with column, application id and last-updated time. |
 | `get_preferences` | read | Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, seniority, AI-role interest and cover-letter settings. |
+| `get_resume_download_link` | read | Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. |
 | `get_task` | read | Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. |
 | `get_unread_reminders` | read | Returns unread recruiter-message and thread counts, oldest unread time and recent message previews with thread, company, role and kind. |
 | `get_updates_since` | read | Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. |
@@ -141,12 +142,12 @@ The web app and MCP tools share the same backend application state. When Dreamwo
 
 ## Getting an API Key
 
-The MCP server needs a Dreamwork agent key to authenticate as your account.
+The MCP server needs a Dreamwork API key to authenticate as your account.
 
-**Create an agent key:**
+**Create an API key:**
 
 1. Log into Dreamwork at `https://www.dreamworkhq.com`
-2. Open Settings or the agent access drawer
+2. Open Profile, then MCP
 3. Tick what the key may do, then generate it
 4. Copy the `sk_...` key once and store it in your MCP client configuration
 
@@ -160,7 +161,7 @@ The key is scoped to your candidate account, carries the scopes you picked, and 
 - An active Dreamwork account
 - A profile with resume context
 - A job in your pipeline with an application URL, or a listing you can add to the pipeline
-- A Dreamwork agent key that starts with `sk_`
+- A Dreamwork API key that starts with `sk_`
 
 ### Via Claude Desktop / Cursor / Warp MCP
 

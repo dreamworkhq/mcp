@@ -98,6 +98,14 @@ const appliedMatchFilters = z
   })
   .partial();
 
+/**
+ * `list_matches` page sizes. The default equals `DEFAULT_MATCH_PAGE_SIZE` in
+ * `apps/api/src/assistant/actions/match-search.ts`, which is what applies it;
+ * this package imports nothing from `apps/*`, so the number is restated here.
+ */
+const MATCH_PAGE_SIZE_DEFAULT = 10;
+const MATCH_PAGE_SIZE_MAX = 50;
+
 export const matchesActions = [
   defineAction({
     id: "list_matches",
@@ -198,10 +206,10 @@ export const matchesActions = [
       limit: z
         .int()
         .min(1)
-        .max(50)
+        .max(MATCH_PAGE_SIZE_MAX)
         .optional()
         .describe(
-          "Page size, 10 when omitted. A cursor keeps the size it was issued with.",
+          `Page size, ${MATCH_PAGE_SIZE_DEFAULT} when omitted. A cursor keeps the size it was issued with.`,
         ),
     }),
     output: z.object({
@@ -230,7 +238,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        "Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. notes describe applied filters and coverage.",
+        `Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. A page holds ${MATCH_PAGE_SIZE_DEFAULT} jobs by default and limit accepts up to ${MATCH_PAGE_SIZE_MAX}; the next page is the previous nextCursor, which keeps the page size it was issued with. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. notes describe applied filters and coverage.`,
       readOnlyHint: true,
       openWorldHint: false,
     },

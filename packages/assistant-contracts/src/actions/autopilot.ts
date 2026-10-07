@@ -73,12 +73,16 @@ export const autopilotActions = [
     risk: "read",
     title: "Read Autopilot status",
     description:
-      "Read whether Dreamwork is applying on the person's behalf: the state, applications sent today and this month against those limits, the match-score floor it applies at, how many roles clear it, how many submissions are still sending, and when the next batch goes out. `unavailable` means the plan does not allow it and `unavailableReason` answers \"why isn't it working\". Read it before saying anything about what Autopilot has done and before turning it on or off. There is no last-run timestamp — narrate cadence from `nextRunAt`. Which roles it applied to is `get_pipeline`.",
+      "Read whether Dreamwork is applying on the person's behalf: the state, applications sent today and this month against those limits, the match-score floor it applies at, how many roles clear it, how many submissions are still sending, and when the next batch goes out. `dailyLimit` is today's allowance and `usualDailyLimit` is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, today's allowance is a larger first-day allowance; after that day the usual daily limit applies. When the two differ, say that today is the first-day allowance and name the usual limit for the days that follow. That first day is the first day it sends in the window, not the first day of the calendar month. `unavailable` means the plan does not allow it and `unavailableReason` answers \"why isn't it working\". Read it before saying anything about what Autopilot has done and before turning it on or off. There is no last-run timestamp — narrate cadence from `nextRunAt`. Which roles it applied to is `get_pipeline`.",
     input: z.object({}),
     output: z.object({
       state: autopilotStateSchema,
       sentToday: z.int(),
+      /** Today's allowance: larger than `usualDailyLimit` on the first day
+       *  Autopilot sends in a monthly window, equal to it after. */
       dailyLimit: z.int().nullable(),
+      /** The plan's steady daily limit, whichever allowance applies today. */
+      usualDailyLimit: z.int().nullable(),
       sentThisMonth: z.int(),
       monthlyLimit: z.int().nullable(),
       /** Display-percentage match floor a role must clear to be picked up. */
@@ -98,7 +102,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Returns Autopilot state, daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt. unavailableReason explains plan restrictions. No last-run timestamp is provided.",
+        "Returns Autopilot state, daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt. dailyLimit is today's allowance and usualDailyLimit is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, dailyLimit is a larger first-day allowance; after that day it equals usualDailyLimit. That first day is the first day it sends in the window, not the first day of the calendar month. unavailableReason explains plan restrictions. No last-run timestamp is provided.",
       readOnlyHint: true,
       openWorldHint: false,
     },

@@ -1,8 +1,8 @@
 {
   "name": "@dreamworkhq/mcp",
-  "version": "1.4.4",
-  "description": "Dreamwork MCP server — AI job search agent with auto-apply",
-  "mcpName": "io.github.ponder-surveys/dreamwork",
+  "version": "1.5.0",
+  "description": "Job search, application materials, and application tracking for AI assistants.",
+  "mcpName": "io.github.dreamworkhq/dreamwork",
   "type": "module",
   "bin": {
     "dreamwork-mcp": "dist/stdio.js"

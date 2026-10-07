@@ -47,7 +47,7 @@ check only keep the map honest about the actions that do exist.
 
 ## Over MCP
 
-47 capabilities any agent holding the person's Dreamwork key can call, each as a tool of the same name in `@dreamworkhq/mcp` and as `POST /assistant/actions/<id>`. "Authorization" is what the executor demands on top of the key: a receipt is written and can be undone inside the stated window, and a confirmation means the first call answers `held` with a summary and a token rather than acting.
+48 capabilities any agent holding the person's Dreamwork key can call, each as a tool of the same name in `@dreamworkhq/mcp` and as `POST /assistant/actions/<id>`. "Authorization" is what the executor demands on top of the key: a receipt is written and can be undone inside the stated window, and a confirmation means the first call answers `held` with a summary and a token rather than acting.
 
 | Capability | What it does | Reads or writes | Authorization |
 |------------|--------------|-----------------|---------------|
@@ -73,6 +73,7 @@ check only keep the map honest about the actions that do exist.
 | `get_pack_status` | Read where each application's materials stand: queued, generating, ready, partial, failed, stale (written from an earlier resume), not started, or not found; which assets were asked for and which landed; whether the person edited them; and the page where they review them. | Reads | The key alone |
 | `get_pipeline` | Read every role the person has saved, applied to, or heard back about, as board cards with their column, the application id when one exists, and when each was last updated. | Reads | The key alone |
 | `get_preferences` | Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, the level they match at, appetite for AI-centred roles, and whether cover letters are on. | Reads | The key alone |
+| `get_resume_download_link` | A link to download the person's own main resume, the one on their profile, as the PDF Dreamwork holds for it. | Reads | The key alone |
 | `get_task` | Read one entry in the assistant's own ledger by task id: which action ran, its current status, the receipt it produced, any error code, and its creation and update times. | Reads | The key alone |
 | `get_unread_reminders` | Check cheaply whether recruiter mail has arrived that the person has not been shown: how many messages and threads, when the oldest arrived, and the newest few with thread, company, role, kind and a short preview. | Reads | The key alone |
 | `get_updates_since` | One read for a scheduled check-in ("every morning, tell me what is new"): matches Dreamwork found, applications whose board status moved, recruiter threads with new employer mail, and Autopilot's state, all since `since`. | Reads | The key alone |
@@ -107,17 +108,17 @@ check only keep the map honest about the actions that do exist.
 |------------|--------------|----------------------|
 | `close_application` | Close whichever row of the Applications board is open and put the person back on the list. | `needs_attached_browser` |
 | `draft_reply` | Write a reply into the Messages composer so the person reads it on their own screen before anything leaves. | `needs_attached_browser` |
-| `get_application_materials` | Read what one application will actually send to this employer: which resume version is selected, whether the cover letter is included, whether a send in flight has locked it, and the `revision` every write against it quotes. | `duplicate_of_mcp_tool` — the hand-written tool of this name returns the document bodies, which an agent reading them for a person needs and this twin withholds. |
+| `get_application_materials` | Read what one application will actually send to this employer: which resume version is selected, whether the cover letter is included, whether a send in flight has locked it, and the `revision` every write against it quotes. | `duplicate_of_mcp_tool`: the hand-written tool of this name returns the document bodies, which an agent reading them for a person needs and this twin withholds. |
 | `highlight` | Mark one element on screen — a card, a row, a control, a block of a document — by its anchor, with an optional `note` beside it. | `needs_attached_browser` |
 | `open` | Move the person's browser to one of the product's named pages, from the fixed set in `destination` — you do not type a URL. | `needs_attached_browser` |
 | `open_application` | Open one row of the Applications board — its review station if nothing has been sent yet, its record if something has — and select `doc` inside it. | `needs_attached_browser` |
 | `open_document` | Open one of an application's materials in the review station so the person can read it. | `needs_attached_browser` |
 | `open_match` | Open one card of the Matches feed — its preview beside the list on a wide screen, its full page below that. | `needs_attached_browser` |
 | `open_thread` | Open one recruiter thread on the Messages page so its transcript is on screen. | `needs_attached_browser` |
-| `reopen_application_materials` | Start a new editable revision of an application whose send FAILED, so its materials can be changed before a retry. | `duplicate_of_mcp_tool` — the hand-written tool of this name answers with the reopened materials block rather than a receipt. |
+| `reopen_application_materials` | Start a new editable revision of an application whose send FAILED, so its materials can be changed before a retry. | `duplicate_of_mcp_tool`: the hand-written tool of this name answers with the reopened materials block rather than a receipt. |
 | `reveal_section` | Scroll one group of the Applications board into view, and with `expand: true` open what it has folded away — Applied's "Show N more", the ones that did not go through, the closed roles, Autopilot's recommendations. | `needs_attached_browser` |
 | `scroll_to` | Bring an anchor into view without marking it. | `needs_attached_browser` |
 | `set_filters` | Change the Matches feed's filter tray, and show or hide the tray itself with `tray`: match quality, posted-within, work setting, location, function, seniority, internships, AI roles, pay, benefits, industry, plus the search box, the sort order, and the Matches/All jobs switch. | `needs_attached_browser` |
-| `update_application_materials` | Change what this one application will send: `resumeVariant` picks the person's own uploaded resume or the tailored one, `coverLetterIncluded` decides whether the letter goes with it. | `duplicate_of_mcp_tool` — the hand-written tool of this name also writes `resumeHtml` and `coverLetter` as free text, which nothing in this registry does. |
+| `update_application_materials` | Change what this one application will send: `resumeVariant` picks the person's own uploaded resume or the tailored one, `coverLetterIncluded` decides whether the letter goes with it. | `duplicate_of_mcp_tool`: the hand-written tool of this name also writes `resumeHtml` and `coverLetter` as free text, which nothing in this registry does. |
 
 <!-- generated:capability-map:end -->

@@ -1,26 +1,26 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.ponder-surveys/dreamwork",
+  "name": "io.github.dreamworkhq/dreamwork",
   "title": "Dreamwork",
-  "description": "AI job search agent — browse listings, generate packs, auto-apply",
+  "description": "Job search, application materials, and application tracking for AI assistants.",
   "repository": {
     "url": "https://github.com/dreamworkhq/mcp",
     "source": "github",
     "subfolder": "apps/mcp"
   },
-  "version": "1.4.4",
+  "version": "1.5.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@dreamworkhq/mcp",
-      "version": "1.4.4",
+      "version": "1.5.0",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
           "name": "DREAMWORK_API_KEY",
-          "description": "Dreamwork agent key (sk_...) for account tools; public job browsing works without a key",
+          "description": "Dreamwork API key (sk_...) for account tools; public job browsing works without a key",
           "isRequired": false,
           "isSecret": true
         },
@@ -31,12 +31,6 @@
           "isSecret": false
         }
       ]
-    }
-  ],
-  "remotes": [
-    {
-      "type": "streamable-http",
-      "url": "https://mcp.dreamworkhq.com/mcp"
     }
   ]
 }

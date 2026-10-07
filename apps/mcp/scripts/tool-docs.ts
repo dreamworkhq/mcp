@@ -3,7 +3,7 @@
  *
  * Three surfaces described the tools by hand and drifted: the package README,
  * `docs/MCP_TOOLS.md`, and the public agent-docs page. They are generated from
- * one place now — a live `tools/list` against the in-memory server, which is
+ * one place now: a live `tools/list` against the in-memory server, which is
  * the same catalog an MCP client sees, plus the registry for the risk class
  * behind each action.
  *
@@ -137,7 +137,7 @@ const GUEST_TOOLS = new Set([
 
 /**
  * One sentence a person can read in a table cell. The registry's descriptions
- * are written for a model — preconditions, results, and what not to do — so the
+ * are written for a model (preconditions, results, and what not to do), so the
  * opening sentence is the summary and the rest is the brief.
  */
 function firstSentence(description: string): string {
@@ -237,11 +237,11 @@ export function renderReadmeTools(entries: readonly CatalogEntry[]): string {
     "",
     names(guest),
     "",
-    "**Assistant actions** — one tool per capability in Dreamwork's assistant registry, each running through the same authorization ladder and receipt ledger the on-site assistant uses. A consequential one holds on its first call, answering with a summary and a confirmationToken; send that token back with identical arguments to go ahead.",
+    "**Assistant actions:** one tool per capability in Dreamwork's assistant registry, each running through the same authorization ladder and receipt ledger the on-site assistant uses. A consequential one holds on its first call, answering with a summary and a confirmationToken; send that token back with identical arguments to go ahead.",
     "",
     names(registry),
     "",
-    "**Direct product tools** — routes with no registry action behind them.",
+    "**Direct product tools:** routes with no registry action behind them.",
     "",
     names(keyed),
     "",
@@ -291,7 +291,7 @@ function overMcpRow(row: CapabilityMapRow): string {
 
 function inAppOnlyRow(row: WithheldCapabilityRow): string {
   const why = row.note
-    ? `\`${row.reason}\` — ${row.note.replace(/\|/g, "\\|")}`
+    ? `\`${row.reason}\`: ${row.note.replace(/\|/g, "\\|")}`
     : `\`${row.reason}\``;
   return `| \`${row.id}\` | ${firstSentence(row.description)} | ${why} |`;
 }

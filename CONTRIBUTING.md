@@ -1,7 +1,7 @@
 # Contributing
 
 Open an issue here with the client, transport, package version, and steps to
-reproduce. Keep agent keys, resumes, and other personal data out of issues.
+reproduce. Keep API keys, resumes, and other personal data out of issues.
 
 This repository receives reviewed source exports from Dreamwork's development
 repository. Maintainers apply fixes there and export them with an MCP release.
@@ -17,7 +17,9 @@ handshake and tool catalog. It requires access to the public npm registry.
 `apps/web/src/app/agents/docs/docsData.ts` is a documentation snapshot used by the
 catalog check; this repository does not contain or run the Dreamwork web app.
 
-The root `server.json` describes the hosted OAuth endpoint for the
-`io.github.dreamworkhq/dreamwork` registry entry. The stdio package retains
-`io.github.ponder-surveys/dreamwork` for compatibility. npm publishing remains
-in Dreamwork's development repository using its existing trusted publisher.
+The root `server.json` is the `io.github.dreamworkhq/dreamwork` registry entry.
+It lists the `@dreamworkhq/mcp` npm package and the hosted OAuth endpoint, and
+this repository's release tag publishes it to the MCP Registry.
+`apps/mcp/server.json` is the same manifest without the hosted endpoint; the
+package tests read it. npm publishing remains in Dreamwork's development
+repository using its existing trusted publisher.

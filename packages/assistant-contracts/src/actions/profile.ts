@@ -719,6 +719,37 @@ export const profileActions = [
     },
   }),
   defineAction({
+    id: "get_resume_download_link",
+    kind: "data",
+    risk: "read",
+    title: "Get a link to the person's resume",
+    description:
+      "A link to download the person's own main resume, the one on their profile, as the PDF Dreamwork holds for it. Give them `url` exactly as returned. It opens in any browser without signing in, for ten minutes, and only for the file that existed when it was made, so fetch a fresh link rather than reusing an old one. It returns a link, never the file. `status` says what happened: `ready` carries the link; `no_resume_on_file` means they have not added a resume yet, which `upload_resume` fixes; `no_file_for_resume` means Dreamwork holds the resume's text but no file for it, so uploading it again is the way to get one. Neither is an error, so say so and do not retry. For what ONE application will send, use `get_application_documents`.",
+    input: z.object({}),
+    output: z.object({
+      status: z
+        .enum(["ready", "no_resume_on_file", "no_file_for_resume"])
+        .describe(
+          "`ready` carries the link. The other two mean there is nothing to link to, and every other field is null.",
+        ),
+      url: z.string().nullable(),
+      expiresAt: z.string().nullable(),
+      filename: z.string().nullable(),
+      mimeType: z.string().nullable(),
+    }),
+    authorization: { mode: "none" },
+    anchor: { route: "/profile", target: "profile.about" },
+    invalidates: [],
+    event: ASSISTANT_EVENTS.ACTION_COMPLETED,
+    mcp: {
+      expose: true,
+      description:
+        "Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. The link opens without login for ten minutes and only for the file that existed when it was made. It returns no file content. status is ready, no_resume_on_file or no_file_for_resume; the last two carry null fields and are not errors.",
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
+  }),
+  defineAction({
     id: "get_communication_preferences",
     kind: "data",
     risk: "read",

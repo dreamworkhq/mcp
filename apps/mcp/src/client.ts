@@ -73,7 +73,7 @@ export class ApiError extends Error {
 
 /** Typed HTTP client for the Dreamwork API. Used by MCP server to call API endpoints. */
 export class ApiClient {
-  // Analytics labeling hints only — never auth signals. Composed from the MCP
+  // Analytics labeling hints only, never auth signals. Composed from the MCP
   // client's `initialize` handshake (client label) and the connection identity
   // (the per-install id for the stdio CLI). The API reads these in
   // apps/api/src/telemetry/mcp-usage.ts.
@@ -131,7 +131,7 @@ export class ApiClient {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       // Tag every proxied call so the API can attribute usage to the MCP
-      // surface (analytics labeling only — never an auth decision). The API
+      // surface (analytics labeling only, never an auth decision). The API
       // reads this in apps/api/src/telemetry/mcp-usage.ts.
       "x-dreamwork-surface": "mcp",
     };
@@ -166,7 +166,7 @@ export class ApiClient {
       // Network-level failure (DNS, refused, TLS). Surface a stable sanitized
       // message rather than the raw fetch error, which can embed internals.
       throw new ApiError(
-        "Unable to reach the Dreamwork API — check network connectivity and DREAMWORK_API_URL.",
+        "Unable to reach the Dreamwork API. Check network connectivity and DREAMWORK_API_URL.",
         0,
       );
     }
@@ -201,7 +201,7 @@ export class ApiClient {
   /**
    * GET a response covered by a canonical wire contract and decode it.
    *
-   * Same transport as {@link get} — headers, auth, non-2xx handling, network
+   * Same transport as {@link get}: headers, auth, non-2xx handling, network
    * and non-JSON sanitization are untouched. The only addition is the success
    * body passing through the operation's canonical schema:
    *
@@ -224,7 +224,7 @@ export class ApiClient {
       // Breadcrumb on stderr (stdout is the JSON-RPC channel). Without it a
       // contract/API divergence is invisible to both sides: the API logs a
       // healthy 200 and the CLI silently turns it into an error for the user.
-      // Operation id only — never the payload or the validator's issue list.
+      // Operation id only, never the payload or the validator's issue list.
       console.error(
         `[dreamwork-mcp] response failed contract validation for ${operationId}`,
       );

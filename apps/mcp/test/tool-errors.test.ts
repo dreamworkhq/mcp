@@ -62,7 +62,7 @@ test("auth-required tool returns isError key guidance in guest mode without call
     const { client, close } = await connectPair(api);
     const result = await client.callTool({ name: "get_profile", arguments: {} });
     assert.equal(result.isError, true);
-    assert.match(firstText(result), /No agent key/);
+    assert.match(firstText(result), /No API key/);
     assert.match(firstText(result), /DREAMWORK_API_KEY/);
     assert.equal(fetched, false, "guest mode must not hit the API");
     await close();
@@ -83,7 +83,7 @@ test("get_stats requires auth: guest mode returns key guidance without calling t
     const { client, close } = await connectPair(api);
     const result = await client.callTool({ name: "get_stats", arguments: {} });
     assert.equal(result.isError, true);
-    assert.match(firstText(result), /No agent key/);
+    assert.match(firstText(result), /No API key/);
     // /stats is user-scoped; a keyless call could only ever 401. Short-circuit
     // it locally instead of spending a round trip to learn that.
     assert.equal(fetched, false, "guest mode must not hit the API");
@@ -100,7 +100,7 @@ test("API 401 surfaces as the sanitized login-required error", async () => {
     const { client, close } = await connectPair(api);
     const result = await client.callTool({ name: "get_stats", arguments: {} });
     assert.equal(result.isError, true);
-    assert.match(firstText(result), /No agent key/);
+    assert.match(firstText(result), /No API key/);
     await close();
   } finally {
     restore();
@@ -121,7 +121,7 @@ test("API 403 keeps the API's own refusal instead of login guidance", async () =
     });
     assert.equal(result.isError, true);
     assert.match(firstText(result), /applications_preview_unavailable/);
-    assert.doesNotMatch(firstText(result), /No agent key/);
+    assert.doesNotMatch(firstText(result), /No API key/);
     await close();
   } finally {
     restore();

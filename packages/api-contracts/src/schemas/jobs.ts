@@ -85,6 +85,10 @@ export const listJobsQuery = {
   status: jobStatusSchema
     .exclude(["waiting_for_user_input"])
     .describe("Filter to a single worker status."),
+  listingId: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{1,200}$/)
+    .describe("Filter to the jobs saved for one listing id, or the job with that id."),
   limit: z
     .int()
     .min(1)

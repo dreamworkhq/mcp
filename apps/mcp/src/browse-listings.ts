@@ -58,6 +58,20 @@ const SORTED_WALK_LIMIT = 1000;
 /** The API's default page size for a sorted browse when no limit is sent. */
 const DEFAULT_SORTED_PAGE_SIZE = 25;
 
+/** The largest `limit` the route honors on any plan. */
+const MAX_BROWSE_PAGE_SIZE = 100;
+
+/**
+ * The route clamps `limit` to the caller's plan (`listingsPerPage` in
+ * `PLAN_ENTITLEMENTS`, `@jobless/shared`). This is the free plan's value,
+ * which a keyless call also gets; the published bundle cannot import that
+ * package, so the number is restated here.
+ */
+const FREE_PLAN_BROWSE_PAGE_SIZE = 25;
+
+/** How `browse_listings` pages, for the tool description. */
+export const BROWSE_PAGING_HINT = `A page holds ${DEFAULT_SORTED_PAGE_SIZE} listings by default and limit accepts up to ${MAX_BROWSE_PAGE_SIZE}, which the API clamps to ${FREE_PLAN_BROWSE_PAGE_SIZE} without a key or on the free plan; the next page is the previous nextCursor.`;
+
 /**
  * Annual US dollars. Under 1,000 is refused rather than read as thousands:
  * 1.x of this tool took thousands, and a figure that means $200k to one agent
@@ -160,9 +174,11 @@ export const browseListingsInputSchema = z.object({
   limit: z
     .int()
     .min(1)
-    .max(100)
+    .max(MAX_BROWSE_PAGE_SIZE)
     .optional()
-    .describe("Page size, 25 when omitted. Without a key the API caps it at 25."),
+    .describe(
+      `Page size, ${DEFAULT_SORTED_PAGE_SIZE} when omitted. Without a key or on the free plan the API caps it at ${FREE_PLAN_BROWSE_PAGE_SIZE}.`,
+    ),
 });
 
 export type BrowseListingsArgs = z.output<typeof browseListingsInputSchema>;

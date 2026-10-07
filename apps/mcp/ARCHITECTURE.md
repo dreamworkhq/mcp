@@ -12,7 +12,7 @@ used to validate API responses and describe MCP outputs.
 The API enforces identity, scopes, rate limits, and confirmations. Consequential
 actions can return a held result with a confirmation token before execution.
 Public browsing works without a key; account operations need the account
-holder's agent key or a hosted OAuth session.
+holder's API key or a hosted OAuth session.
 
 The hosted endpoint is a separate service that shares this tool implementation.
 Per-session state belongs inside `createMcpServer`; shared source must not read

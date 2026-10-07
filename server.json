@@ -8,7 +8,31 @@
     "source": "github",
     "subfolder": "apps/mcp"
   },
-  "version": "1.4.4",
+  "version": "1.5.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@dreamworkhq/mcp",
+      "version": "1.5.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "DREAMWORK_API_KEY",
+          "description": "Dreamwork API key (sk_...) for account tools; public job browsing works without a key",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "DREAMWORK_API_URL",
+          "description": "API endpoint override (default: https://api.dreamworkhq.com)",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",

@@ -568,6 +568,14 @@ export const operations: readonly OperationDescriptor[] = [
         schema: listJobsQuery.status,
       },
       {
+        name: "listingId",
+        in: "query",
+        required: false,
+        description:
+          "Filter to the jobs saved for one listing id, or the job with that id.",
+        schema: listJobsQuery.listingId,
+      },
+      {
         name: "limit",
         in: "query",
         required: false,
@@ -1058,6 +1066,14 @@ export const operations: readonly OperationDescriptor[] = [
         required: false,
         description: "Escape hatch that disables the work-eligibility filter.",
         schema: recommendedListingsQuery.includeIneligible,
+      },
+      {
+        name: "awaitRanked",
+        in: "query",
+        required: false,
+        description:
+          'Send "1" to get no rows (ranking "building") instead of newest-first rows while a ranked pool is being built.',
+        schema: recommendedListingsQuery.awaitRanked,
       },
       {
         name: "minSalary",
