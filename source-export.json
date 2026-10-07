@@ -46,6 +46,7 @@
     "apps/web/src/app/agents/docs/docsData.ts",
     "docs/CAPABILITY_MAP.md",
     "docs/MCP_TOOLS.md",
+    "glama.json",
     "package.json",
     "packages/api-contracts/package.json",
     "packages/api-contracts/src/admin-support.ts",
