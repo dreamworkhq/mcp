@@ -1,4 +1,9 @@
-name: Publish MCP registry entry
+name: Publish MCP package and registry entry
+# npm's trusted publisher for @dreamworkhq/mcp names this repository and this
+# workflow filename, so renaming the file breaks npm publishing until the npm
+# package setting is changed to match. It also names the npm-release
+# environment, which this repository restricts to mcp-v* tags, so a workflow
+# edited on a branch cannot obtain an identity npm accepts.
 on:
   push:
     tags: ["mcp-v*"]
@@ -13,9 +18,10 @@ jobs:
     uses: ./.github/workflows/ci.yml
   publish:
     needs: checks
-    if: github.repository == 'dreamworkhq/mcp' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/mcp-v'))
+    if: github.repository == 'dreamworkhq/mcp' && startsWith(github.ref, 'refs/tags/mcp-v')
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    environment: npm-release
+    timeout-minutes: 30
     permissions:
       contents: read
       id-token: write
@@ -32,6 +38,7 @@ jobs:
           const pkg = JSON.parse(readFileSync('apps/mcp/package.json', 'utf-8'));
           const identity = 'io.github.dreamworkhq/dreamwork';
           if (manifest.name !== identity || pkg.mcpName !== identity) throw new Error('Registry identity mismatch');
+          if (pkg.repository?.url !== 'git+https://github.com/dreamworkhq/mcp.git') throw new Error('package.json repository.url must be git+https://github.com/dreamworkhq/mcp.git: npm trusted publishing rejects a package whose repository differs from the publishing repository');
           if (manifest.version !== pkg.version) throw new Error('Registry version differs from the package version');
           const [npmPackage] = manifest.packages ?? [];
           if (manifest.packages?.length !== 1 || npmPackage.registryType !== 'npm' || npmPackage.identifier !== pkg.name || npmPackage.version !== pkg.version) throw new Error('The registry entry must list this npm release');
@@ -51,6 +58,41 @@ jobs:
           tar xzf "$archive" mcp-publisher
       - name: Validate manifest
         run: ./mcp-publisher validate
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10.23.0
+          run_install: false
+      # No dependency cache: a release build must not restore files an earlier
+      # run saved.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      # npm trusted publishing needs npm >= 11.5.1 and Node 22 ships 10.x. The
+      # version is pinned exactly so a release never runs an unreviewed npm.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@11.19.1
+      - run: pnpm build
+      # The tarball inlines the contract sources, so only the packed artifact
+      # proves that a consumer's install works.
+      - run: pnpm test:package
+      # No token: npm exchanges this job's GitHub OIDC identity for a
+      # short-lived credential and attaches provenance. The step runs only for
+      # a release tag, so a dispatch on main can never publish a version that
+      # has no tag. A version npm already serves is skipped, so a re-run is safe.
+      - name: Publish to npm
+        if: startsWith(github.ref, 'refs/tags/mcp-v')
+        working-directory: apps/mcp
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          if npm view "@dreamworkhq/mcp@$VERSION" version >/dev/null 2>&1; then
+            echo "npm already serves $VERSION; skipping"
+          else
+            npm publish --access public
+          fi
       # The registry accepts the entry only when npm serves this version with a
       # matching mcpName, and npm can answer 404 for a version it has just
       # accepted. `validate` does not check npm, so wait here, bounded, and

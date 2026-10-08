@@ -3,5 +3,7 @@ packages:
   - packages/api-contracts
   - packages/assistant-contracts
 
+minimumReleaseAge: 4320
+
 ignoredBuiltDependencies:
   - esbuild
