@@ -185,7 +185,7 @@ const DREAMWORK_PLATFORM_CONTEXT: z.output<typeof platformContextSchema> = {
     "company and listing data",
     "applications and pipeline state",
     "recruiter email threads and replies",
-    "interviews, escalations, and outcomes",
+    "interviews and outcomes",
   ],
   systemOfIntelligence: [
     "rank job recommendations and semantic matches",
@@ -194,7 +194,7 @@ const DREAMWORK_PLATFORM_CONTEXT: z.output<typeof platformContextSchema> = {
     "write a tailored resume, cover letter and answers for a saved role (generate_pack)",
     "apply to a job the person picked (apply answers held with a summary first, and submits when called again with the confirmationToken)",
     "run Autopilot, which applies on the person's behalf without asking each time, only after they opt in (set_autopilot)",
-    "classify replies, extract interviews, and escalate uncertainty",
+    "classify replies and extract interviews",
     "preserve candidate-specific memory so future decisions improve",
     "update About you details (update_profile), job preferences (update_preferences, parse_preferences_text) and notification settings (update_communication_preferences)",
   ],
@@ -721,7 +721,7 @@ export function createMcpServer(
   registerDreamworkTool("get_platform_context", {
     title: "Get platform context",
     description:
-      "Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach, escalation and interview capabilities, plus its product context.",
+      "Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach and interview capabilities, plus its product context.",
     annotations: {
       readOnlyHint: true,
       idempotentHint: true,
@@ -896,48 +896,6 @@ export function createMcpServer(
     requiresAuth: true,
     handler: async (args) =>
       json(withoutInlineFiles(await api.get(`/applications/${args.applicationId}/resumes`))),
-  });
-
-  // ─── Escalations (auth required) ───────────────────────────────
-
-  registerDreamworkTool("list_escalations", {
-    title: "List escalations",
-    description:
-      "Returns pending account-owned application escalations requiring human attention.",
-    annotations: { readOnlyHint: true, openWorldHint: false },
-    inputSchema: z.object({}),
-    requiresAuth: true,
-    handler: async () => json(await api.get("/escalations")),
-  });
-
-  registerDreamworkTool("resolve_escalation", {
-    title: "Resolve escalation",
-    description:
-      "Closes one escalation by dismissing it or recording human_takeover. This sends no recruiter message, contacts no employer and does not resubmit an application.",
-    annotations: {
-      readOnlyHint: false,
-      destructiveHint: false,
-      idempotentHint: false,
-      openWorldHint: false,
-    },
-    inputSchema: z.object({
-      escalationId: z.uuid().describe("Escalation ID"),
-      resolution: z.string().describe("Resolution notes"),
-      // The route also takes retry_application, which acts on the outside
-      // world on the first call. It is left out so the only door to
-      // resubmission is the action that holds for consent.
-      actionType: z
-        .enum(["human_takeover", "dismiss"])
-        .describe("Action to take"),
-    }),
-    requiresAuth: true,
-    handler: async (args) =>
-      json(
-        await api.post(`/escalations/${args.escalationId}/resolve`, {
-          resolution: args.resolution,
-          action: { type: args.actionType },
-        }),
-      ),
   });
 
   // ─── Contacts & Outreach (auth required) ────────────────────────

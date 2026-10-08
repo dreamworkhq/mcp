@@ -140,7 +140,7 @@ With telemetry disabled, no install id is generated, read, or sent.
 ## Tools
 
 The typical flow: browse the public index, save roles to the pipeline, tailor
-materials, apply, then track replies, interviews, and escalations. Call
+materials, apply, then track replies and interviews. Call
 `get_platform_context` first. It describes what Dreamwork can do, so the agent
 picks the right workflow.
 
@@ -157,7 +157,7 @@ picks the right workflow.
 
 **Direct product tools:** routes with no registry action behind them.
 
-`add_contact`, `add_jobs`, `generate_outreach`, `generate_resume`, `get_application_materials`, `get_generated_resumes`, `get_profile`, `get_stats`, `list_contacts`, `list_escalations`, `list_interviews`, `reopen_application_materials`, `resolve_escalation`, `update_application_materials`, `update_profile`, `upload_resume`
+`add_contact`, `add_jobs`, `generate_outreach`, `generate_resume`, `get_application_materials`, `get_generated_resumes`, `get_profile`, `get_stats`, `list_contacts`, `list_interviews`, `reopen_application_materials`, `update_application_materials`, `update_profile`, `upload_resume`
 
 <!-- generated:mcp-tools:end -->
 
@@ -176,8 +176,12 @@ Notes on a few tools:
 - 1.3.0 removed the 1.2.0 tools a registry action replaced: `search_jobs` and
   `list_applications` (use `get_pipeline`; `browse_listings` searches the
   index), `apply_to_job` (`apply`), `add_listing_to_pipeline` (`save_job`),
-  `skip_job` (`dismiss_match`), and `send_outreach`. `resolve_escalation` only dismisses or hands over; replies
-  and resubmissions go through `reply_to_recruiter` and `apply`.
+  `skip_job` (`dismiss_match`), and `send_outreach`. Replies and resubmissions
+  go through `reply_to_recruiter` and `apply`.
+- Releases after 1.5.1 no longer include `list_escalations` and
+  `resolve_escalation`, and the hosted server no longer offers them. Dreamwork
+  no longer hands an application back to you as an escalation, so there is
+  nothing for them to list or resolve.
 - `update_application_materials` and `reopen_application_materials` are open to
   the Applications rollout cohort the API admits; outside it they return the
   API's own refusal.

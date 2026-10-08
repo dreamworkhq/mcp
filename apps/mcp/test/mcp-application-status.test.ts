@@ -4,7 +4,7 @@ import { formatApiErrorMessage } from "../src/client.js";
 
 test("keeps the reason beside the code when a route sends both", () => {
   // The retry gates answer `{ error: "retry_not_safe", message: "…" }` on
-  // 409; an agent driving resolve_escalation needs the reason, not the code.
+  // 409; an agent needs the reason, not the code.
   assert.equal(
     formatApiErrorMessage(
       { error: "retry_not_safe", message: "This application may have been submitted. It needs operator review before retry." },

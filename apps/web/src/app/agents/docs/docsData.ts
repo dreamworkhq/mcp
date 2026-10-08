@@ -334,27 +334,6 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
     ],
   },
   {
-    id: "review",
-    title: "Candidate review",
-    blurb:
-      "Escalations route uncertain cases back to the candidate instead of silently applying with missing context.",
-    endpoints: [
-      {
-        method: "GET",
-        path: "/escalations",
-        description: "List pending items that need candidate attention.",
-        status: "stabilizing",
-      },
-      {
-        method: "POST",
-        path: "/escalations/:id/resolve",
-        description:
-          "Resolve an escalation with a retry, human takeover, or dismissal.",
-        status: "stabilizing",
-      },
-    ],
-  },
-  {
     id: "outreach",
     title: "Contacts and outreach",
     blurb:
@@ -599,7 +578,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_platform_context",
-    purpose: "Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach, escalation and interview capabilities, plus its product context.",
+    purpose: "Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach and interview capabilities, plus its product context.",
     calls: "MCP context",
   },
   {
@@ -656,11 +635,6 @@ export const MCP_TOOLS: McpTool[] = [
     name: "list_contacts",
     purpose: "Returns the account's saved recruiter and referrer contacts, optionally filtered by company.",
     calls: "GET /contacts",
-  },
-  {
-    name: "list_escalations",
-    purpose: "Returns pending account-owned application escalations requiring human attention.",
-    calls: "GET /escalations",
   },
   {
     name: "list_interviews",
@@ -721,11 +695,6 @@ export const MCP_TOOLS: McpTool[] = [
     name: "reply_to_recruiter",
     purpose: "Sends the supplied reply text to one existing recruiter conversation under the account holder's identity.",
     calls: "POST /assistant/actions/reply_to_recruiter",
-  },
-  {
-    name: "resolve_escalation",
-    purpose: "Closes one escalation by dismissing it or recording human_takeover.",
-    calls: "POST /escalations/:id/resolve",
   },
   {
     name: "restore_material",

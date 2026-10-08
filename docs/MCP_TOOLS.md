@@ -102,15 +102,13 @@ Tools that call a product route directly, with no registry action behind them. `
 | `get_application_materials` | `GET /applications/:id/pack` | Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. |
 | `get_generated_resumes` | `GET /applications/:id/resumes` | Returns tailored resumes generated for the specified account-owned application. |
 | `get_listing` | `GET /listings/:id` | Returns full details of a platform job listing identified by id. |
-| `get_platform_context` | `MCP context` | Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach, escalation and interview capabilities, plus its product context. |
+| `get_platform_context` | `MCP context` | Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach and interview capabilities, plus its product context. |
 | `get_profile` | `GET /profile` | Returns the authenticated account's profile, resume text, preferences and profileIdentityVersion snapshot. |
 | `get_stats` | `GET /stats` | Returns aggregate account-owned job, application, escalation and outreach statistics. |
 | `get_upgrade_link` | `GET /public/billing/upgrade-link` | Returns a browser link to checkout for the requested Pro or Dreamer plan and optional billing interval or promo code. |
 | `list_contacts` | `GET /contacts` | Returns the account's saved recruiter and referrer contacts, optionally filtered by company. |
-| `list_escalations` | `GET /escalations` | Returns pending account-owned application escalations requiring human attention. |
 | `list_interviews` | `GET /interviews` | Returns all interviews detected for the account, including role, company, time and platform when known. |
 | `reopen_application_materials` | `POST /applications/:id/materials/reopen` | Opens a new editable material revision only after the API establishes that a failed application cannot still submit. |
-| `resolve_escalation` | `POST /escalations/:id/resolve` | Closes one escalation by dismissing it or recording human_takeover. |
 | `update_application_materials` | `PATCH /applications/:id/materials` | Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision. |
 | `update_profile` | `PUT /profile` | Updates profile text fields such as name, email, phone and tone. |
 | `upload_resume` | `POST /profile/resume` | Uploads original resume-file bytes encoded as base64 with PDF, DOCX, TXT, MD, PNG, JPG, JPEG or WEBP format and the current profileIdentityVersion. |
