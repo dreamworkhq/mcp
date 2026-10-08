@@ -1,6 +1,6 @@
 {
   "version": "1.5.1",
-  "sourceCommit": "28afd285bef6c848a642d61860c2456e0f823e0c",
+  "sourceCommit": "76ec868fbf2a90be0776c103c8bb6f96db73576d",
   "managedFiles": [
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
@@ -14,6 +14,7 @@
     "apps/mcp/package.json",
     "apps/mcp/scripts/build.mjs",
     "apps/mcp/scripts/generate-tool-docs.ts",
+    "apps/mcp/scripts/release-notes.mjs",
     "apps/mcp/scripts/tool-docs.ts",
     "apps/mcp/scripts/verify-package.mjs",
     "apps/mcp/server.json",

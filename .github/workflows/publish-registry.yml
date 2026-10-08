@@ -124,3 +124,29 @@ jobs:
           done
           echo "::error::could not publish $name $VERSION within 10 minutes"
           exit 1
+  # A separate job so the one holding id-token gains no write permission. It
+  # runs only after npm and the registry accepted the release, and a re-run
+  # rewrites the notes of the release it already created.
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          node apps/mcp/scripts/release-notes.mjs "$TAG" > "$RUNNER_TEMP/release-notes.md"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+          else
+            gh release create "$TAG" --verify-tag --title "Dreamwork MCP ${TAG#mcp-v}" --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi
