@@ -205,6 +205,13 @@ could already do.
   logging goes to stderr.
 - **Every account tool says "No API key".** `DREAMWORK_API_KEY` isn't
   reaching the process. Confirm it's in the `env` block of your client config.
+- **Every account tool says "API key rejected".** The key reached the server,
+  but it has expired or been revoked. Create a new one under Profile, then MCP,
+  replace `DREAMWORK_API_KEY` with it, and restart your MCP client.
+- **Apply returns `missing_onboarding_fields` or `missing_profile_fields`.**
+  The tool reports the missing fields and the Dreamwork path that fixes each
+  one. Complete those details in Dreamwork before retrying; the failed request
+  has not started an application.
 
 ## Development
 
@@ -229,8 +236,3 @@ drift-checked against the registered tools by `test/tool-catalog.test.ts`.
 ## License
 
 MIT
-
-When an Apply request returns `missing_onboarding_fields` or
-`missing_profile_fields`, the tool reports the missing fields and the Dreamwork
-path that fixes each one. Complete those details in Dreamwork
-before retrying; the failed request has not started an application.

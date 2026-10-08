@@ -130,6 +130,18 @@ const AUTH_REQUIRED_MESSAGE = {
   ],
 };
 
+/** A key is configured, yet the API answered 401: it expired or was revoked. */
+const KEY_REJECTED_MESSAGE = {
+  error: "API key rejected",
+  message:
+    "Dreamwork rejected the configured API key. It may have expired or been revoked. Tell the person these steps:",
+  steps: [
+    "Create a new key at https://www.dreamworkhq.com under Profile, then MCP.",
+    "Replace DREAMWORK_API_KEY in the MCP client config with the new key.",
+    "Restart the MCP client so it picks up the key.",
+  ],
+};
+
 function mcpInstructions(distribution: "default" | "openai"): string {
   return `Dreamwork is a job-search product. These tools act on one person's own account: their matches, their pipeline, their materials, their recruiter mail.
 
@@ -257,6 +269,7 @@ function createDreamworkToolRegistrar(
   api: ApiClient,
   notices: UnreadNotices | null,
   authRequired: typeof AUTH_REQUIRED_MESSAGE,
+  authRejected: typeof AUTH_REQUIRED_MESSAGE,
   distribution: "default" | "openai",
 ): DreamworkToolRegistrar {
   return function registerDreamworkTool(name, definition) {
@@ -278,7 +291,7 @@ function createDreamworkToolRegistrar(
         return distribution === "openai" ? openAiToolResult(name, decorated) : decorated;
       } catch (err) {
         if (err instanceof AuthRequiredError) {
-          return errorResult(authRequired);
+          return errorResult(api.isAuthenticated ? authRejected : authRequired);
         }
         if (err instanceof ApiError) {
           const result = errorResult({ error: err.message });
@@ -451,7 +464,8 @@ export interface McpServerOptions {
    * What a tool tells the person when the API has no usable identity for this
    * caller. The default is written for the stdio CLI, where the fix is a key
    * in the client config; a hosted connector has no config to edit, so it
-   * passes text that says to reconnect instead.
+   * passes text that says to reconnect instead. When set, it also replaces
+   * the default text for a configured key the API rejected.
    */
   authRequiredMessage?: typeof AUTH_REQUIRED_MESSAGE;
 }
@@ -624,6 +638,7 @@ export function createMcpServer(
     api,
     notices,
     options.authRequiredMessage ?? AUTH_REQUIRED_MESSAGE,
+    options.authRequiredMessage ?? KEY_REJECTED_MESSAGE,
     distribution,
   );
 

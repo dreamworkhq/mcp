@@ -93,14 +93,16 @@ test("get_stats requires auth: guest mode returns key guidance without calling t
   }
 });
 
-test("API 401 surfaces as the sanitized login-required error", async () => {
+test("API 401 on a configured key says the key was rejected, not missing", async () => {
   const restore = stubFetch({ status: 401, body: { error: "unauthorized" } });
   try {
     const api = new ApiClient("https://api.example.test", "sk_expired");
     const { client, close } = await connectPair(api);
     const result = await client.callTool({ name: "get_stats", arguments: {} });
     assert.equal(result.isError, true);
-    assert.match(firstText(result), /No API key/);
+    assert.match(firstText(result), /API key rejected/);
+    assert.match(firstText(result), /Profile, then MCP/);
+    assert.doesNotMatch(firstText(result), /No API key/);
     await close();
   } finally {
     restore();
