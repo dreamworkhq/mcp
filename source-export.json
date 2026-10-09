@@ -1,6 +1,6 @@
 {
-  "version": "1.5.1",
-  "sourceCommit": "4e3a92fa6e8f32f8147e74cf98691b74fa4b5d90",
+  "version": "1.5.2",
+  "sourceCommit": "1f57160b2a31cc6134ad3dceb9ad535a2f565feb",
   "managedFiles": [
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",

@@ -41,7 +41,7 @@ export const publicListingSchema = responseComponent(
     remoteType: z.string().nullable(),
     remoteEligibilityCountries: z.array(z.string()).nullable(),
     remoteEligibilitySource: z
-      .enum(["parsed", "ats", "application", "llm", "manual"])
+      .enum(["parsed", "ats", "application", "llm", "manual", "source_scope"])
       .nullable(),
     remoteEligibilityConfidence: remoteEligibilityConfidence.nullable(),
     salary: z.string().nullable(),

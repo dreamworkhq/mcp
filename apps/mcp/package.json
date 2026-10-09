@@ -1,6 +1,6 @@
 {
   "name": "@dreamworkhq/mcp",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Job search, application materials, and application tracking for AI assistants.",
   "mcpName": "io.github.dreamworkhq/dreamwork",
   "type": "module",
