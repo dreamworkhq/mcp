@@ -39,7 +39,16 @@ const server = createMcpServer(
   api,
   unreadNoticesOff ? {} : { unreadNotices: {} },
 );
-const transport = new StdioServerTransport();
+// SDK 1.31's stdio transport stops reading at 10 MiB. upload_resume sends the
+// file as base64, and a file at PROFILE_DOCUMENT_MAX_BYTES (10 MiB) encodes
+// to about 13.4 MiB before the JSON-RPC envelope. The API accepts that
+// encoded body up to UPLOAD_ROUTE_BODY_LIMIT_BYTES (20 MiB). One mebibyte
+// above that body limit fits the envelope; a larger frame is past what the
+// route will accept.
+const STDIO_MAX_BUFFER_SIZE = 21 * 1024 * 1024;
+const transport = new StdioServerTransport(process.stdin, process.stdout, {
+  maxBufferSize: STDIO_MAX_BUFFER_SIZE,
+});
 
 await server.connect(transport);
 console.error(
