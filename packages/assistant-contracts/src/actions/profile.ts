@@ -106,6 +106,13 @@ const preferencesPatchSchema = z
       .optional()
       .describe("`null` withdraws it, which stops applications until it is answered again."),
     dealBreakers: z.array(z.string().max(200)).max(10).optional(),
+    excludedCompanies: z
+      .array(z.string().trim().min(1).max(120))
+      .max(50)
+      .optional()
+      .describe(
+        "Companies never to show in matches, job alerts or Autopilot. A name hides that company, the companies it owns, the parent brand of a division (`Walmart Global Tech` hides `Walmart`) and longer company names that begin with it (`Amazon` hides `Amazon Web Services`), so use the shortest name that is still specific. A name with no Latin letters or digits, or made only of legal forms like `Inc`, is refused. This REPLACES the list: to add one, include the current ones from get_preferences. It does not block a manual apply or remove saved jobs.",
+      ),
     coverLettersEnabled: z.boolean().optional(),
     // One level, because matching reads one: the overlay takes the first entry
     // and the profile editor is a single-select. A second entry would be
@@ -140,6 +147,7 @@ const storedPreferencesSchema = z
     compensation: compensationSchema.optional(),
     availability: availabilitySchema.optional(),
     dealBreakers: z.array(z.string()).optional(),
+    excludedCompanies: z.array(z.string()).optional(),
     coverLettersEnabled: z.boolean().optional(),
     seniorities: z.array(z.string()).optional(),
     aiRoleInterest: aiRoleInterestSchema.optional(),
@@ -445,7 +453,7 @@ export const profileActions = [
     risk: "read",
     title: "Read job preferences",
     description:
-      "Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, the level they match at, appetite for AI-centred roles, and whether cover letters are on. It also names the keys they have never answered, which is what makes a weak feed explicable. Read it before changing any of it and before explaining why their matches look the way they do. Resume content and work history are `get_career_record`.",
+      "Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, excluded companies, the level they match at, appetite for AI-centred roles, and whether cover letters are on. It also names the keys they have never answered, which is what makes a weak feed explicable. Read it before changing any of it and before explaining why their matches look the way they do. Resume content and work history are `get_career_record`.",
     input: z.object({}),
     output: z.object({
       preferences: storedPreferencesSchema,
@@ -460,7 +468,7 @@ export const profileActions = [
     mcp: {
       expose: true,
       description:
-        "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, seniority, AI-role interest and cover-letter settings. unanswered identifies preference keys the account holder has not supplied. It does not return resume content or work history.",
+        "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, seniority, AI-role interest and cover-letter settings. unanswered identifies preference keys the account holder has not supplied. It does not return resume content or work history.",
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -472,7 +480,7 @@ export const profileActions = [
     risk: "cheap",
     title: "Update job preferences",
     description:
-      "Change the person's stated preferences as a merge patch: send only the keys that change. Salary belongs to `compensation` as a `minimum` with an amount, an ISO-4217 currency and a period; nowhere else stores pay the matcher reads. `seniorities` takes one level and overrides the resume, and `[]` hands that back to it. A change here re-runs matching, so the feed moves. Read `get_preferences` first before touching work modes or relocation: those two are stored as one group, so a patch omitting one carries the stored value forward. Do NOT send keys they did not mention, and do NOT infer a pay floor from a salary they admired on a listing.",
+      "Change the person's stated preferences as a merge patch: send only the keys that change. Salary belongs to `compensation` as a `minimum` with an amount, an ISO-4217 currency and a period; nowhere else stores pay the matcher reads. `seniorities` takes one level and overrides the resume, and `[]` hands that back to it. `excludedCompanies` hides a company from matches, job alerts and Autopilot. A change here re-runs matching, so the feed moves. Read `get_preferences` first before touching work modes or relocation: those two are stored as one group, so a patch omitting one carries the stored value forward. Do NOT send keys they did not mention, and do NOT infer a pay floor from a salary they admired on a listing.",
     input: z.object({
       patch: preferencesPatchSchema,
     }),
@@ -484,7 +492,7 @@ export const profileActions = [
     mcp: {
       expose: true,
       description:
-        "Merges the supplied preference fields into the account's stored preferences and refreshes matching. compensation.kind is open or minimum; minimum requires minimumAmount, an ISO-4217 currency and an hour or year period. seniorities accepts one override level; an empty list restores resume-derived seniority. Work modes and relocation are stored together, with omitted values preserved.",
+        "Merges the supplied preference fields into the account's stored preferences and refreshes matching. compensation.kind is open or minimum; minimum requires minimumAmount, an ISO-4217 currency and an hour or year period. seniorities accepts one override level; an empty list restores resume-derived seniority. excludedCompanies replaces the list of companies hidden from matches, alerts and Autopilot. Work modes and relocation are stored together, with omitted values preserved.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,

@@ -17,7 +17,7 @@ const careerPreferencesSchema = profileResponseSchema.shape.profile.shape.prefer
   roles: true, salaryMin: true, salaryMax: true, preferredLocations: true,
   preferredPlaces: true, functions: true, acceptedWorkModes: true,
   willingToRelocate: true, remotePreference: true, remote: true,
-  dealBreakers: true, coverLettersEnabled: true,
+  dealBreakers: true, excludedCompanies: true, coverLettersEnabled: true,
 }).strip();
 
 const careerProfileSchema = profileResponseSchema.shape.profile.pick({

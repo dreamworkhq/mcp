@@ -583,7 +583,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_preferences",
-    purpose: "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, seniority, AI-role interest and cover-letter settings.",
+    purpose: "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, seniority, AI-role interest and cover-letter settings.",
     calls: "POST /assistant/actions/get_preferences",
   },
   {

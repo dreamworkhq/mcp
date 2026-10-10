@@ -761,6 +761,8 @@ export const profilePreferencesSchema = responseComponent(
     remotePreference: z.enum(["REMOTE", "ONSITE"]).nullable().optional(),
     remote: z.boolean().optional(),
     dealBreakers: z.array(z.string()).optional(),
+    /** Company names never shown in matches, alerts or Autopilot (engine/own-employer.ts). */
+    excludedCompanies: z.array(z.string()).optional(),
     address: z.string().optional(),
     mailingAddress: mailingAddressSchema.optional(),
     applicationProfile: applicationProfileSchema.optional(),
