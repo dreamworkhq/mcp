@@ -214,7 +214,6 @@ const DREAMWORK_PLATFORM_CONTEXT: z.output<typeof platformContextSchema> = {
     "Dreamwork keeps one candidate's job search over time. Prefer actions that improve recommendations, pipeline state, application outcomes, reply handling and stored candidate context over one-off searches.",
 };
 
-// ─── First-party registration convention ──────────────────────────────
 
 interface DreamworkToolDefinition<InputShape extends z.ZodRawShape> {
   /** Human-readable display name shown by MCP clients. */
@@ -325,7 +324,6 @@ function createDreamworkToolRegistrar(
   };
 }
 
-// ─── Registry-generated tools ─────────────────────────────────────────
 
 /**
  * What `POST /assistant/actions/:id` answers. The route is ours, so this is
@@ -423,7 +421,6 @@ function heldResult(
   return result;
 }
 
-// ─── Unread recruiter mail notices ────────────────────────────────────
 
 /**
  * Tools that are already about the inbox. A notice beside them would repeat
@@ -642,8 +639,6 @@ export function createMcpServer(
     distribution,
   );
 
-  // ─── Registry actions ─────────────────────────────────────────────
-  //
   // One tool per exposed data action, generated from
   // `packages/assistant-contracts`, the same registry the site assistant and
   // the agent docs are generated from. The action id IS the tool name, the
@@ -731,7 +726,6 @@ export function createMcpServer(
     });
   }
 
-  // ─── Platform Context ─────────────────────────────────────────────
 
   registerDreamworkTool("get_platform_context", {
     title: "Get platform context",
@@ -751,7 +745,6 @@ export function createMcpServer(
     }),
   });
 
-  // ─── Jobs (auth required) ────────────────────────────────────────
 
   registerDreamworkTool("add_jobs", {
     title: "Add job manually",
@@ -774,7 +767,6 @@ export function createMcpServer(
     handler: async (args) => json(await api.post("/jobs", args)),
   });
 
-  // ─── Applications (auth required) ───────────────────────────────
 
   registerDreamworkTool("get_application_materials", {
     title: "Get application materials",
@@ -880,7 +872,6 @@ export function createMcpServer(
     },
   });
 
-  // ─── Resume (auth required) ─────────────────────────────────────
 
   registerDreamworkTool("generate_resume", {
     title: "Generate tailored resume",
@@ -913,7 +904,6 @@ export function createMcpServer(
       json(withoutInlineFiles(await api.get(`/applications/${args.applicationId}/resumes`))),
   });
 
-  // ─── Contacts & Outreach (auth required) ────────────────────────
 
   registerDreamworkTool("add_contact", {
     title: "Add contact",
@@ -970,7 +960,6 @@ export function createMcpServer(
     handler: async (args) => json(await api.post("/outreach/generate", args)),
   });
 
-  // ─── Profile (auth required) ────────────────────────────────────
 
   registerDreamworkTool("get_profile", {
     title: "Get profile",
@@ -1087,7 +1076,6 @@ export function createMcpServer(
       ),
   });
 
-  // ─── Stats (auth required) ──────────────────────────────────────
 
   registerDreamworkTool("get_stats", {
     title: "Get pipeline stats",
@@ -1106,7 +1094,6 @@ export function createMcpServer(
       ),
   });
 
-  // ─── Interviews (auth required) ─────────────────────────────────
 
   registerDreamworkTool("list_interviews", {
     title: "List interviews",
@@ -1118,7 +1105,6 @@ export function createMcpServer(
     handler: async () => json(await api.get("/interviews")),
   });
 
-  // ─── Listings (public) ─────────────────────────────────────────
 
   registerDreamworkTool("browse_listings", {
     title: "Browse job listings",

@@ -198,7 +198,6 @@ test("a holdable registry tool advertises no output schema and takes a confirmat
   }
 });
 
-// ── Documented-catalog drift checks ─────────────────────────────────────
 
 /**
  * The README's catalog is the generated block and nothing else. Scanning the

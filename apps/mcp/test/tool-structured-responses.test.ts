@@ -67,7 +67,6 @@ async function callWithStub(
   }
 }
 
-// ── Fixtures: one valid wire payload per canonical response schema ──────
 
 const UUID_A = "123e4567-e89b-42d3-a456-426614174000";
 const UUID_B = "123e4567-e89b-42d3-a456-426614174001";
@@ -219,7 +218,6 @@ test("untyped resume and profile proxies withhold PDFs and data: URIs at any dep
   });
 });
 
-// ── Additive compatibility ─────────────────────────────────────────────
 
 test("unknown additive success fields are accepted and stripped everywhere", async () => {
   const result = await callWithStub(
@@ -244,7 +242,6 @@ test("unknown additive success fields are accepted and stripped everywhere", asy
   );
 });
 
-// ── browse_listings: paging and refused filters ────────────────────────
 
 /**
  * Several calls on one connection against a scripted API, recording the path
@@ -407,7 +404,6 @@ test("browse_listings refuses a filter the route could not apply", async () => {
   assert.equal(paths.length, 1);
 });
 
-// ── Fail-closed on malformed known fields ──────────────────────────────
 
 test("a malformed 200 fails closed as a sanitized isError result", async () => {
   const result = await callWithStub(
