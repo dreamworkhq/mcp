@@ -15,6 +15,8 @@ import {
 } from "./schemas/assistant-memory.js";
 import { z } from "zod";
 import {
+  billingCancellationReasonRequestSchema,
+  billingCancellationReasonResponseSchema,
   billingCheckoutRequestSchema,
   billingCheckoutResponseSchema,
   billingCheckoutErrorSchema,
@@ -257,6 +259,39 @@ export const operations: readonly OperationDescriptor[] = [
       "404": {
         description:
           "No application with that id is owned by the caller. Unknown, non-owned and malformed ids are indistinguishable.",
+        schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "recordBillingCancellationReason",
+    method: "post",
+    path: "/billing/cancellation-reason",
+    fastifyPath: "/billing/cancellation-reason",
+    summary: "Record why a subscriber is canceling",
+    description:
+      "Stores the caller's answer to the billing page's cancel question with their current Stripe subscription id, and reports the reason (never the free text) to PostHog under their profile id. It does not cancel anything: the cancellation itself happens afterwards in the Stripe portal. Each answer is a new row.",
+    tags: ["billing"],
+    auth: "user-session",
+    contractMaturity: "consumer-adopted",
+    requestBody: {
+      description: "The chosen reason and optional free text.",
+      contentType: "application/json",
+      required: true,
+      schema: billingCancellationReasonRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The answer is stored.",
+        schema: billingCancellationReasonResponseSchema,
+      },
+      "400": {
+        description: "Unknown reason, or free text longer than 2000 characters (`invalid_cancellation_reason`).",
+        schema: errorResponseSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "An API key; only the person in the app answers why they are leaving (`session_required`).",
         schema: errorResponseSchema,
       },
     },

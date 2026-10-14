@@ -258,3 +258,39 @@ export const billingDreamerUpgradeErrorSchema = responseComponent(
       "Upgrade refusal. `billing_upgrade_use_portal` means the subscription changes plans in the Stripe portal instead; `billing_payment_failed` carries the processor's message and nothing changed; `billing_payment_requires_action` means the card needs 3-D Secure, which this upgrade cannot run, and nothing changed.",
   },
 );
+
+export const billingCancellationReasonSchema = sharedComponent(
+  z.enum(["got_job", "applications_not_sent", "matches_wrong", "too_expensive", "other"]),
+  {
+    id: "BillingCancellationReason",
+    description:
+      "Why a subscriber is canceling, as answered on the billing page before the Stripe cancel screen opens. `got_job` is success churn; `applications_not_sent` and `matches_wrong` are the two product failures.",
+  },
+);
+
+export type BillingCancellationReason = z.infer<typeof billingCancellationReasonSchema>;
+
+export const billingCancellationReasonRequestSchema = requestComponent(
+  z.strictObject({
+    reason: billingCancellationReasonSchema,
+    detail: z
+      .string()
+      .max(2000)
+      .optional()
+      .describe("The subscriber's own words. The billing page sends it with `other`; it is stored as written and never sent to analytics."),
+  }),
+  {
+    id: "BillingCancellationReasonRequest",
+    description: "One answer to the cancel question.",
+  },
+);
+
+export const billingCancellationReasonResponseSchema = responseComponent(
+  z.strictObject({
+    recorded: z.literal(true),
+  }),
+  {
+    id: "BillingCancellationReasonResponse",
+    description: "The answer is stored. Nothing about the subscription changed.",
+  },
+);
