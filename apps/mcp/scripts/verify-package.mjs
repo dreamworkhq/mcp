@@ -96,7 +96,6 @@ function report(step) {
   console.log(`  ok  ${step}`);
 }
 
-// ── 1 & 2: the bundle itself ───────────────────────────────────────────
 
 if (!existsSync(bundlePath)) {
   console.error(
@@ -150,7 +149,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-// ── 3: npm pack contents ───────────────────────────────────────────────
 
 const workDir = mkdtempSync(join(tmpdir(), "dreamwork-mcp-package-proof-"));
 let exitCode = 0;
@@ -174,7 +172,6 @@ try {
 
   const tarball = join(workDir, packed.filename);
 
-  // ── 4: clean install, no workspace to fall back on ───────────────────
 
   const installDir = join(workDir, "install");
   mkdirSync(installDir, { recursive: true });
@@ -221,7 +218,6 @@ try {
     throw new Error(`installed entry point is missing: ${installedEntryPath}`);
   }
 
-  // ── 5 & 6: handshake over the installed bin, stdout purity ───────────
 
   const stdout = await runHandshake(installedEntryPath);
   const lines = stdout.split("\n").filter((line) => line.trim() !== "");
