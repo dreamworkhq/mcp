@@ -46,7 +46,7 @@ export const DOC_PAGES: DocPage[] = [
     title: "Agent docs",
     eyebrow: "Start",
     summary:
-      "How Dreamwork exposes the long-term job-search intelligence layer to agents.",
+      "Set up Dreamwork in Claude Code, Cursor, Claude or ChatGPT and apply to jobs from your own agent.",
   },
   {
     slug: "quickstart",
