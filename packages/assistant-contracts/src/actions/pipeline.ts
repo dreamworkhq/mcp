@@ -119,26 +119,54 @@ export const pipelineActions = [
     risk: "cheap",
     title: "Record an application made elsewhere",
     description:
-      "Record that the person applied to this role themselves, outside Dreamwork. Requires `attestation: true` — them stating they really did — because this writes 'applied' into a record the product later reports as truth and nothing else can verify it. The record is stamped now and cannot be backdated, so do not promise a date they named, and there is no undo. Do NOT use it for an application Dreamwork itself sent, and do NOT set the attestation yourself: if they have not said they applied, ask.",
-    input: z.object({
-      matchId: z.string(),
-      attestation: z
-        .literal(true)
-        .describe(
-          "The person stated they applied to this role themselves. Never assumed.",
-        ),
-    }),
+      "Record that the person applied to a role themselves, outside Dreamwork, so the role stops coming back in their matches and Autopilot never applies to it again. Name the role with exactly one of `matchId` (a board card), `listingId` (any Dreamwork listing, saved or not, open or closed) or `url` (the posting, for a role Dreamwork does not list, whose details are then read in the background). A role not on the board is added to it in Applied; nothing is written for it and no allowance is spent. `appliedAt` is the date they say they applied; leave it out only when they applied today or did not say, and never invent one. Recording again with a different `appliedAt` corrects the date. Requires `attestation: true` — them stating they really did — because this writes 'applied' into a record the product later reports as truth and nothing else can verify it. There is no undo. An application Dreamwork is still sending is refused; one it already sent is left as it is. Do NOT use it for an application Dreamwork sent, and do NOT set the attestation yourself: if they have not said they applied, ask.",
+    input: z
+      .object({
+        matchId: z
+          .string()
+          .optional()
+          .describe("Board card id from `get_pipeline`."),
+        listingId: z
+          .string()
+          .optional()
+          .describe(
+            "Dreamwork listing id, from `list_matches` or `get_job`. The role does not have to be saved.",
+          ),
+        url: z
+          .url()
+          .optional()
+          .describe("The job posting's URL, for a role Dreamwork does not list."),
+        appliedAt: z
+          .union([z.iso.date(), z.iso.datetime({ offset: true })])
+          .optional()
+          .describe(
+            "When they applied, as YYYY-MM-DD or an ISO 8601 timestamp. Not in the future. Omitted means now.",
+          ),
+        attestation: z
+          .literal(true)
+          .describe(
+            "The person stated they applied to this role themselves. Never assumed.",
+          ),
+      })
+      .refine(
+        (input) =>
+          [input.matchId, input.listingId, input.url].filter(
+            (value) => value !== undefined,
+          ).length === 1,
+        { message: "Send exactly one of `matchId`, `listingId` or `url`." },
+      ),
     output: receiptSchema,
     authorization: { mode: "receipt" },
     anchor: { route: "/applications", target: "pipeline.row:<id>" },
-    invalidates: ["pipeline"],
+    invalidates: ["pipeline", "matches"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
       expose: true,
       description:
-        "Records an application the account holder submitted outside Dreamwork. attestation:true is required and represents the person's confirmation that submission occurred. The record is stamped at the current time, cannot be backdated and has no undo. This call does not send an application.",
+        "Records an application the account holder submitted outside Dreamwork. Exactly one of matchId, listingId or url names the role; a role not yet in the pipeline is added in Applied without generating materials, and an unlisted URL is imported in the background. appliedAt (YYYY-MM-DD or ISO 8601, not in the future) is the reported application date and defaults to now; repeating the call with a new appliedAt corrects it. attestation:true is required and represents the person's confirmation that submission occurred. Recorded roles are excluded from matches and Autopilot. Applications Dreamwork is still sending are refused. There is no undo. This call does not send an application.",
       readOnlyHint: false,
-      openWorldHint: false,
+      // An unlisted URL is fetched in the background to read the posting.
+      openWorldHint: true,
       destructiveHint: false,
     },
   }),

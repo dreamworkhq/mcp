@@ -93,13 +93,19 @@ const preferencesPatchSchema = z
       .max(5)
       .optional()
       .describe("Where they want to work, not where they live."),
-    acceptedWorkModes: z.array(workModeSchema).min(1).optional(),
+    acceptedWorkModes: z
+      .array(workModeSchema)
+      .min(1)
+      .optional()
+      .describe(
+        "Every work setting they accept. Autopilot never applies outside it, and for someone who works only remotely it skips a listing that states no setting.",
+      ),
     willingToRelocate: z.boolean().optional(),
     compensation: compensationSchema
       .nullable()
       .optional()
       .describe(
-        "The person's pay floor. This is where salary lives. `null` withdraws it, which stops applications until it is answered again.",
+        "The person's pay floor. This is where salary lives. Autopilot never applies to a role whose posted pay tops out below an annual floor; a role that posts no pay is still judged on the rest. `null` withdraws it, which stops applications until it is answered again.",
       ),
     availability: availabilitySchema
       .nullable()
@@ -110,7 +116,7 @@ const preferencesPatchSchema = z
       .max(10)
       .optional()
       .describe(
-        "Free-text notes the fit check and job alerts weigh. They do NOT remove matches: a short term of three words or less, such as an industry, only ranks listings whose title, company or industry contains it lower. A rule that must filter goes in its own key: a company in `excludedCompanies`, a level in `seniorities`, pay in `compensation`, work setting in `acceptedWorkModes`, places in `preferredLocations`.",
+        "Free-text notes the fit check reads in each posting. They do not hide matches: a term of three words or fewer, such as an industry, only ranks listings whose title, company or industry contains it lower. Job alerts and Autopilot skip a role when the fit check finds a deal-breaker in it, but that is a model's reading, not a rule. A rule that must hold goes in its own key: a company in `excludedCompanies`, a place in `excludedPlaces`, a level in `excludedSeniorities`, pay in `compensation`, work setting in `acceptedWorkModes`. When a deal-breaker names one of those, offer to set the key instead.",
       ),
     excludedCompanies: z
       .array(z.string().trim().min(1).max(120))
@@ -118,6 +124,13 @@ const preferencesPatchSchema = z
       .optional()
       .describe(
         "Companies never to show in matches, job alerts or Autopilot. A name hides that company, the companies it owns, the parent brand of a division (`Walmart Global Tech` hides `Walmart`) and longer company names that begin with it (`Amazon` hides `Amazon Web Services`), so use the shortest name that is still specific. A name with no Latin letters or digits, or made only of legal forms like `Inc`, is refused. This REPLACES the list: to add one, include the current ones from get_preferences. It does not block a manual apply or remove saved jobs.",
+      ),
+    excludedPlaces: z
+      .array(z.string().trim().min(1).max(160))
+      .max(20)
+      .optional()
+      .describe(
+        "Places never to show in matches, job alerts or Autopilot: each a city, a state or region, or a country, as the person names it (`Kirkland`, `Bellevue, WA`, `California`). A city hides that city only, not its metro, so list each suburb. Remote roles are never hidden by a place. A name that cannot be placed refuses the whole write and names it, so ask which city they mean (`Eastside` is not a place; `Bellevue`, `Redmond` and `Kirkland` are). This REPLACES the list: to add one, include the current ones from get_preferences.",
       ),
     coverLettersEnabled: z.boolean().optional(),
     // One level, because matching reads one: the overlay takes the first entry
@@ -128,7 +141,14 @@ const preferencesPatchSchema = z
       .max(1)
       .optional()
       .describe(
-        "The level to match at, as a one-item list. `[]` drops back to the level read off the resume.",
+        "The level to match at, as a one-item list. It ranks roles; it hides none. `[]` drops back to the level read off the resume. To keep roles at other levels out of matches and Autopilot, use `excludedSeniorities`.",
+      ),
+    excludedSeniorities: z
+      .array(senioritySchema)
+      .max(9)
+      .optional()
+      .describe(
+        "Levels never to show in matches, job alerts or Autopilot, such as `[\"STAFF\", \"PRINCIPAL\"]` for someone who wants senior roles and nothing above. A role whose level is not classified is not hidden. This REPLACES the list; `[]` clears it.",
       ),
     aiRoleInterest: aiRoleInterestSchema
       .optional()
@@ -154,6 +174,8 @@ const storedPreferencesSchema = z
     availability: availabilitySchema.optional(),
     dealBreakers: z.array(z.string()).optional(),
     excludedCompanies: z.array(z.string()).optional(),
+    excludedPlaces: z.array(z.string()).optional(),
+    excludedSeniorities: z.array(z.string()).optional(),
     coverLettersEnabled: z.boolean().optional(),
     seniorities: z.array(z.string()).optional(),
     aiRoleInterest: aiRoleInterestSchema.optional(),
@@ -459,7 +481,7 @@ export const profileActions = [
     risk: "read",
     title: "Read job preferences",
     description:
-      "Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, excluded companies, the level they match at, appetite for AI-centred roles, and whether cover letters are on. It also names the keys they have never answered, which is what makes a weak feed explicable. Read it before changing any of it and before explaining why their matches look the way they do. Resume content and work history are `get_career_record`.",
+      "Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, the level they match at, appetite for AI-centred roles, and whether cover letters are on. It also names the keys they have never answered, which is what makes a weak feed explicable. Read it before changing any of it and before explaining why their matches look the way they do. Resume content and work history are `get_career_record`.",
     input: z.object({}),
     output: z.object({
       preferences: storedPreferencesSchema,
@@ -474,7 +496,7 @@ export const profileActions = [
     mcp: {
       expose: true,
       description:
-        "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, seniority, AI-role interest and cover-letter settings. unanswered identifies preference keys the account holder has not supplied. It does not return resume content or work history.",
+        "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, seniority, AI-role interest and cover-letter settings. unanswered identifies preference keys the account holder has not supplied. It does not return resume content or work history.",
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -486,7 +508,7 @@ export const profileActions = [
     risk: "cheap",
     title: "Update job preferences",
     description:
-      "Change the person's stated preferences as a merge patch: send only the keys that change. Salary belongs to `compensation` as a `minimum` with an amount, an ISO-4217 currency and a period; nowhere else stores pay the matcher reads. `seniorities` takes one level and overrides the resume, and `[]` hands that back to it; a level below the resume's also ranks higher-level roles lower. `excludedCompanies` hides a company from matches, job alerts and Autopilot. `dealBreakers` is free text that removes nothing, so never use it for a rule the matches must obey. A change here re-runs matching, so the feed moves. Read `get_preferences` first before touching work modes or relocation: those two are stored as one group, so a patch omitting one carries the stored value forward. Do NOT send keys they did not mention, and do NOT infer a pay floor from a salary they admired on a listing.",
+      "Change the person's stated preferences as a merge patch: send only the keys that change. Salary belongs to `compensation` as a `minimum` with an amount, an ISO-4217 currency and a period; nowhere else stores pay the matcher reads. `seniorities` takes one level and overrides the resume, and `[]` hands that back to it; a level below the resume's also ranks higher-level roles lower. Autopilot applies only inside the accepted work settings and never where posted pay tops out below the floor. `excludedCompanies`, `excludedPlaces` and `excludedSeniorities` hide companies, places and levels from matches, job alerts and Autopilot. `dealBreakers` is free text that hides nothing, so never use it for a rule the matches must obey. A change here re-runs matching, so the feed moves. Read `get_preferences` first before touching work modes or relocation: those two are stored as one group, so a patch omitting one carries the stored value forward. Do NOT send keys they did not mention, and do NOT infer a pay floor from a salary they admired on a listing.",
     input: z.object({
       patch: preferencesPatchSchema,
     }),
@@ -498,7 +520,7 @@ export const profileActions = [
     mcp: {
       expose: true,
       description:
-        "Merges the supplied preference fields into the account's stored preferences and refreshes matching. compensation.kind is open or minimum; minimum requires minimumAmount, an ISO-4217 currency and an hour or year period. seniorities accepts one override level; an empty list restores resume-derived seniority. excludedCompanies replaces the list of companies hidden from matches, alerts and Autopilot. Work modes and relocation are stored together, with omitted values preserved.",
+        "Merges the supplied preference fields into the account's stored preferences and refreshes matching. compensation.kind is open or minimum; minimum requires minimumAmount, an ISO-4217 currency and an hour or year period. seniorities accepts one override level; an empty list restores resume-derived seniority. excludedCompanies, excludedPlaces and excludedSeniorities replace the lists of companies, places and levels hidden from matches, alerts and Autopilot; an excludedPlaces name that cannot be placed refuses the write. Autopilot never applies below the pay floor or outside the accepted work modes. Work modes and relocation are stored together, with omitted values preserved.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,
@@ -759,6 +781,61 @@ export const profileActions = [
       expose: true,
       description:
         "Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. The link opens without login for ten minutes and only for the file that existed when it was made. It returns no file content. status is ready, no_resume_on_file or no_file_for_resume; the last two carry null fields and are not errors.",
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
+  }),
+  defineAction({
+    id: "get_resume_work_history",
+    kind: "data",
+    risk: "read",
+    title: "Read how the resume's experience was understood",
+    description:
+      "How Dreamwork reads the person's main resume, role by role: each employer with the bullets placed under it, read from the file's page layout, plus `unattributed`, the achievements it places under no role. Tailored resumes, cover letters and answers attach achievements to employers by this grouping, so read it before preparing applications for someone whose resume might be laid out in columns, and tell them when it looks wrong. `unattributed` is not empty, or `bulletsOutOfTextOrder` is above zero: say so, show them the lines, and point them to the Resume section of their profile to check it. `status` is `pending` while it is still being read (call again in about twenty seconds) and `unavailable` when there is no resume or it could not be read; neither is an error.",
+    input: z.object({}),
+    output: z.object({
+      status: z
+        .enum(["ready", "pending", "unavailable"])
+        .describe(
+          "`ready` carries the grouping. `pending` and `unavailable` carry empty lists.",
+        ),
+      source: z
+        .enum(["pdf", "text"])
+        .nullable()
+        .describe(
+          "`pdf` when read from the uploaded file's layout, `text` when only the extracted text was available (a DOCX, or a file too large to read as pages).",
+        ),
+      derivedAt: z.string().nullable(),
+      roles: z.array(
+        z.object({
+          employer: z.string(),
+          title: z.string().nullable(),
+          location: z.string().nullable(),
+          period: z.string().nullable(),
+          bullets: z.array(z.string()),
+        }),
+      ),
+      unattributed: z
+        .array(z.string())
+        .describe(
+          "Achievements the resume lists under no role, such as a Key Achievements section, or lines the layout left unplaced. Generated materials never attach these to an employer.",
+        ),
+      bulletsOutOfTextOrder: z
+        .number()
+        .int()
+        .nonnegative()
+        .describe(
+          "How many bullets the resume's extracted text places under a different role than its page layout does, which usually means a two-column file. Zero means none detected.",
+        ),
+    }),
+    authorization: { mode: "none" },
+    anchor: { route: "/profile", target: "profile.about" },
+    invalidates: [],
+    event: ASSISTANT_EVENTS.ACTION_COMPLETED,
+    mcp: {
+      expose: true,
+      description:
+        "Returns the account's main resume grouped by role: each employer with its title, location, dates and bullets as read from the file's page layout, plus achievements placed under no role and a count of bullets whose extracted-text position disagrees with the layout. status is ready, pending (still being read; call again shortly) or unavailable (no resume, or it could not be read).",
       readOnlyHint: true,
       openWorldHint: false,
     },

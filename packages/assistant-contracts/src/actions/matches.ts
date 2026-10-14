@@ -106,6 +106,21 @@ const appliedMatchFilters = z
 const MATCH_PAGE_SIZE_DEFAULT = 10;
 const MATCH_PAGE_SIZE_MAX = 50;
 
+/**
+ * How long a dismissal's receipt offers its undo. As long as `move_pipeline`'s
+ * for the same reason: "put that back" is spoken, and a spoken round trip does
+ * not fit in eight seconds. `restore_match` stays available after it closes.
+ */
+const DISMISS_UNDO_WINDOW_MS = 60_000;
+
+/**
+ * `list_dismissed_matches` page sizes. The default equals
+ * `DISMISSED_LISTINGS_DEFAULT_LIMIT` in `apps/api/src/api/sources.ts`, which
+ * applies it; this package imports nothing from `apps/*`.
+ */
+const DISMISSED_PAGE_SIZE_DEFAULT = 20;
+const DISMISSED_PAGE_SIZE_MAX = 50;
+
 export const matchesActions = [
   defineAction({
     id: "list_matches",
@@ -214,18 +229,27 @@ export const matchesActions = [
     }),
     output: z.object({
       jobs: z.array(matchedJobSchema),
-      /** Every job these filters keep in the pool, across all pages. */
-      total: z.int(),
-      /** True when filters excluded every candidate, which is a real answer. */
-      filteredToEmpty: z.boolean(),
+      total: z
+        .int()
+        .describe(
+          "Jobs these filters keep, across all pages. Following every nextCursor returns this many while poolChanged stays false.",
+        ),
+      filteredToEmpty: z
+        .boolean()
+        .describe(
+          "True when this call's filters left none of the poolSize jobs. total 0 with this false means the pool itself is empty or still building.",
+        ),
       nextCursor: z.string().nullable(),
       /**
        * "building" while the pool is still being computed or refreshed: the
        * page can be empty or provisional, which is not "no jobs".
        */
       poolStatus: z.enum(["ready", "building"]),
-      /** The person's matches before this call's filters. */
-      poolSize: z.int(),
+      poolSize: z
+        .int()
+        .describe(
+          "Jobs a walk of this pool returns before this call's filters narrow it, so it equals total when no filter is set. Dismissed and saved roles, excluded companies and same-company same-title duplicates are already left out, and so are onsite roles outside the area of someone who will not relocate, unless location or workSettings is set. query, functions and location also choose which pool is built.",
+        ),
       /** The pool changed since the cursor's page, so a job can repeat or be skipped. */
       poolChanged: z.boolean(),
       appliedFilters: appliedMatchFilters,
@@ -300,7 +324,7 @@ export const matchesActions = [
     risk: "cheap",
     title: "Save a job",
     description:
-      "Put a role into the person's pipeline at SAVED. Saving prepares nothing and sends nothing — it is the bookmark that makes a role available to `generate_pack` and `apply`. Saving a role that is already saved is a no-op receipt, not an error. Do NOT use it as a step they did not ask for: if they asked to apply, call `apply`, which saves as part of its own work.",
+      "Put a role into the person's pipeline at SAVED. It is a bookmark: it sends nothing and requests no application, and the role waits in SAVED until they apply or record that they applied elsewhere. Saving may also start writing application materials for the role in the background, so `generate_pack` can find them ready. Saving a role that is already saved is a no-op receipt, not an error. Do NOT use it as a step they did not ask for: if they asked to apply, call `apply`, which saves as part of its own work.",
     input: z.object({
       jobId: z.string().describe("Listing id or private-job id."),
     }),
@@ -312,7 +336,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        "Saves one role to the account's pipeline at SAVED. Saving does not generate materials or submit an application. An already saved role returns a no-op receipt.",
+        "Saves one role to the account's pipeline at SAVED as a bookmark. No application is submitted or queued until apply is called. Application materials may start preparing in the background. An already saved role returns a no-op receipt.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,
@@ -325,9 +349,9 @@ export const matchesActions = [
     risk: "cheap",
     title: "Dismiss a match",
     description:
-      "Hide one role from the person's feed, job alerts and Autopilot. It hides that one listing only and does not change which roles are matched later: other roles at the same company keep appearing, so a company they never want goes in `update_preferences.excludedCompanies`, and a level they never want goes in `seniorities`. There is no undo here; the listing comes back if they save it. Do NOT dismiss a role they merely declined to act on right now, and do NOT dismiss in bulk to 'clean up' a feed nobody complained about. Taking something off the applications board is `move_pipeline`: this would hide the listing and leave the card exactly where it was.",
+      "Hide one role from the person's feed, job alerts and Autopilot. It hides that one listing only and does not change which roles are matched later: other roles at the same company keep appearing, so a company they never want goes in `update_preferences.excludedCompanies`, and a level they never want goes in `excludedSeniorities`. The receipt offers an undo for a minute; after that, `restore_match` brings the role back at any time, and `list_dismissed_matches` lists what they have dismissed. Do NOT dismiss a role they merely declined to act on right now, and do NOT dismiss in bulk to 'clean up' a feed nobody complained about. Taking something off the applications board is `move_pipeline`: this would hide the listing and leave the card exactly where it was.",
     input: z.object({
-      jobId: z.string(),
+      jobId: z.string().describe("Listing id from the feed or `list_matches`."),
       reason: z
         .string()
         .max(200)
@@ -337,17 +361,91 @@ export const matchesActions = [
         ),
     }),
     output: receiptSchema,
-    authorization: { mode: "receipt" },
+    authorization: { mode: "receipt", undoWindowMs: DISMISS_UNDO_WINDOW_MS },
     anchor: { route: "/", target: "matches.card:<id>" },
     invalidates: ["matches"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
       expose: true,
       description:
-        "Hides one listing from the account's match feed, job alerts and Autopilot until the account saves it. The supplied reason is not stored. It does not hide other listings from the same company and does not move or remove an existing pipeline card.",
+        "Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it. The receipt offers undo for one minute; restore_match reverses it at any time and list_dismissed_matches lists dismissed listings. The supplied reason is not stored. It does not hide other listings from the same company and does not move or remove an existing pipeline card.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: true,
+      destructiveHint: false,
+    },
+  }),
+
+  defineAction({
+    id: "restore_match",
+    kind: "data",
+    risk: "cheap",
+    title: "Restore a dismissed match",
+    description:
+      "Take back a dismissal, at any time: the role can appear in the person's feed, job alerts and Autopilot again. Take the id from `list_dismissed_matches` or the `dismiss_match` receipt. Restoring a role that is not dismissed is a no-op receipt, not an error. It saves nothing; bookmarking the role is `save_job`. A role dismissed long ago comes back once the person's match pool is next rebuilt, and a listing the employer has closed stays out of the feed, so say that rather than promising it is on screen now.",
+    input: z.object({
+      jobId: z
+        .string()
+        .describe("Listing id, as `dismiss_match` and `list_dismissed_matches` give it."),
+    }),
+    output: receiptSchema,
+    authorization: { mode: "receipt", undoWindowMs: DISMISS_UNDO_WINDOW_MS },
+    anchor: { route: "/", target: "matches.card:<id>" },
+    invalidates: ["matches"],
+    event: ASSISTANT_EVENTS.ACTION_COMPLETED,
+    mcp: {
+      expose: true,
+      description:
+        "Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot. Restoring a listing that is not dismissed returns a no-op receipt. Restoring does not save the listing. A closed listing stays out of the feed.",
+      readOnlyHint: false,
+      openWorldHint: false,
+      destructiveHint: false,
+    },
+  }),
+
+  defineAction({
+    id: "list_dismissed_matches",
+    kind: "data",
+    risk: "read",
+    title: "List dismissed matches",
+    description:
+      "List the roles the person has dismissed, newest first: per role its listing id, title, company, `url` (its page on Dreamwork), when it was dismissed, and `active`, which is false once the listing is no longer served (closed, expired or gone stale). Use it for \"what did I hide\" and to find the id `restore_match` takes. `total` counts every dismissed role; for the next page send `nextOffset` as `offset`, and null means done.",
+    input: z.object({
+      limit: z
+        .int()
+        .min(1)
+        .max(DISMISSED_PAGE_SIZE_MAX)
+        .optional()
+        .describe(`Page size, ${DISMISSED_PAGE_SIZE_DEFAULT} when omitted.`),
+      offset: z
+        .int()
+        .min(0)
+        .optional()
+        .describe("`nextOffset` from the previous page; 0 when omitted."),
+    }),
+    output: z.object({
+      matches: z.array(
+        z.object({
+          jobId: z.string(),
+          title: z.string(),
+          company: z.string(),
+          url: z.string().nullable(),
+          dismissedAt: z.string(),
+          /** False once the listing is no longer served anywhere. */
+          active: z.boolean(),
+        }),
+      ),
+      total: z.int(),
+      nextOffset: z.int().nullable(),
+    }),
+    authorization: { mode: "none" },
+    invalidates: [],
+    event: ASSISTANT_EVENTS.ACTION_COMPLETED,
+    mcp: {
+      expose: true,
+      description:
+        `Returns the account's dismissed listings, newest first, with listing id, title, company, Dreamwork page url, dismissal time and whether the listing is still active. total counts all dismissed listings. limit defaults to ${DISMISSED_PAGE_SIZE_DEFAULT} and accepts up to ${DISMISSED_PAGE_SIZE_MAX}; nextOffset continues the list and null ends it.`,
+      readOnlyHint: true,
+      openWorldHint: false,
     },
   }),
 ] as const;

@@ -42,7 +42,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `apply` | consequential | Submits one application to an employer under the account holder's name using the saved materials at expectedRevision. |
 | `cancel_apply` | cheap | Stops a queued or in-progress application when submission can still be prevented. |
 | `confirm_hypothesis` | cheap | Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis. |
-| `dismiss_match` | cheap | Hides one listing from the account's match feed, job alerts and Autopilot until the account saves it. |
+| `dismiss_match` | cheap | Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it. |
 | `edit_answer` | cheap | Revises one employer-question answer identified by questionId; other answers and documents remain unchanged. |
 | `edit_cover_letter` | cheap | Revises an existing application's cover letter using the supplied instruction. |
 | `edit_resume` | cheap | Revises one application's tailored resume using the supplied instruction, preserving its formatting and regenerating the PDF. |
@@ -53,20 +53,22 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_application_readiness` | read | Returns readiness for one-off submission and Autopilot, plan entitlement and missing onboarding answers. |
 | `get_application_status` | read | Returns an application's event timeline and separate submitted, employerConfirmed and replied facts. |
 | `get_autopilot_settings` | read | Returns the saved minimum Matches score and default-versus-tailored resume choice for Autopilot. |
-| `get_autopilot_status` | read | Returns Autopilot state, daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt. |
+| `get_autopilot_status` | read | Returns Autopilot state (on or off, matching the product switch, or unavailable when the plan does not include it), daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt, which is null unless the state is on. |
 | `get_career_record` | read | Returns resume-derived professional facts, document-vault metadata, person-stated preferences, writing preferences and unconfirmed hypotheses as separate fields. |
 | `get_communication_preferences` | read | Returns job-alert settings and cadence, Autopilot result-email mode, product-update consent and the all-optional-emails-off state. |
 | `get_inbox` | read | Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. |
 | `get_job` | read | Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. |
 | `get_pack_status` | read | Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. |
 | `get_pipeline` | read | Returns saved and applied roles as board cards with column, application id and last-updated time. |
-| `get_preferences` | read | Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, seniority, AI-role interest and cover-letter settings. |
+| `get_preferences` | read | Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, seniority, AI-role interest and cover-letter settings. |
 | `get_resume_download_link` | read | Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. |
+| `get_resume_work_history` | read | Returns the account's main resume grouped by role: each employer with its title, location, dates and bullets as read from the file's page layout, plus achievements placed under no role and a count of bullets whose extracted-text position disagrees with the layout. |
 | `get_task` | read | Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. |
 | `get_unread_reminders` | read | Returns unread recruiter-message and thread counts, oldest unread time and recent message previews with thread, company, role and kind. |
 | `get_updates_since` | read | Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. |
 | `get_usage` | read | Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time. |
 | `import_job` | async | Fetches a public job-posting URL and imports it as a private role in the account's pipeline. |
+| `list_dismissed_matches` | read | Returns the account's dismissed listings, newest first, with listing id, title, company, Dreamwork page url, dismissal time and whether the listing is still active. |
 | `list_matches` | read | Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. |
 | `list_tasks` | read | Returns recent account-owned assistant actions, newest first, across the site and MCP. |
 | `mark_applied_offsite` | cheap | Records an application the account holder submitted outside Dreamwork. |
@@ -77,10 +79,11 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `remember_hypothesis` | cheap | Stores an unconfirmed career hypothesis separately from established facts. |
 | `replace_application_document` | cheap | Replaces one application's resume or cover letter with the person's supplied text or raw-base64 PDF, DOCX, TXT or MD. |
 | `reply_to_recruiter` | consequential | Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. |
+| `restore_match` | cheap | Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot. |
 | `restore_material` | cheap | Restores a cover letter, tailored resume or answer to a recorded pre-edit version within its undo window. |
 | `save_application_answers` | cheap | Saves person-stated application-answer and contact groups through onboarding validation, then rechecks readiness and completes setup when no requirements remain. |
-| `save_job` | cheap | Saves one role to the account's pipeline at SAVED. |
-| `set_autopilot` | consequential | Sets Autopilot on, off or paused after explicit consent. |
+| `save_job` | cheap | Saves one role to the account's pipeline at SAVED as a bookmark. |
+| `set_autopilot` | consequential | Sets Autopilot on or off after explicit consent. |
 | `start_checkout` | consequential | Returns a checkout URL for the requested plan change after explicit consent. |
 | `strengthen_application` | async | Improves an application's existing materials against its role and recorded career evidence, spending one refine allowance per changed asset. |
 | `undo_last` | cheap | Reverses the latest action with an available undo, or the action identified by taskId. |

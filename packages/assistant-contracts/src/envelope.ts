@@ -387,7 +387,14 @@ export const contextEnvelopeSchema = z.object({
   materialsRevision: z.number().nullable(),
   tier: z.enum(["free", "pro", "dreamer"]),
   packsLeftToday: z.number().nullable(),
-  autopilot: z.enum(["off", "on", "paused", "unavailable"]),
+  /**
+   * The same three values `get_autopilot_status` reports. A browser still
+   * running a bundle from before off and pause were one state may send
+   * `paused`, which is read as `off` so its turns are not refused.
+   */
+  autopilot: z
+    .enum(["off", "on", "paused", "unavailable"])
+    .transform((state) => (state === "paused" ? "off" : state)),
   /** Action ids the attached browser can actually run from this surface. */
   availableActions: z.array(z.string()),
   voiceMinutesLeft: z.number().nullable(),

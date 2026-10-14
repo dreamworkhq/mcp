@@ -178,9 +178,17 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
         status: "stabilizing",
       },
       {
+        method: "DELETE",
+        path: "/listings/:id/dismiss",
+        description:
+          "Restore a hidden listing so it can return to the candidate's recommendations.",
+        status: "stabilizing",
+      },
+      {
         method: "GET",
         path: "/listings/dismissed",
-        description: "Return listings the candidate has hidden.",
+        description:
+          "Page through listings the candidate has hidden, newest first, with title, company and whether each is still active.",
         status: "stabilizing",
       },
     ],
@@ -463,7 +471,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "dismiss_match",
-    purpose: "Hides one listing from the account's match feed, job alerts and Autopilot until the account saves it.",
+    purpose: "Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it.",
     calls: "POST /assistant/actions/dismiss_match",
   },
   {
@@ -533,7 +541,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_autopilot_status",
-    purpose: "Returns Autopilot state, daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt.",
+    purpose: "Returns Autopilot state (on or off, matching the product switch, or unavailable when the plan does not include it), daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt, which is null unless the state is on.",
     calls: "POST /assistant/actions/get_autopilot_status",
   },
   {
@@ -583,7 +591,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_preferences",
-    purpose: "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, seniority, AI-role interest and cover-letter settings.",
+    purpose: "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, seniority, AI-role interest and cover-letter settings.",
     calls: "POST /assistant/actions/get_preferences",
   },
   {
@@ -595,6 +603,11 @@ export const MCP_TOOLS: McpTool[] = [
     name: "get_resume_download_link",
     purpose: "Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type.",
     calls: "POST /assistant/actions/get_resume_download_link",
+  },
+  {
+    name: "get_resume_work_history",
+    purpose: "Returns the account's main resume grouped by role: each employer with its title, location, dates and bullets as read from the file's page layout, plus achievements placed under no role and a count of bullets whose extracted-text position disagrees with the layout.",
+    calls: "POST /assistant/actions/get_resume_work_history",
   },
   {
     name: "get_stats",
@@ -635,6 +648,11 @@ export const MCP_TOOLS: McpTool[] = [
     name: "list_contacts",
     purpose: "Returns the account's saved recruiter and referrer contacts, optionally filtered by company.",
     calls: "GET /contacts",
+  },
+  {
+    name: "list_dismissed_matches",
+    purpose: "Returns the account's dismissed listings, newest first, with listing id, title, company, Dreamwork page url, dismissal time and whether the listing is still active.",
+    calls: "POST /assistant/actions/list_dismissed_matches",
   },
   {
     name: "list_interviews",
@@ -697,6 +715,11 @@ export const MCP_TOOLS: McpTool[] = [
     calls: "POST /assistant/actions/reply_to_recruiter",
   },
   {
+    name: "restore_match",
+    purpose: "Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot.",
+    calls: "POST /assistant/actions/restore_match",
+  },
+  {
     name: "restore_material",
     purpose: "Restores a cover letter, tailored resume or answer to a recorded pre-edit version within its undo window.",
     calls: "POST /assistant/actions/restore_material",
@@ -708,12 +731,12 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "save_job",
-    purpose: "Saves one role to the account's pipeline at SAVED.",
+    purpose: "Saves one role to the account's pipeline at SAVED as a bookmark.",
     calls: "POST /assistant/actions/save_job",
   },
   {
     name: "set_autopilot",
-    purpose: "Sets Autopilot on, off or paused after explicit consent.",
+    purpose: "Sets Autopilot on or off after explicit consent.",
     calls: "POST /assistant/actions/set_autopilot",
   },
   {

@@ -78,7 +78,11 @@ export const statusActions = [
       applicationId: z.string(),
       title: z.string(),
       company: z.string(),
-      /** The board's display status, so a cancelled row does not read as failed. */
+      /**
+       * The board's display status, so a cancelled row does not read as
+       * failed, and `not_started` for materials prepared for a saved role
+       * that nobody has asked Dreamwork to send.
+       */
       status: z.string(),
       truth: applicationTruthSchema,
       timeline: z.array(

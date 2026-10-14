@@ -3,12 +3,13 @@ import { defineAction } from "../action.js";
 import { ASSISTANT_EVENTS } from "../events.js";
 import { receiptSchema } from "../receipt.js";
 
-export const autopilotStateSchema = z.enum([
-  "off",
-  "on",
-  "paused",
-  "unavailable",
-]);
+/**
+ * `on` is sending. `off` is not sending, however it got there, with the
+ * person's settings kept: the two positions of the switch on the Applications
+ * page. `unavailable` is the plan or the rollout refusing Autopilot, which the
+ * switch cannot change.
+ */
+export const autopilotStateSchema = z.enum(["off", "on", "unavailable"]);
 
 export const autopilotActions = [
   defineAction({
@@ -73,7 +74,7 @@ export const autopilotActions = [
     risk: "read",
     title: "Read Autopilot status",
     description:
-      "Read whether Dreamwork is applying on the person's behalf: the state, applications sent today and this month against those limits, the match-score floor it applies at, how many roles clear it, how many submissions are still sending, and when the next batch goes out. `dailyLimit` is today's allowance and `usualDailyLimit` is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, today's allowance is a larger first-day allowance; after that day the usual daily limit applies. When the two differ, say that today is the first-day allowance and name the usual limit for the days that follow. That first day is the first day it sends in the window, not the first day of the calendar month. `unavailable` means the plan does not allow it and `unavailableReason` answers \"why isn't it working\". Read it before saying anything about what Autopilot has done and before turning it on or off. There is no last-run timestamp — narrate cadence from `nextRunAt`. Which roles it applied to is `get_pipeline`.",
+      "Read whether Dreamwork is applying on the person's behalf: the state (`on` is sending; `off` is not sending, with every setting kept; these are the two positions of the switch on the Applications page), applications sent today and this month against those limits, the match-score floor it applies at, how many roles clear it, how many submissions are still sending, and when the next batch goes out. `dailyLimit` is today's allowance and `usualDailyLimit` is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, today's allowance is a larger first-day allowance; after that day the usual daily limit applies. When the two differ, say that today is the first-day allowance and name the usual limit for the days that follow. That first day is the first day it sends in the window, not the first day of the calendar month. `unavailable` means the plan does not allow it and `unavailableReason` answers \"why isn't it working\". Read it before saying anything about what Autopilot has done and before turning it on or off. There is no last-run timestamp — narrate cadence from `nextRunAt`, which is null unless the state is `on`. Which roles it applied to is `get_pipeline`.",
     input: z.object({}),
     output: z.object({
       state: autopilotStateSchema,
@@ -91,7 +92,8 @@ export const autopilotActions = [
       eligibleCount: z.int().nullable(),
       /** Submissions Autopilot started that have not settled. */
       inFlightCount: z.int().nullable(),
-      /** When the next batch goes out, or the monthly reset when spent. */
+      /** When the next batch goes out, or the monthly reset when spent.
+       *  Null unless `state` is `on`: nothing runs while it is off. */
       nextRunAt: z.string().nullable(),
       unavailableReason: z.string().nullable(),
     }),
@@ -102,7 +104,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Returns Autopilot state, daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt. dailyLimit is today's allowance and usualDailyLimit is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, dailyLimit is a larger first-day allowance; after that day it equals usualDailyLimit. That first day is the first day it sends in the window, not the first day of the calendar month. unavailableReason explains plan restrictions. No last-run timestamp is provided.",
+        "Returns Autopilot state (on or off, matching the product switch, or unavailable when the plan does not include it), daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt, which is null unless the state is on. dailyLimit is today's allowance and usualDailyLimit is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, dailyLimit is a larger first-day allowance; after that day it equals usualDailyLimit. That first day is the first day it sends in the window, not the first day of the calendar month. unavailableReason explains plan restrictions. No last-run timestamp is provided.",
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -114,8 +116,10 @@ export const autopilotActions = [
     risk: "consequential",
     title: "Turn Autopilot on or off",
     description:
-      'Turn Autopilot on, off, or paused. On means real applications go to real employers under the person\'s name without asking each time, so it runs only on an explicit instruction — "turn on autopilot", "pause it", "stop applying for me" — and never as an inference from a complaint about volume. Pause keeps the configuration and stops sending; off clears the schedule. The state is the only thing it changes: how many go out a day is fixed by their plan and nothing in Dreamwork can move it, so answer "only send three a day" by naming the limit `get_autopilot_status` reports rather than calling this.',
+      'Turn Autopilot on or off. On means real applications go to real employers under the person\'s name without asking each time, so it runs only on an explicit instruction — "turn on autopilot", "pause it", "stop applying for me" — and never as an inference from a complaint about volume. Off stops sending and keeps every setting (minimum match, resume choice, queue), so turning it back on needs no setup; "pause" and "stop" mean off. The state is the only thing it changes: how many go out a day is fixed by their plan and nothing in Dreamwork can move it, so answer "only send three a day" by naming the limit `get_autopilot_status` reports rather than calling this.',
     input: z.object({
+      /** `paused` means `off`. It stays accepted because clients built when
+       *  the two were separate states still send it. */
       state: z.enum(["on", "off", "paused"]),
     }),
     output: receiptSchema,
@@ -126,7 +130,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Sets Autopilot on, off or paused after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval. Pause preserves configuration and stops sending; off clears the schedule. Daily and monthly limits remain determined by the plan.",
+        "Sets Autopilot on or off after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval. Off stops sending and keeps the minimum match, resume choice and queue; paused is accepted and means off. Daily and monthly limits remain determined by the plan.",
       readOnlyHint: false,
       openWorldHint: true,
       destructiveHint: true,

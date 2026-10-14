@@ -47,14 +47,14 @@ check only keep the map honest about the actions that do exist.
 
 ## Over MCP
 
-48 capabilities any agent holding the person's Dreamwork key can call, each as a tool of the same name in `@dreamworkhq/mcp` and as `POST /assistant/actions/<id>`. "Authorization" is what the executor demands on top of the key: a receipt is written and can be undone inside the stated window, and a confirmation means the first call answers `held` with a summary and a token rather than acting.
+51 capabilities any agent holding the person's Dreamwork key can call, each as a tool of the same name in `@dreamworkhq/mcp` and as `POST /assistant/actions/<id>`. "Authorization" is what the executor demands on top of the key: a receipt is written and can be undone inside the stated window, and a confirmation means the first call answers `held` with a summary and a token rather than acting.
 
 | Capability | What it does | Reads or writes | Authorization |
 |------------|--------------|-----------------|---------------|
 | `apply` | Submit the person's application to a real employer, under their name, with the materials currently saved for it. | Writes | Confirmation (explicit_verb, unambiguous_target, reviewed_revision) |
 | `cancel_apply` | Stop an application that is queued or mid-submission. | Writes | Receipt |
 | `confirm_hypothesis` | Promote a stored hypothesis into the career record after the person has agreed with it, and delete the hypothesis. | Writes | Receipt |
-| `dismiss_match` | Hide one role from the person's feed, job alerts and Autopilot. | Writes | Receipt |
+| `dismiss_match` | Hide one role from the person's feed, job alerts and Autopilot. | Writes | Receipt, undo for 60s |
 | `edit_answer` | Revise a single answer to one of the employer's application questions. | Writes | Receipt, undo for 900s |
 | `edit_cover_letter` | Revise an existing cover letter against an instruction in the person's own words. | Writes | Receipt, undo for 900s |
 | `edit_resume` | Revise the tailored resume for one application against an instruction. | Writes | Receipt, undo for 900s |
@@ -65,23 +65,25 @@ check only keep the map honest about the actions that do exist.
 | `get_application_readiness` | Read whether Dreamwork can apply for the person right now and, if not, exactly what is missing. | Reads | The key alone |
 | `get_application_status` | Read what actually happened to one application: a timeline of events plus the three facts the product may claim — submitted, confirmed by the employer, replied to. | Reads | The key alone |
 | `get_autopilot_settings` | Read the saved minimum Matches score and whether Autopilot sends the default or tailored resume. | Reads | The key alone |
-| `get_autopilot_status` | Read whether Dreamwork is applying on the person's behalf: the state, applications sent today and this month against those limits, the match-score floor it applies at, how many roles clear it, how many submissions are still sending, and when the next batch goes out. | Reads | The key alone |
+| `get_autopilot_status` | Read whether Dreamwork is applying on the person's behalf: the state (`on` is sending; `off` is not sending, with every setting kept; these are the two positions of the switch on the Applications page), applications sent today and this month against those limits, the match-score floor it applies at, how many roles clear it, how many submissions are still sending, and when the next batch goes out. | Reads | The key alone |
 | `get_career_record` | Read what Dreamwork knows about the person as a professional, in four separate lists: `facts` from the resume analysis (function, seniority, years, skills), `vault` naming the documents they have filed, `stated` for preferences they answered themselves, and `hypotheses` for what you have guessed and they have not confirmed. | Reads | The key alone |
 | `get_communication_preferences` | Read which emails this person has asked for: job alerts and how often, Autopilot results as individual mail or a daily digest or off, product updates, and whether every optional email is off. | Reads | The key alone |
 | `get_inbox` | List the person's recruiter conversations, newest activity first: who wrote, about which role, when, what kind of mail it was, whether the employer spoke last, whether anything is unread. | Reads | The key alone |
 | `get_job` | Read one role in full: title, company, location and remote terms, salary band, posted date, the description text, this person's match score, and whether the role is saved, in which board column, with an application and materials. | Reads | The key alone |
 | `get_pack_status` | Read where each application's materials stand: queued, generating, ready, partial, failed, stale (written from an earlier resume), not started, or not found; which assets were asked for and which landed; whether the person edited them; and the page where they review them. | Reads | The key alone |
 | `get_pipeline` | Read every role the person has saved, applied to, or heard back about, as board cards with their column, the application id when one exists, and when each was last updated. | Reads | The key alone |
-| `get_preferences` | Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, excluded companies, the level they match at, appetite for AI-centred roles, and whether cover letters are on. | Reads | The key alone |
+| `get_preferences` | Read the person's stated job preferences: target functions, preferred locations, accepted work modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, the level they match at, appetite for AI-centred roles, and whether cover letters are on. | Reads | The key alone |
 | `get_resume_download_link` | A link to download the person's own main resume, the one on their profile, as the PDF Dreamwork holds for it. | Reads | The key alone |
+| `get_resume_work_history` | How Dreamwork reads the person's main resume, role by role: each employer with the bullets placed under it, read from the file's page layout, plus `unattributed`, the achievements it places under no role. | Reads | The key alone |
 | `get_task` | Read one entry in the assistant's own ledger by task id: which action ran, its current status, the receipt it produced, any error code, and its creation and update times. | Reads | The key alone |
 | `get_unread_reminders` | Check cheaply whether recruiter mail has arrived that the person has not been shown: how many messages and threads, when the oldest arrived, and the newest few with thread, company, role, kind and a short preview. | Reads | The key alone |
 | `get_updates_since` | One read for a scheduled check-in ("every morning, tell me what is new"): matches Dreamwork found, applications whose board status moved, recruiter threads with new employer mail, and Autopilot's state, all since `since`. | Reads | The key alone |
 | `get_usage` | Read what the person's plan still allows today: packs and applications used against their limits, the tier those limits come from, and when each resets. | Reads | The key alone |
 | `import_job` | Fetch a job posting the person found anywhere on the web and add it to their pipeline as a private role. | Writes | Receipt |
+| `list_dismissed_matches` | List the roles the person has dismissed, newest first: per role its listing id, title, company, `url` (its page on Dreamwork), when it was dismissed, and `active`, which is false once the listing is no longer served (closed, expired or gone stale). | Reads | The key alone |
 | `list_matches` | Rank the person's live matches and return them as data: per job its id, `url` (its page on Dreamwork — the link you give the person), title, company, location, remote flag, pay, posted and first-seen dates, match percent, and whether it is saved or applied to. | Reads | The key alone |
 | `list_tasks` | List what the assistant has recently done for this person, newest first, across both the site and MCP; `status` narrows it to work still running or work that failed. | Reads | The key alone |
-| `mark_applied_offsite` | Record that the person applied to this role themselves, outside Dreamwork. | Writes | Receipt |
+| `mark_applied_offsite` | Record that the person applied to a role themselves, outside Dreamwork, so the role stops coming back in their matches and Autopilot never applies to it again. | Writes | Receipt |
 | `mark_messages_read` | Mark exact recruiter messages read, the way opening them in Messages does. | Writes | Receipt |
 | `move_pipeline` | Record where a role actually stands by moving its card to another column. | Writes | Receipt, undo for 60s |
 | `parse_preferences_text` | Turn one sentence describing several preferences at once — "remote only, no crypto, AI-native companies" — into keys and apply them. | Writes | Receipt |
@@ -89,10 +91,11 @@ check only keep the map honest about the actions that do exist.
 | `remember_hypothesis` | Write down something you believe about the person but were not told outright — "seems to be moving from IC to management". | Writes | Receipt |
 | `replace_application_document` | Replace one application's resume or cover letter with a document the person edited themselves: their pasted text, or their file (PDF, DOCX, TXT or MD) as raw base64. | Writes | Receipt, undo for 900s |
 | `reply_to_recruiter` | Send a reply into an existing recruiter conversation, as the person. | Writes | Confirmation (explicit_verb, unambiguous_target) |
+| `restore_match` | Take back a dismissal, at any time: the role can appear in the person's feed, job alerts and Autopilot again. | Writes | Receipt, undo for 60s |
 | `restore_material` | Put a cover letter, the tailored resume, or one answer back the way it stood before an edit. | Writes | Receipt |
 | `save_application_answers` | Save answers the person just gave you, through the same checks the onboarding wizard runs, then re-check readiness and finish setup once nothing is left. | Writes | Receipt |
 | `save_job` | Put a role into the person's pipeline at SAVED. | Writes | Receipt, undo for 8s |
-| `set_autopilot` | Turn Autopilot on, off, or paused. | Writes | Confirmation (explicit_verb) |
+| `set_autopilot` | Turn Autopilot on or off. | Writes | Confirmation (explicit_verb) |
 | `start_checkout` | Begin a plan change by returning a checkout URL for the browser to open. | Writes | Confirmation (explicit_verb) |
 | `strengthen_application` | Improve every asset of one application together: it reads the role, the existing materials and the person's recorded evidence, then composes one edit per asset itself. | Writes | Receipt |
 | `undo_last` | Reverse the most recent action that offered an undo, or the one `taskId` names. | Writes | The key alone |
