@@ -54,7 +54,7 @@ check only keep the map honest about the actions that do exist.
 | `apply` | Submit the person's application to a real employer, under their name, with the materials currently saved for it. | Writes | Confirmation (explicit_verb, unambiguous_target, reviewed_revision) |
 | `cancel_apply` | Stop an application that is queued or mid-submission. | Writes | Receipt |
 | `confirm_hypothesis` | Promote a stored hypothesis into the career record after the person has agreed with it, and delete the hypothesis. | Writes | Receipt |
-| `dismiss_match` | Remove one role from the person's feed and teach the matcher that roles like it are unwanted; a `reason` in their own words is the signal, not the removal, that improves later feeds. | Writes | Receipt, undo for 8s |
+| `dismiss_match` | Hide one role from the person's feed, job alerts and Autopilot. | Writes | Receipt |
 | `edit_answer` | Revise a single answer to one of the employer's application questions. | Writes | Receipt, undo for 900s |
 | `edit_cover_letter` | Revise an existing cover letter against an instruction in the person's own words. | Writes | Receipt, undo for 900s |
 | `edit_resume` | Revise the tailored resume for one application against an instruction. | Writes | Receipt, undo for 900s |

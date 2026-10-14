@@ -132,7 +132,7 @@ export const matchesActions = [
         .max(80)
         .optional()
         .describe(
-          "Seniority labels, comma-separated for a union: Junior, Mid-Level, Senior, Staff+, Director+.",
+          "Seniority labels, comma-separated for a union: Junior, Mid-Level, Senior, Staff+, Director+. A hard filter: pass it when the person names a level they want only, because the stored level ranks matches but never removes other levels. It also drops roles whose level was never classified.",
         ),
       location: z
         .string()
@@ -325,7 +325,7 @@ export const matchesActions = [
     risk: "cheap",
     title: "Dismiss a match",
     description:
-      "Remove one role from the person's feed and teach the matcher that roles like it are unwanted; a `reason` in their own words is the signal, not the removal, that improves later feeds. Do NOT dismiss a role they merely declined to act on right now, and do NOT dismiss in bulk to 'clean up' a feed nobody complained about. Taking something off the applications board is `move_pipeline`: this would hide the listing and leave the card exactly where it was.",
+      "Hide one role from the person's feed, job alerts and Autopilot. It hides that one listing only and does not change which roles are matched later: other roles at the same company keep appearing, so a company they never want goes in `update_preferences.excludedCompanies`, and a level they never want goes in `seniorities`. There is no undo here; the listing comes back if they save it. Do NOT dismiss a role they merely declined to act on right now, and do NOT dismiss in bulk to 'clean up' a feed nobody complained about. Taking something off the applications board is `move_pipeline`: this would hide the listing and leave the card exactly where it was.",
     input: z.object({
       jobId: z.string(),
       reason: z
@@ -333,18 +333,18 @@ export const matchesActions = [
         .max(200)
         .optional()
         .describe(
-          "The person's own words for why this role is wrong, when they gave them.",
+          "The person's own words for why this role is wrong. Accepted but not stored, and it does not change later matches.",
         ),
     }),
     output: receiptSchema,
-    authorization: { mode: "receipt", undoWindowMs: 8_000 },
+    authorization: { mode: "receipt" },
     anchor: { route: "/", target: "matches.card:<id>" },
     invalidates: ["matches"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
       expose: true,
       description:
-        "Removes one role from the account's match feed and stores the person's supplied reason as matching feedback. This hides the listing but does not move or remove its existing pipeline card.",
+        "Hides one listing from the account's match feed, job alerts and Autopilot until the account saves it. The supplied reason is not stored. It does not hide other listings from the same company and does not move or remove an existing pipeline card.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: true,

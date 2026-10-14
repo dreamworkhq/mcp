@@ -42,7 +42,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `apply` | consequential | Submits one application to an employer under the account holder's name using the saved materials at expectedRevision. |
 | `cancel_apply` | cheap | Stops a queued or in-progress application when submission can still be prevented. |
 | `confirm_hypothesis` | cheap | Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis. |
-| `dismiss_match` | cheap | Removes one role from the account's match feed and stores the person's supplied reason as matching feedback. |
+| `dismiss_match` | cheap | Hides one listing from the account's match feed, job alerts and Autopilot until the account saves it. |
 | `edit_answer` | cheap | Revises one employer-question answer identified by questionId; other answers and documents remain unchanged. |
 | `edit_cover_letter` | cheap | Revises an existing application's cover letter using the supplied instruction. |
 | `edit_resume` | cheap | Revises one application's tailored resume using the supplied instruction, preserving its formatting and regenerating the PDF. |

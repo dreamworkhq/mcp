@@ -463,7 +463,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "dismiss_match",
-    purpose: "Removes one role from the account's match feed and stores the person's supplied reason as matching feedback.",
+    purpose: "Hides one listing from the account's match feed, job alerts and Autopilot until the account saves it.",
     calls: "POST /assistant/actions/dismiss_match",
   },
   {

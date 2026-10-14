@@ -105,7 +105,13 @@ const preferencesPatchSchema = z
       .nullable()
       .optional()
       .describe("`null` withdraws it, which stops applications until it is answered again."),
-    dealBreakers: z.array(z.string().max(200)).max(10).optional(),
+    dealBreakers: z
+      .array(z.string().max(200))
+      .max(10)
+      .optional()
+      .describe(
+        "Free-text notes the fit check and job alerts weigh. They do NOT remove matches: a short term of three words or less, such as an industry, only ranks listings whose title, company or industry contains it lower. A rule that must filter goes in its own key: a company in `excludedCompanies`, a level in `seniorities`, pay in `compensation`, work setting in `acceptedWorkModes`, places in `preferredLocations`.",
+      ),
     excludedCompanies: z
       .array(z.string().trim().min(1).max(120))
       .max(50)
@@ -480,7 +486,7 @@ export const profileActions = [
     risk: "cheap",
     title: "Update job preferences",
     description:
-      "Change the person's stated preferences as a merge patch: send only the keys that change. Salary belongs to `compensation` as a `minimum` with an amount, an ISO-4217 currency and a period; nowhere else stores pay the matcher reads. `seniorities` takes one level and overrides the resume, and `[]` hands that back to it. `excludedCompanies` hides a company from matches, job alerts and Autopilot. A change here re-runs matching, so the feed moves. Read `get_preferences` first before touching work modes or relocation: those two are stored as one group, so a patch omitting one carries the stored value forward. Do NOT send keys they did not mention, and do NOT infer a pay floor from a salary they admired on a listing.",
+      "Change the person's stated preferences as a merge patch: send only the keys that change. Salary belongs to `compensation` as a `minimum` with an amount, an ISO-4217 currency and a period; nowhere else stores pay the matcher reads. `seniorities` takes one level and overrides the resume, and `[]` hands that back to it; a level below the resume's also ranks higher-level roles lower. `excludedCompanies` hides a company from matches, job alerts and Autopilot. `dealBreakers` is free text that removes nothing, so never use it for a rule the matches must obey. A change here re-runs matching, so the feed moves. Read `get_preferences` first before touching work modes or relocation: those two are stored as one group, so a patch omitting one carries the stored value forward. Do NOT send keys they did not mention, and do NOT infer a pay floor from a salary they admired on a listing.",
     input: z.object({
       patch: preferencesPatchSchema,
     }),
