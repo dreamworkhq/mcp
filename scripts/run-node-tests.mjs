@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 import { spawn, spawnSync } from "node:child_process";
+import { mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { loadShardPlan, parseShard, selectShardFiles } from "./ci-test-shards.mjs";
 import {
   applyNodeHeapLimit,
   resolveValidationProfile,
@@ -15,6 +17,10 @@ const RUNNER_PACKAGES = {
   "tsx-web": "apps/web/package.json",
 };
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
+const SHARD_PLAN_PATH = fileURLToPath(new URL("./ci-test-shard-plan.json", import.meta.url));
+const NODE_TIMING_REPORTER = fileURLToPath(
+  new URL("./node-test-timing-reporter.mjs", import.meta.url),
+);
 
 export function parseNodeTestArgs(argv) {
   const [runner, separator, ...rawTestArgs] = argv;
@@ -49,7 +55,12 @@ export function resolveNodeTestShard(env, testArgs) {
   return [`--test-shard=${match[1]}/${match[2]}`];
 }
 
-export function resolveNodeTestCommand(parsed, env = process.env, repoRoot = REPO_ROOT) {
+export function resolveNodeTestCommand(
+  parsed,
+  env = process.env,
+  repoRoot = REPO_ROOT,
+  options = {},
+) {
   const profile = resolveValidationProfile(env);
   const testArgs = [];
   for (let index = 0; index < parsed.testArgs.length; index += 1) {
@@ -88,11 +99,84 @@ export function resolveNodeTestCommand(parsed, env = process.env, repoRoot = REP
     : [
         createRequire(resolve(repoRoot, RUNNER_PACKAGES[parsed.runner])).resolve("tsx/cli"),
       ];
+  const shardFiles = options.shardFiles?.map(literalNodeTestPath);
+  if (shardFiles && shardFiles.length === 0) {
+    throw new Error("Duration shard plan resolved to zero test files.");
+  }
+  const shardFlags = shardFiles
+    ? explicitShardConflict(testArgs)
+    : resolveNodeTestShard(env, testArgs);
+  const timingReporter = env.DREAMWORK_TEST_TIMING_REPORT
+    ? [
+        "--test-reporter=tap",
+        "--test-reporter-destination=stdout",
+        `--test-reporter=${NODE_TIMING_REPORTER}`,
+        // Node fsyncs each reporter destination. A null device rejects that
+        // call and fails the process after the tests themselves passed.
+        `--test-reporter-destination=${dirname(env.DREAMWORK_TEST_TIMING_REPORT)}/node-reporter-output`,
+      ]
+    : [];
   return {
     command: process.execPath,
-    args: [...runnerArgs, "--test", ...concurrency, ...resolveNodeTestShard(env, testArgs), ...testArgs],
+    args: [
+      ...runnerArgs,
+      "--test",
+      ...concurrency,
+      ...timingReporter,
+      ...shardFlags,
+      ...(shardFiles ?? testArgs),
+    ],
     env: applyNodeHeapLimit(env, profile.nodeHeapMb),
   };
+}
+
+// Node treats a test path as a glob. A directory named `[id]` is a character
+// class, matches nothing, and the run still exits 0. `[[]` is a literal `[`.
+function literalNodeTestPath(file) {
+  return file.replaceAll("[", "[[]");
+}
+
+function explicitShardConflict(testArgs) {
+  if (testArgs.some((arg) => arg === "--test-shard" || arg.startsWith("--test-shard="))) {
+    throw new Error(
+      "DREAMWORK_TEST_SHARD cannot be combined with an explicit --test-shard argument; remove one shard configuration.",
+    );
+  }
+  return [];
+}
+
+export async function resolveWebShardFiles(env = process.env, {
+  plan,
+  discover = () => discoverWebTests(process.cwd()),
+} = {}) {
+  const parsed = parseShard(env.DREAMWORK_TEST_SHARD);
+  if (!parsed) return undefined;
+  const resolved = plan ?? loadShardPlan(JSON.parse(readFileSync(SHARD_PLAN_PATH, "utf8")));
+  if (resolved.web.shards.length !== parsed.count) return undefined;
+  return selectShardFiles({
+    planShards: resolved.web.shards,
+    discovered: await discover(),
+    shardIndex: parsed.index,
+  });
+}
+
+function discoverWebTests(cwd) {
+  const files = [];
+  const root = join(cwd, "src");
+  const visit = (directory) => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const full = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(full);
+        continue;
+      }
+      if (entry.name.endsWith(".test.ts") || entry.name.endsWith(".test.tsx")) {
+        files.push(relative(cwd, full).replaceAll("\\", "/"));
+      }
+    }
+  };
+  visit(root);
+  return files;
 }
 
 export function terminateTestTree(
@@ -127,10 +211,15 @@ export function terminateTestTree(
 export async function main(argv = process.argv.slice(2), env = process.env) {
   let command;
   try {
-    command = resolveNodeTestCommand(parseNodeTestArgs(argv), env);
+    const parsed = parseNodeTestArgs(argv);
+    const shardFiles = await resolveWebShardFiles(env);
+    command = resolveNodeTestCommand(parsed, env, REPO_ROOT, { shardFiles });
   } catch (error) {
     console.error(`run-node-tests: ${error.message}`);
     return 2;
+  }
+  if (env.DREAMWORK_TEST_TIMING_REPORT) {
+    mkdirSync(dirname(env.DREAMWORK_TEST_TIMING_REPORT), { recursive: true });
   }
   const child = spawn(command.command, command.args, {
     env: command.env,

@@ -1,6 +1,6 @@
 {
   "version": "1.7.0",
-  "sourceCommit": "63e9441b1ae62a324d2727ff6d4be296b54a2c91",
+  "sourceCommit": "b033ff4470ac0636a2017fd95a0d5b78fdf63436",
   "managedFiles": [
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
@@ -107,6 +107,7 @@
     "packages/assistant-contracts/src/turn.ts",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
+    "scripts/ci-test-shards.mjs",
     "scripts/run-node-tests.mjs",
     "scripts/validation-profile.mjs",
     "server.json",
