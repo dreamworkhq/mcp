@@ -42,6 +42,15 @@ export function dreamworkJobUrl(listingId: string): string {
   return `${DREAMWORK_WEB_ORIGIN}/job/${listingId}`;
 }
 
+/**
+ * The page of a job saved without a listing - a private pipeline role. The
+ * same origin and stem shape the web routes (`/job/private/<id>`), so a link
+ * handed to a person opens the same page the board's card does.
+ */
+export function dreamworkPrivateJobUrl(jobId: string): string {
+  return `${DREAMWORK_WEB_ORIGIN}/job/private/${jobId}`;
+}
+
 const BROWSE_SORTS = ["newest", "pay_high", "pay_low", "featured"] as const;
 type BrowseSort = (typeof BROWSE_SORTS)[number];
 

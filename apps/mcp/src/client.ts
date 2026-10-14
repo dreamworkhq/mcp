@@ -45,6 +45,32 @@ export function formatApiErrorMessage(err: unknown, status: number): string {
   return errorValueToMessage(err) ?? `API ${status}`;
 }
 
+/**
+ * The hourly key quota's 429 carries whole seconds until the window resets.
+ * A bare "rate limit exceeded" invites an immediate retry (another refusal);
+ * the wait turns it into "tell the person, come back in N minutes" — so the
+ * agent needs it inside the message, the only text it reliably reads.
+ */
+function withRetryAfter(message: string, err: unknown): string {
+  if (!err || typeof err !== "object") return message;
+  const record = err as Record<string, unknown>;
+  const retryAfter = record.retryAfter;
+  if (
+    typeof retryAfter !== "number" ||
+    !Number.isFinite(retryAfter) ||
+    retryAfter <= 0
+  ) {
+    return message;
+  }
+  const seconds = retryAfter;
+  const wait =
+    seconds >= 90
+      ? `${Math.ceil(seconds / 60)} minutes`
+      : `${Math.ceil(seconds)} seconds`;
+  const joiner = /[.!?]$/.test(message) ? "" : ".";
+  return `${message}${joiner} Try again in about ${wait}.`;
+}
+
 const DEFAULT_REQUEST_TIMEOUT_MS = 120_000;
 
 export class AuthRequiredError extends Error {
@@ -181,7 +207,12 @@ export class ApiClient {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new ApiError(formatApiErrorMessage(err, res.status), res.status);
+      const formatted = formatApiErrorMessage(err, res.status);
+      // Only the key quota's 429 carries retryAfter; other failures pass
+      // through unchanged.
+      const message =
+        res.status === 429 ? withRetryAfter(formatted, err) : formatted;
+      throw new ApiError(message, res.status);
     }
 
     try {

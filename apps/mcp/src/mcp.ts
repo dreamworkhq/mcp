@@ -24,6 +24,7 @@ import {
   browseRequest,
   browseResult,
   dreamworkJobUrl,
+  dreamworkPrivateJobUrl,
 } from "./browse-listings.js";
 import { ApiClient, ApiError, AuthRequiredError } from "./client.js";
 import { registerWorkflowPrompts } from "./prompts.js";
@@ -151,13 +152,13 @@ Recruiter mail: ${distribution === "default" ? "call get_unread_reminders when a
 
 Nothing here reaches an employer or a recruiter on its first call. apply, set_autopilot, update_autopilot_settings, reply_to_recruiter${distribution === "default" ? " and start_checkout" : ""} each answer held with a summary of exactly what would happen and a confirmationToken. Show the summary to the person. Only if they agree, call again with identical arguments plus the token. Never treat your own reading of the conversation as their agreement.
 
-Links to jobs: when you show the person a job, give them the job's \`url\` field, which is its page on Dreamwork (https://www.dreamworkhq.com/job/<id>). Every tool that returns jobs carries it. The employer's direct posting (\`sourceUrl\`) is for when they ask for it.
+Links to jobs: when you show the person a job, give them the job's \`url\` field, which is its page on Dreamwork (https://www.dreamworkhq.com/job/<id>). \`browse_listings\`, \`list_matches\`, \`get_listing\` and \`get_job\` carry it on every row, and \`add_jobs\` returns it for each saved role; a saved private role lives at /job/private/<id>. When a row carries no \`url\` (pipeline cards, inbox threads), name the role by title and company instead of linking the employer's site. The employer's direct posting (\`sourceUrl\`) is for when they ask for it.
 
 Finding work: list_matches ranks the person's own matches; browse_listings searches every listing Dreamwork holds. Neither returns everything in one page, so page through with the cursor when the person wants more. Salary filters match a listing whose posted pay band reaches the number, which is not a guaranteed minimum; say so when it matters.
 
 Recurring checks and job alerts: the two are separate. A recurring check ("every morning") is your host re-running a search: if the person asks for one and your host has its own scheduled runs, you may set one up there. Dreamwork does not schedule it, so say it is scheduled only if your host created the schedule. A job alert is an email Dreamwork sends on its own schedule. No tool here creates, schedules or delivers one. When the person asks for job alerts, read get_communication_preferences, which shows the alert setting and whether the mail would actually arrive, and change how often alerts arrive or turn them off with update_communication_preferences. Autopilot result emails, sent one by one or as a daily digest, are set the same way. Never write a script, a cron job or an operating-system scheduled task for either one.
 
-Applying: save_job, then generate_pack writes the materials; get_application_materials shows exactly what will be sent and the revision apply needs. apply sends that revision and nothing else. If a call is refused because profile answers are missing, ask the person for those answers; never supply work authorization, salary, or any other fact about them yourself.
+Applying: save_job, then generate_pack writes the materials; get_application_materials shows exactly what will be sent and the revision apply needs. apply sends that revision and nothing else. If a call is refused because profile answers are missing, ask the person for those answers; never supply work authorization, salary, or any other fact about them yourself. A role's \`eligible\` field never decides whether to apply: only \`eligible: false\` is a real bar, and \`null\` means work eligibility is unknown — apply anyway and let the application surface any restriction.
 
 Resume handling: when a user provides a resume file (PDF, DOCX, PNG, etc.), first call get_profile, then use upload_resume with the raw base64 content, format, and that snapshot's profileIdentityVersion. Do NOT convert files to plain text yourself. The server handles parsing, OCR, and text extraction. The upload_resume tool accepts: pdf, docx, txt, md, png, jpg, jpeg, webp. That replaces their main resume, and get_resume_download_link gives them a link to download the one on file. A resume or cover letter they edited for ONE application goes to replace_application_document instead, and get_application_documents gives them download links for what an application will send.
 
@@ -764,7 +765,28 @@ export function createMcpServer(
       applicationMethod: z.enum(["email", "web", "api", "unknown"]).optional(),
     }),
     requiresAuth: true,
-    handler: async (args) => json(await api.post("/jobs", args)),
+    handler: async (args) => {
+      const body = await api.post<{ jobs?: unknown }>("/jobs", args);
+      // The route stores the person-supplied posting link on the job row and
+      // echoes it back as `url`. Every other tool hands the person the role's
+      // page on Dreamwork and keeps the direct posting for an explicit ask, so
+      // project the same convention here: a row the agent reads carries the
+      // Dreamwork page in `url` and the posting link in `sourceUrl`.
+      const jobs = Array.isArray(body.jobs) ? body.jobs : null;
+      if (!jobs) return json(body);
+      return json({
+        ...body,
+        jobs: jobs.map((job) =>
+          job && typeof job === "object" && typeof (job as { id?: unknown }).id === "string"
+            ? {
+                ...job,
+                url: dreamworkPrivateJobUrl((job as { id: string }).id),
+                sourceUrl: (job as { url?: unknown }).url ?? null,
+              }
+            : job,
+        ),
+      });
+    },
   });
 
 
