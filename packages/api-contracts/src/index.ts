@@ -22,6 +22,12 @@ export { CONTRACT_MATURITIES } from "./operation.js";
 export { operations } from "./operations.js";
 export { listingStatsSchema, publicStatsSchema } from "./schemas/listing-stats.js";
 export {
+  companyRoleLandingResponseSchema,
+  jobLandingIndexResponseSchema,
+  jobLandingLinksResponseSchema,
+  roleLocationLandingResponseSchema,
+} from "./schemas/job-landings.js";
+export {
   applicationMaterialsResponseSchema,
   applicationMaterialsSchema,
   applicationMaterialsUpdateRequestSchema,
@@ -145,6 +151,7 @@ export {
   generationModelUpdateResponseSchema,
   instantApplyAccessSchema,
   meCountsSchema,
+  meExperiencesSchema,
   meResponseSchema,
   meUserSchema,
   onboardingIncompleteResponseSchema,
@@ -167,6 +174,16 @@ import type {
   assistantMemoryResponseSchema,
 } from "./schemas/assistant-memory.js";
 export type ListingStats = z.infer<typeof listingStatsSchema>;
+import type {
+  companyRoleLandingResponseSchema,
+  jobLandingIndexResponseSchema,
+  jobLandingLinksResponseSchema,
+  roleLocationLandingResponseSchema,
+} from "./schemas/job-landings.js";
+export type JobLandingIndex = z.infer<typeof jobLandingIndexResponseSchema>;
+export type RoleLocationLanding = z.infer<typeof roleLocationLandingResponseSchema>;
+export type CompanyRoleLanding = z.infer<typeof companyRoleLandingResponseSchema>;
+export type JobLandingLinks = z.infer<typeof jobLandingLinksResponseSchema>;
 import type {
   jobListResponseSchema,
   jobRecordSchema,

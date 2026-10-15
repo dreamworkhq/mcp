@@ -125,11 +125,27 @@ export const meCountsSchema = responseComponent(
   },
 );
 
+export const meExperiencesSchema = responseComponent(
+  z.object({
+    autopilotFirst: z
+      .boolean()
+      .describe(
+        "The Autopilot-first first week: Applications as the default page, the post-checkout launch sheet, the trial meter, and the day-one allowance. Set by the `autopilot_first_experience_mode` setting (off, admins, everyone).",
+      ),
+  }),
+  {
+    id: "MeExperiences",
+    description:
+      "Product experiences being ramped for this account. Each key is removed once its experience reaches everyone.",
+  },
+);
+
 /** `GET /users/me` 200 body. */
 export const meResponseSchema = responseComponent(
   z.object({
     user: meUserSchema,
     instantApply: instantApplyAccessSchema,
+    experiences: meExperiencesSchema,
     recruiterReplyReceived: z.boolean(),
     profile: meProfileSchema.nullable(),
     profileId: uuidString.nullable(),

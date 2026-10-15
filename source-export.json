@@ -1,6 +1,6 @@
 {
   "version": "1.7.0",
-  "sourceCommit": "b033ff4470ac0636a2017fd95a0d5b78fdf63436",
+  "sourceCommit": "6269978f0ee69e507fd0f359a20c24f69be6c5c9",
   "managedFiles": [
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
@@ -65,6 +65,7 @@
     "packages/api-contracts/src/schemas/billing.ts",
     "packages/api-contracts/src/schemas/common.ts",
     "packages/api-contracts/src/schemas/filtered-mail.ts",
+    "packages/api-contracts/src/schemas/job-landings.ts",
     "packages/api-contracts/src/schemas/jobs.ts",
     "packages/api-contracts/src/schemas/listing-stats.ts",
     "packages/api-contracts/src/schemas/listings.ts",

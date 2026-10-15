@@ -1,5 +1,11 @@
 import { listingStatsSchema, publicStatsSchema } from "./schemas/listing-stats.js";
 import {
+  companyRoleLandingResponseSchema,
+  jobLandingIndexResponseSchema,
+  jobLandingLinksResponseSchema,
+  roleLocationLandingResponseSchema,
+} from "./schemas/job-landings.js";
+import {
   applicationMaterialsResponseSchema,
   applicationMaterialsUpdateRequestSchema,
   applicationResumeVariantSchema,
@@ -1659,6 +1665,76 @@ export const operations: readonly OperationDescriptor[] = [
     responses: {
       "200": { description: "Product statistics with the shared active-job observation.", schema: publicStatsSchema },
       "503": { description: "No fresh active-job observation is available.", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "getJobLandingIndex",
+    method: "get",
+    path: "/research/job-landings",
+    fastifyPath: "/research/job-landings",
+    summary: "List the public job landing pages",
+    tags: ["research"],
+    auth: "public",
+    contractMaturity: "handler-verified",
+    responses: {
+      "200": { description: "Every landing page the current snapshot covers, with its indexability.", schema: jobLandingIndexResponseSchema },
+      "503": { description: "No landing snapshot has been computed yet.", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "getCompanyRoleLanding",
+    method: "get",
+    path: "/research/job-landings/company/{domain}/{role}",
+    fastifyPath: "/research/job-landings/company/:domain/:role",
+    summary: "Read one company-by-role landing page",
+    tags: ["research"],
+    auth: "public",
+    contractMaturity: "handler-verified",
+    parameters: [
+      { name: "domain", in: "path", required: true, description: "Company domain.", schema: z.string() },
+      { name: "role", in: "path", required: true, description: "Catalog role slug.", schema: z.string() },
+    ],
+    responses: {
+      "200": { description: "The page data.", schema: companyRoleLandingResponseSchema },
+      "404": { description: "Unknown role or company, or no open roles.", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "getJobLandingLinks",
+    method: "get",
+    path: "/research/job-landings/links",
+    fastifyPath: "/research/job-landings/links",
+    summary: "List indexable landing pages for a listing or a company",
+    tags: ["research"],
+    auth: "public",
+    contractMaturity: "handler-verified",
+    parameters: [
+      { name: "listingId", in: "query", required: false, description: "A listing UUID.", schema: uuidString },
+      { name: "domain", in: "query", required: false, description: "A company domain.", schema: z.string() },
+    ],
+    responses: {
+      "200": { description: "Up to a handful of landing pages, largest first.", schema: jobLandingLinksResponseSchema },
+      "400": { description: "Neither parameter, or a malformed listingId.", schema: errorResponseSchema },
+      "503": { description: "No landing snapshot has been computed yet.", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "getRoleLocationLanding",
+    method: "get",
+    path: "/research/job-landings/role/{role}/{location}",
+    fastifyPath: "/research/job-landings/role/:role/:location",
+    summary: "Read one role-by-location landing page",
+    tags: ["research"],
+    auth: "public",
+    contractMaturity: "handler-verified",
+    parameters: [
+      { name: "role", in: "path", required: true, description: "Catalog role slug.", schema: z.string() },
+      { name: "location", in: "path", required: true, description: "Catalog location slug.", schema: z.string() },
+    ],
+    responses: {
+      "200": { description: "The page data.", schema: roleLocationLandingResponseSchema },
+      "404": { description: "Unknown slug, or no open roles in the snapshot.", schema: errorResponseSchema },
+      "503": { description: "No landing snapshot has been computed yet.", schema: errorResponseSchema },
     },
   },
   {
