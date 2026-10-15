@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { requestComponent, responseComponent, sharedComponent } from "../registry.js";
-import { billingIntervalSchema } from "./common.js";
+import { billingIntervalSchema, isoDateTime } from "./common.js";
 
 export const checkoutConflictSchema = responseComponent(
   z.object({
@@ -214,6 +214,48 @@ export const billingDreamerUpgradePreviewSchema = responseComponent(
 );
 
 export type BillingDreamerUpgradePreview = z.infer<typeof billingDreamerUpgradePreviewSchema>;
+
+export const billingTrialStatusSchema = responseComponent(
+  z.strictObject({
+    trial: z
+      .strictObject({
+        startedAt: isoDateTime,
+        endsAt: isoDateTime.describe("When the trial ends and Stripe first charges."),
+        amountCents: z
+          .number()
+          .int()
+          .nullable()
+          .describe(
+            "The first charge after the trial, after any coupon, in the currency's minor unit. Null when Stripe gave no price; show no price then.",
+          ),
+        currency: z.string().describe("Lowercase ISO currency code."),
+        interval: z
+          .enum(["month", "quarter", "year"])
+          .nullable()
+          .describe("The billing cadence the trial turns into; null for a cadence outside the three."),
+        progress: z
+          .strictObject({
+            sent: z.int().describe("Applications that reached an employer since the trial started."),
+            confirmed: z
+              .int()
+              .describe("Of those, the ones with an employer's confirmation receipt on file."),
+            replies: z
+              .int()
+              .describe("Of those, the ones an employer responded to (reply_received or later)."),
+          })
+          .describe("Counted once per application, with the trial-ending email's definitions."),
+      })
+      .nullable()
+      .describe("Null unless Stripe reports the caller's current subscription as trialing."),
+  }),
+  {
+    id: "BillingTrialStatus",
+    description:
+      "The caller's free trial as Stripe reports it, with what Dreamwork sent during it, for the trial meter.",
+  },
+);
+
+export type BillingTrialStatus = z.infer<typeof billingTrialStatusSchema>;
 
 export const billingDreamerUpgradeRequestSchema = requestComponent(
   z.strictObject({

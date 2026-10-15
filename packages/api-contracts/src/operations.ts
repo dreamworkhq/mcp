@@ -28,6 +28,7 @@ import {
   billingCheckoutErrorSchema,
   billingDreamerUpgradeErrorSchema,
   billingDreamerUpgradePreviewSchema,
+  billingTrialStatusSchema,
   billingDreamerUpgradeRequestSchema,
   billingDreamerUpgradeResponseSchema,
   billingPromoPreviewQuery,
@@ -383,6 +384,29 @@ export const operations: readonly OperationDescriptor[] = [
       "401": unauthorized,
       "404": {
         description: "Account was not found.",
+        schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "getBillingTrialStatus",
+    method: "get",
+    path: "/billing/trial",
+    fastifyPath: "/billing/trial",
+    summary: "Read the caller's free trial and what it has sent",
+    description:
+      "Read-only, live from Stripe: when the caller's trial started and ends, the first charge it turns into, and the applications sent, confirmed and replied to since it started. `trial` is null unless the current subscription is trialing.",
+    tags: ["billing"],
+    auth: "user-session",
+    contractMaturity: "documented",
+    responses: {
+      "200": {
+        description: "The trial, or null.",
+        schema: billingTrialStatusSchema,
+      },
+      "401": unauthorized,
+      "502": {
+        description: "Stripe could not be read.",
         schema: errorResponseSchema,
       },
     },
