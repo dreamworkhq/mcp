@@ -130,7 +130,7 @@ export const meExperiencesSchema = responseComponent(
     autopilotFirst: z
       .boolean()
       .describe(
-        "The Autopilot-first first week: Applications as the default page, the post-checkout launch sheet, the trial meter, and the day-one allowance. Set by the `autopilot_first_experience_mode` setting (off, admins, everyone).",
+        "The Autopilot-first first week: Applications as the default page, the post-checkout launch sheet, the trial meter, free applications, and apply-after-pack. Set by the `autopilot_first_experience_mode` setting (off, admins, everyone).",
       ),
   }),
   {
@@ -140,12 +140,54 @@ export const meExperiencesSchema = responseComponent(
   },
 );
 
+export const meFreeApplicationsSchema = responseComponent(
+  z.object({
+    limit: z.int(),
+    used: z.int(),
+    remaining: z.int(),
+  }),
+  {
+    id: "MeFreeApplications",
+    description:
+      "A free account's lifetime applications in the Autopilot-first experience: sends through Apply that reached the employer or may have; a failure that did not gives its credit back.",
+  },
+);
+
+export const applyPreferencesSchema = responseComponent(
+  z.object({
+    reviewBeforeSending: z
+      .boolean()
+      .describe(
+        "When true, Apply saves the job and the person sends it from Applications; when false (the default), Apply sends once the pack is ready.",
+      ),
+  }),
+  { id: "ApplyPreferences", description: "How Apply behaves for this account." },
+);
+
+export const applyPreferencesUpdateRequestSchema = requestComponent(
+  z.strictObject({ reviewBeforeSending: z.boolean() }),
+  {
+    id: "ApplyPreferencesUpdateRequest",
+    description: "The complete apply preference set; every key is required.",
+  },
+);
+export type ApplyPreferences = z.infer<typeof applyPreferencesSchema>;
+export type ApplyPreferencesUpdateRequest = z.infer<
+  typeof applyPreferencesUpdateRequestSchema
+>;
+
 /** `GET /users/me` 200 body. */
 export const meResponseSchema = responseComponent(
   z.object({
     user: meUserSchema,
     instantApply: instantApplyAccessSchema,
     experiences: meExperiencesSchema,
+    freeApplications: meFreeApplicationsSchema
+      .nullable()
+      .describe(
+        "Non-null only for a free account in the Autopilot-first experience.",
+      ),
+    applyPreferences: applyPreferencesSchema,
     recruiterReplyReceived: z.boolean(),
     profile: meProfileSchema.nullable(),
     profileId: uuidString.nullable(),

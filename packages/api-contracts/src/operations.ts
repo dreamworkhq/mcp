@@ -76,6 +76,8 @@ import {
 } from "./schemas/profile.js";
 import { statsResponseSchema } from "./schemas/stats.js";
 import {
+  applyPreferencesSchema,
+  applyPreferencesUpdateRequestSchema,
   communicationPreferencesResponseSchema,
   communicationPreferencesUpdateRequestSchema,
   productActivityRequestSchema,
@@ -1836,6 +1838,19 @@ export const operations: readonly OperationDescriptor[] = [
         schema: errorResponseSchema,
       },
     },
+  },
+  {
+    operationId: "getApplyPreferences", method: "get",
+    path: "/users/me/apply-preferences", fastifyPath: "/users/me/apply-preferences",
+    summary: "Read apply preferences", tags: ["users"], auth: "user-session", contractMaturity: "documented",
+    responses: { "200": { description: "Current apply preferences", schema: applyPreferencesSchema }, "401": unauthorized, "404": { description: "User not found", schema: errorResponseSchema } },
+  },
+  {
+    operationId: "updateApplyPreferences", method: "put",
+    path: "/users/me/apply-preferences", fastifyPath: "/users/me/apply-preferences",
+    summary: "Replace apply preferences", tags: ["users"], auth: "user-session", contractMaturity: "documented",
+    requestBody: { description: "The complete apply preference set", contentType: "application/json", required: true, schema: applyPreferencesUpdateRequestSchema },
+    responses: { "200": { description: "Stored apply preferences", schema: applyPreferencesSchema }, "400": { description: "Invalid apply preferences", schema: errorResponseSchema }, "401": unauthorized, "404": { description: "User not found", schema: errorResponseSchema } },
   },
   {
     operationId: "getCommunicationPreferences", method: "get",

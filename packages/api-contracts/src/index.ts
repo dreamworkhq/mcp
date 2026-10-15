@@ -298,3 +298,4 @@ export type { AdminSupportAssignment, AdminSupportAssignee } from "./admin-suppo
 export type { AdminSupportReplyRequest } from "./schemas/admin-support.js";
 
 export { communicationPreferencesResponseSchema, communicationPreferencesUpdateRequestSchema, productActivityRequestSchema, type CommunicationPreferencesResponse, type CommunicationPreferencesUpdateRequest } from "./schemas/users.js";
+export { applyPreferencesSchema, applyPreferencesUpdateRequestSchema, meFreeApplicationsSchema, type ApplyPreferences, type ApplyPreferencesUpdateRequest } from "./schemas/users.js";
