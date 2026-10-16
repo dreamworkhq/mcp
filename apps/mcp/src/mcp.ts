@@ -1029,6 +1029,12 @@ export function createMcpServer(
         .describe(
           "Whether generated application packs include a cover letter. false turns cover letters off; Autopilot then skips jobs that require one.",
         ),
+      tailoredResumesEnabled: z
+        .boolean()
+        .optional()
+        .describe(
+          "Whether each application gets a resume rewritten for the role, on manual applies and Autopilot. false sends the default resume unless an application picked a version itself.",
+        ),
       expectedProfileIdentityVersion: z
         .number()
         .int()
@@ -1040,14 +1046,18 @@ export function createMcpServer(
     }),
     requiresAuth: true,
     handler: async (args) => {
-      const { coverLettersEnabled, ...rest } = args;
+      const { coverLettersEnabled, tailoredResumesEnabled, ...rest } = args;
+      const preferences = {
+        ...(coverLettersEnabled === undefined ? {} : { coverLettersEnabled }),
+        ...(tailoredResumesEnabled === undefined
+          ? {}
+          : { tailoredResumesEnabled }),
+      };
       return json(
         withoutInlineFiles(
           await api.put("/profile", {
             ...rest,
-            ...(coverLettersEnabled === undefined
-              ? {}
-              : { preferences: { coverLettersEnabled } }),
+            ...(Object.keys(preferences).length === 0 ? {} : { preferences }),
           }),
         ),
       );

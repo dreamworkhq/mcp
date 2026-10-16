@@ -133,6 +133,12 @@ const preferencesPatchSchema = z
         "Places never to show in matches, job alerts or Autopilot: each a city, a state or region, or a country, as the person names it (`Kirkland`, `Bellevue, WA`, `California`). A city hides that city only, not its metro, so list each suburb. Remote roles are never hidden by a place. A name that cannot be placed refuses the whole write and names it, so ask which city they mean (`Eastside` is not a place; `Bellevue`, `Redmond` and `Kirkland` are). This REPLACES the list: to add one, include the current ones from get_preferences.",
       ),
     coverLettersEnabled: z.boolean().optional(),
+    tailoredResumesEnabled: z
+      .boolean()
+      .optional()
+      .describe(
+        "Whether each application gets a resume rewritten for the role, on the person's own Apply and on Autopilot. False sends their default resume instead, unless they picked a version on that application.",
+      ),
     // One level, because matching reads one: the overlay takes the first entry
     // and the profile editor is a single-select. A second entry would be
     // stored and never scored.
@@ -177,6 +183,7 @@ const storedPreferencesSchema = z
     excludedPlaces: z.array(z.string()).optional(),
     excludedSeniorities: z.array(z.string()).optional(),
     coverLettersEnabled: z.boolean().optional(),
+    tailoredResumesEnabled: z.boolean().optional(),
     seniorities: z.array(z.string()).optional(),
     aiRoleInterest: aiRoleInterestSchema.optional(),
   })

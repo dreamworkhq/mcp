@@ -770,6 +770,10 @@ export const profilePreferencesSchema = responseComponent(
     // generation and every automated cover-letter use off — see
     // coverLettersEnabledFromPreferences in apps/api.
     coverLettersEnabled: z.boolean().optional(),
+    // Absent means enabled. An explicit false sends the default resume on
+    // every application that has no resume choice of its own — see
+    // tailoredResumesEnabledFromPreferences in apps/api.
+    tailoredResumesEnabled: z.boolean().optional(),
   }),
   {
     id: "ProfilePreferences",
