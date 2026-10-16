@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
  * counts. A few long files then land on one runner and the 15-minute job limit
  * cancels that runner even though no assertion failed. The committed plan
  * packs files by measured duration instead. It applies only when the shard
- * denominator matches the plan (CI's 6 and 3). Local `verify:ci` uses four API
+ * denominator matches the plan (CI's 3 and 2). Local `verify:ci` uses four API
  * shards and keeps the runner's own split.
  */
 
