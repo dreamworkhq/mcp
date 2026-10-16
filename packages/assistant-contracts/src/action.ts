@@ -105,18 +105,29 @@ export type McpHiddenReason = (typeof MCP_HIDDEN_REASONS)[number];
 
 /**
  * Behaviour hints carried into every generated tool definition.
- * `readOnlyHint` and `openWorldHint` are mandatory so each action states them
- * deliberately instead of inheriting a client default, matching the
- * first-party convention in `apps/mcp/src/mcp.ts`.
+ *
+ * `readOnlyHint` and `openWorldHint` are mandatory. A tool that writes also
+ * states `destructiveHint`: true when the call deletes, replaces, sends, or
+ * otherwise cannot be undone, false when it only adds or updates. A read-only
+ * tool is not destructive, so it leaves the flag off rather than repeating
+ * itself. Clients then see `destructiveHint: false` on the wire.
  */
-export interface ActionMcpExposed {
+interface ActionMcpExposedCommon {
   expose: true;
   /** Factual operation description for external MCP clients, without model instructions. */
   description: string;
-  readOnlyHint: boolean;
   openWorldHint: boolean;
-  destructiveHint?: boolean;
 }
+
+export type ActionMcpExposed =
+  | (ActionMcpExposedCommon & {
+      readOnlyHint: true;
+      destructiveHint?: false;
+    })
+  | (ActionMcpExposedCommon & {
+      readOnlyHint: false;
+      destructiveHint: boolean;
+    });
 
 /**
  * A capability the MCP catalog does not offer, and the ground for that.

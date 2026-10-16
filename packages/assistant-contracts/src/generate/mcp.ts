@@ -5,19 +5,18 @@ import type { ActionDefinition } from "../action.js";
  * A tool definition in the shape `apps/mcp` registers, minus the handler the
  * MCP package binds itself.
  *
- * `readOnlyHint` and `openWorldHint` are required, matching the first-party
- * convention in `apps/mcp/src/mcp.ts`: every tool states its behaviour
- * deliberately instead of inheriting an SDK default.
+ * Hints match `ActionMcpExposed`: a write states `destructiveHint`, and a
+ * read does not inherit the SDK's destructive default.
  */
+export type McpToolAnnotations =
+  | { readOnlyHint: true; openWorldHint: boolean; destructiveHint?: false }
+  | { readOnlyHint: false; openWorldHint: boolean; destructiveHint: boolean };
+
 export interface McpToolDefinition {
   name: string;
   title: string;
   description: string;
-  annotations: {
-    readOnlyHint: boolean;
-    openWorldHint: boolean;
-    destructiveHint?: boolean;
-  };
+  annotations: McpToolAnnotations;
   inputSchema: z.ZodObject;
   outputSchema?: z.ZodObject;
   requiresAuth: boolean;
@@ -44,13 +43,19 @@ export function toMcpToolDefinitions(
       name: action.id,
       title: action.title,
       description: action.mcp.description,
-      annotations: {
-        readOnlyHint: action.mcp.readOnlyHint,
-        openWorldHint: action.mcp.openWorldHint,
-        ...(action.mcp.destructiveHint === undefined
-          ? {}
-          : { destructiveHint: action.mcp.destructiveHint }),
-      },
+      annotations: action.mcp.readOnlyHint
+        ? {
+            readOnlyHint: true,
+            openWorldHint: action.mcp.openWorldHint,
+            ...(action.mcp.destructiveHint === undefined
+              ? {}
+              : { destructiveHint: action.mcp.destructiveHint }),
+          }
+        : {
+            readOnlyHint: false,
+            openWorldHint: action.mcp.openWorldHint,
+            destructiveHint: action.mcp.destructiveHint,
+          },
       inputSchema: action.input,
       outputSchema: action.output,
       requiresAuth: true,

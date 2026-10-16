@@ -221,13 +221,14 @@ interface DreamworkToolDefinition<InputShape extends z.ZodRawShape> {
   title: string;
   description: string;
   /**
-   * Behavior hints. `readOnlyHint` and `openWorldHint` are mandatory so every
-   * tool states them deliberately instead of inheriting SDK defaults.
+   * Behavior hints. A write states `destructiveHint`. A read leaves it off;
+   * registration publishes `false` so clients do not inherit the SDK default.
    */
-  annotations: ToolAnnotations & {
-    readOnlyHint: boolean;
-    openWorldHint: boolean;
-  };
+  annotations: ToolAnnotations &
+    (
+      | { readOnlyHint: true; openWorldHint: boolean; destructiveHint?: false }
+      | { readOnlyHint: false; openWorldHint: boolean; destructiveHint: boolean }
+    );
   inputSchema: z.ZodObject<InputShape>;
   /** Optional structured-output contract; the handler must then also return `structuredContent`. */
   outputSchema?: z.ZodObject<z.ZodRawShape>;
@@ -246,6 +247,21 @@ type DreamworkToolRegistrar = <InputShape extends z.ZodRawShape>(
   name: string,
   definition: DreamworkToolDefinition<InputShape>,
 ) => void;
+
+/**
+ * Tools a session may call with no API key and no OAuth token.
+ *
+ * Everything else registered by `createMcpServer` reads or changes one
+ * account. The hosted endpoint allows this set on a guest session and
+ * answers every other `tools/call` with 401. Registration throws if a
+ * tool's `requiresAuth` disagrees with this set.
+ */
+export const PUBLIC_MCP_TOOL_NAMES: ReadonlySet<string> = new Set([
+  "browse_listings",
+  "get_listing",
+  "get_platform_context",
+  "get_upgrade_link",
+]);
 
 /**
  * Typed first-party wrapper over `server.registerTool()`. Owns the cross-tool
@@ -273,6 +289,11 @@ function createDreamworkToolRegistrar(
   distribution: "default" | "openai",
 ): DreamworkToolRegistrar {
   return function registerDreamworkTool(name, definition) {
+    if (PUBLIC_MCP_TOOL_NAMES.has(name) === definition.requiresAuth) {
+      throw new Error(
+        `${name}: requiresAuth is ${definition.requiresAuth}, which does not match PUBLIC_MCP_TOOL_NAMES`,
+      );
+    }
     if (distribution === "openai" && OPENAI_WITHHELD_TOOLS.has(name)) return;
     type Args = Parameters<typeof definition.handler>[0];
     const run = async (args: Args): Promise<CallToolResult> => {
@@ -314,7 +335,13 @@ function createDreamworkToolRegistrar(
         annotations: {
           ...definition.annotations,
           title: definition.title,
-          destructiveHint: !definition.annotations.readOnlyHint,
+          readOnlyHint: definition.annotations.readOnlyHint,
+          openWorldHint: definition.annotations.openWorldHint,
+          // A read cannot destroy anything. Publishing false, rather than
+          // omitting the hint, keeps clients off the SDK's destructive default.
+          destructiveHint: definition.annotations.readOnlyHint
+            ? false
+            : definition.annotations.destructiveHint,
         },
       },
       // The SDK's callback generics vary with the schema shape; `run` already

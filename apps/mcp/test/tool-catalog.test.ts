@@ -7,7 +7,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { dataActions, toMcpToolDefinitions } from "@jobless/assistant-contracts";
 import { ApiClient } from "../src/client.js";
-import { createMcpServer } from "../src/mcp.js";
+import { createMcpServer, PUBLIC_MCP_TOOL_NAMES } from "../src/mcp.js";
 import { REPO_ROOT, renderAll } from "../scripts/tool-docs.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -70,6 +70,13 @@ async function listRegisteredTools() {
   return tools;
 }
 
+test("every keyless tool name is registered on the server", async () => {
+  const tools = new Set((await listRegisteredTools()).map((tool) => tool.name));
+  for (const name of PUBLIC_MCP_TOOL_NAMES) {
+    assert.equal(tools.has(name), true, `${name} is public but not registered`);
+  }
+});
+
 test("registered tool catalog is the registry's exposed actions plus the hand-written set", async () => {
   const tools = await listRegisteredTools();
   assert.deepEqual(tools.map((t) => t.name).sort(), EXPECTED_TOOLS);
@@ -85,29 +92,53 @@ test("every tool declares a title, description, and deliberate annotations", asy
     );
     assert.ok(tool.annotations, `${tool.name}: no annotations`);
     assert.equal(
-      tool.annotations.destructiveHint,
-      !tool.annotations.readOnlyHint,
-      `${tool.name}: mutations require explicit permission`,
-    );
-    assert.equal(
       tool.annotations.title,
       tool.title,
       `${tool.name}: annotation title must name the tool`,
     );
     assert.equal(
-      typeof tool.annotations?.readOnlyHint,
+      typeof tool.annotations.readOnlyHint,
       "boolean",
       `${tool.name}: readOnlyHint must be explicitly declared`,
     );
     assert.equal(
-      typeof tool.annotations?.openWorldHint,
+      typeof tool.annotations.destructiveHint,
+      "boolean",
+      `${tool.name}: destructiveHint must be explicitly declared`,
+    );
+    assert.equal(
+      typeof tool.annotations.openWorldHint,
       "boolean",
       `${tool.name}: openWorldHint must be explicitly declared`,
     );
+    if (tool.annotations.readOnlyHint) {
+      assert.equal(
+        tool.annotations.destructiveHint,
+        false,
+        `${tool.name}: a read-only tool is not destructive`,
+      );
+    }
     assert.equal(
       tool.inputSchema.type,
       "object",
       `${tool.name}: input schema must be an object schema`,
+    );
+  }
+});
+
+test("registry hints are published as declared, including non-destructive writes", async () => {
+  const tools = await listRegisteredTools();
+  for (const definition of toMcpToolDefinitions(dataActions)) {
+    const tool = tools.find((entry) => entry.name === definition.name);
+    assert.ok(tool, `${definition.name}: not registered`);
+    assert.equal(tool.annotations?.readOnlyHint, definition.annotations.readOnlyHint);
+    assert.equal(tool.annotations?.openWorldHint, definition.annotations.openWorldHint);
+    assert.equal(
+      tool.annotations?.destructiveHint,
+      definition.annotations.readOnlyHint
+        ? false
+        : definition.annotations.destructiveHint,
+      `${definition.name}: a write's destructiveHint must survive registration`,
     );
   }
 });

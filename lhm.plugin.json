@@ -1,0 +1,3217 @@
+{
+  "identifier": "dreamworkhq-mcp",
+  "name": "Dreamwork",
+  "author": "Dreamwork",
+  "authorUrl": "https://github.com/dreamworkhq",
+  "version": "1.7.0",
+  "description": "MCP server for job search. Browse listings with no account. With a free Dreamwork key: rank matches, tailor resumes and cover letters, apply, track replies.",
+  "homepage": "https://www.dreamworkhq.com/agents",
+  "category": "productivity",
+  "cloudEndpoint": "https://mcp.dreamworkhq.com/mcp",
+  "icon": "https://raw.githubusercontent.com/dreamworkhq/mcp/main/icon-400.png",
+  "tags": [
+    "job-search",
+    "jobs",
+    "resume",
+    "cover-letter",
+    "job-applications",
+    "career",
+    "recruiting",
+    "ai-agents"
+  ],
+  "tools": [
+    {
+      "name": "add_contact",
+      "title": "Add contact",
+      "description": "Adds a recruiter or referrer contact to the account using the supplied contact details.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Contact name"
+          },
+          "company": {
+            "type": "string",
+            "description": "Company"
+          },
+          "email": {
+            "description": "Email",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "title": {
+            "description": "Job title",
+            "type": "string"
+          },
+          "linkedinUrl": {
+            "description": "LinkedIn URL",
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "name",
+          "company"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Add contact",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "add_jobs",
+      "title": "Add job manually",
+      "description": "Adds a job to the account's private pipeline using title, company and optional description, URL, contact email and application method. For eligible accounts, a new job can also create and queue its application materials, using pack allowance. No application is submitted.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "company": {
+            "type": "string",
+            "description": "Company name"
+          },
+          "description": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "contactEmail": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "applicationMethod": {
+            "type": "string",
+            "enum": [
+              "email",
+              "web",
+              "api",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "title",
+          "company"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Add job manually",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "apply",
+      "title": "Apply to a job",
+      "description": "Submits one application to an employer under the account holder's name using the saved materials at expectedRevision. Submission requires existing materials and plan allowance and cannot be recalled. A confirmation hold returns the destination, material summary and a token bound to identical arguments; the reviewed revision is enforced.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "The materials revision the person reviewed. A mismatch fences the send."
+          },
+          "confirmationToken": {
+            "description": "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicationId",
+          "expectedRevision"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Apply to a job",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "browse_listings",
+      "title": "Browse job listings",
+      "description": "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported; a paid plan raises the page-size limit. A page holds 25 listings by default and limit accepts up to 100, which the API clamps to 25 without a key or on the free plan; the next page is the previous nextCursor. An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "search": {
+            "description": "Words in the job title or company name.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "company": {
+            "description": "Company name or domain.",
+            "type": "string",
+            "maxLength": 120
+          },
+          "function": {
+            "description": "Job functions to keep, as a union.",
+            "minItems": 1,
+            "maxItems": 15,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Engineering",
+                "Product",
+                "Design",
+                "Marketing",
+                "Data Science",
+                "Sales",
+                "Operations",
+                "Finance",
+                "Legal",
+                "HR",
+                "Customer Success",
+                "DevRel",
+                "Security",
+                "Research",
+                "Executive"
+              ]
+            }
+          },
+          "seniority": {
+            "description": "Seniority levels to keep, as a union.",
+            "minItems": 1,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Mid-Level",
+                "Senior",
+                "Staff+",
+                "Director+"
+              ]
+            }
+          },
+          "workSettings": {
+            "description": "Work settings to keep, as a union. A posting that states none counts as onsite.",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "remote",
+                "hybrid",
+                "onsite"
+              ]
+            }
+          },
+          "remote": {
+            "description": "Shorthand for workSettings [\"remote\"].",
+            "type": "boolean"
+          },
+          "location": {
+            "description": "City, region, or country. Remote roles open to that country match too. A place Dreamwork cannot resolve is refused.",
+            "type": "string",
+            "maxLength": 120
+          },
+          "internship": {
+            "description": "Internships, co-ops, and apprenticeships only.",
+            "type": "boolean"
+          },
+          "aiRole": {
+            "description": "AI-focused roles only.",
+            "type": "boolean"
+          },
+          "postedWithinDays": {
+            "description": "Employer posting date within this many days.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 90
+          },
+          "minSalary": {
+            "description": "Pay floor in whole annual US dollars, e.g. 200000. A listing passes when its posted band reaches it; listings with no posted pay drop out.",
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 9007199254740991
+          },
+          "maxSalary": {
+            "description": "Pay ceiling in whole annual US dollars.",
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 9007199254740991
+          },
+          "equity": {
+            "description": "Only postings offering equity.",
+            "type": "boolean"
+          },
+          "bonus": {
+            "description": "Only postings offering a bonus.",
+            "type": "boolean"
+          },
+          "healthcare": {
+            "description": "Only postings offering healthcare.",
+            "type": "boolean"
+          },
+          "industry": {
+            "description": "Employer industry. One of: Software & Technology, Financial Services, Insurance, Healthcare & Hospitals, Pharma & Biotech, Consulting & Professional Services, Retail & Consumer Goods, Manufacturing & Industrial, Media & Entertainment, Education, Government & Public Sector, Nonprofit & NGO, Energy & Utilities, Telecommunications, Transportation & Logistics, Real Estate & Construction, Aerospace & Defense, Hospitality & Travel, Agriculture & Food, Legal, Marketing & Advertising, Other.",
+            "type": "string",
+            "maxLength": 60
+          },
+          "addedAfter": {
+            "description": "Only listings Dreamwork first saw after this ISO date-time.",
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "sort": {
+            "description": "Order. Omit it to walk every match in a stable, unranked order; any sort stops the walk at 1,000.",
+            "type": "string",
+            "enum": [
+              "newest",
+              "pay_high",
+              "pay_low",
+              "featured"
+            ]
+          },
+          "cursor": {
+            "description": "`nextCursor` from the previous page. Send the same filters and sort, or it is refused.",
+            "type": "string",
+            "maxLength": 1024
+          },
+          "limit": {
+            "description": "Page size, 25 when omitted. Without a key or on the free plan the API caps it at 25.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Browse job listings",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "cancel_apply",
+      "title": "Cancel an application that is still sending",
+      "description": "Stops a queued or in-progress application when submission can still be prevented. Already submitted applications cannot be recalled; the receipt reports that boundary.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Cancel an application that is still sending",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "confirm_hypothesis",
+      "title": "Confirm a guess",
+      "description": "Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis. A stated refusal becomes a matching deal-breaker; other confirmations become work-vault notes that do not filter matches. The receipt identifies which record changed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hypothesisId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hypothesisId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Confirm a guess",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "dismiss_match",
+      "title": "Dismiss a match",
+      "description": "Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it. The receipt offers undo for one minute; restore_match reverses it at any time and list_dismissed_matches lists dismissed listings. The supplied reason is not stored. It does not hide other listings from the same company and does not move or remove an existing pipeline card.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "Listing id from the feed or `list_matches`."
+          },
+          "reason": {
+            "description": "The person's own words for why this role is wrong. Accepted but not stored, and it does not change later matches.",
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Dismiss a match",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "edit_answer",
+      "title": "Edit one application answer",
+      "description": "Revises one employer-question answer identified by questionId; other answers and documents remain unchanged. This edits application prose rather than the account's factual screening, work-authorization, compensation or availability settings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "questionId": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          }
+        },
+        "required": [
+          "applicationId",
+          "questionId",
+          "instruction"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Edit one application answer",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "edit_cover_letter",
+      "title": "Edit the cover letter",
+      "description": "Revises an existing application's cover letter using the supplied instruction. scope can identify a paragraph or selected passage. Without scope, the targeted passage is located from the instruction; a whole-letter instruction revises the whole letter. Existing materials are required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600,
+            "description": "What to change, in the person's words."
+          },
+          "scope": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "paragraph"
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Blank-line-separated paragraph index in the cover letter."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "index"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "selection"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 600,
+                    "description": "Exact substring of the asset, which must occur exactly once."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "text"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "section"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Resume block id from the HTML block map."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "answer"
+                  },
+                  "questionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "questionId"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "applicationId",
+          "instruction"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Edit the cover letter",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "edit_resume",
+      "title": "Edit the tailored resume",
+      "description": "Revises one application's tailored resume using the supplied instruction, preserving its formatting and regenerating the PDF. scope identifies a section block or selected passage; otherwise the target is located from the instruction. The person's default uploaded resume is not modified; an active default variant is refused. Existing materials are required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "scope": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "paragraph"
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Blank-line-separated paragraph index in the cover letter."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "index"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "selection"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 600,
+                    "description": "Exact substring of the asset, which must occur exactly once."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "text"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "section"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Resume block id from the HTML block map."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "answer"
+                  },
+                  "questionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "questionId"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "applicationId",
+          "instruction"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Edit the tailored resume",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "forget_hypothesis",
+      "title": "Forget a guess",
+      "description": "Deletes the specified unconfirmed career hypothesis from the account's stored hypotheses. Existing confirmed career facts and stated preferences are unaffected.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hypothesisId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hypothesisId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Forget a guess",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "format_resume",
+      "title": "Change how part of the resume looks",
+      "description": "Changes alignment, bold, italic or underline formatting of a tailored resume without changing its words. line identifies a passage and section identifies a heading; selected text can supply the target when neither is given. No writing model or allowance is used. The receipt includes undo.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "line": {
+            "description": "A few words that identify one non-blank line of the tailored resume, matched case-insensitively.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "section": {
+            "description": "A heading as it appears on the resume, such as SUMMARY or EXPERIENCE; the section's lines under it are styled together. The heading line itself is not — to style it, name it as a `line`.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "text": {
+            "description": "A phrase within the targeted lines. When given, the marks apply to it alone; otherwise to the whole of each line.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "align": {
+            "type": "string",
+            "enum": [
+              "left",
+              "center"
+            ]
+          },
+          "bold": {
+            "description": "`false` removes the mark.",
+            "type": "boolean"
+          },
+          "italic": {
+            "description": "`false` removes the mark.",
+            "type": "boolean"
+          },
+          "underline": {
+            "description": "`false` removes the mark.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Change how part of the resume looks",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "generate_outreach",
+      "title": "Generate outreach email",
+      "description": "Generates a personalized outreach-email draft for the specified contact and job. No email is sent by this call.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Contact ID"
+          },
+          "jobId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Job ID"
+          }
+        },
+        "required": [
+          "contactId",
+          "jobId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Generate outreach email",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "generate_pack",
+      "title": "Generate application materials",
+      "description": "Queues a tailored resume, cover letter and employer-question answers for one saved role. assets optionally selects a subset; omission requests all three. Each request spends one pack allowance, regardless of subset, and generation settles asynchronously. Existing materials can be overwritten by generation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "Listing or private-job id, for a role not yet prepared."
+          },
+          "assets": {
+            "description": "Subset to generate. Omit for all three.",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "resume",
+                "coverLetter",
+                "answers"
+              ]
+            }
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Generate application materials",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "generate_resume",
+      "title": "Generate tailored resume",
+      "description": "Generates a tailored resume for the specified account-owned application and returns its result. This does not submit an application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Application ID"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Generate tailored resume",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_application_documents",
+      "title": "Get links to one application's documents",
+      "description": "Returns version-specific resume PDF and DOCX, cover-letter PDF and combined-pack PDF download links for one application, plus source, inclusion, lock state and revision. Links open without login for about ten minutes. Null links indicate missing or excluded documents. packPageUrl requires sign-in. There is no cover-letter DOCX.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get links to one application's documents",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_application_materials",
+      "title": "Get application materials",
+      "description": "Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. Materials include default and tailored resume contents, selected variant, inclusion, lock state and optimistic revision for submission. Rendered resume PDFs are not included (pdfBase64 is null); get_application_documents returns download links for the files this application will send.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Application ID"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get application materials",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_application_readiness",
+      "title": "Check what applying still needs",
+      "description": "Returns readiness for one-off submission and Autopilot, plan entitlement and missing onboarding answers. Missing items include question, answerShape, choices, current value, available suggestion and webUrl. A null answerShape means the step requires the person's action in the web app. This read sends nothing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Check what applying still needs",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_application_status",
+      "title": "Read what happened to one application",
+      "description": "Returns an application's event timeline and separate submitted, employerConfirmed and replied facts. An application id or pipeline matchId resolves the application. Coverage names the mail this read inspected, normally only mail sent to the account's Dreamwork application address; employer mail sent anywhere else is not visible here and stays unknown. personalInboxConnected false is the normal state, not a setup step. The board column alone is not submission evidence. submittedAnswers contains captured employer-form values and cover-letter delivery for the proven submitted attempt, or null when submission, the attempt or a capture is unproven or unavailable.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "description": "Application id. A pipeline card's `matchId` is accepted and resolved to the application behind it."
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read what happened to one application",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_autopilot_settings",
+      "title": "Read Autopilot settings",
+      "description": "Returns the saved minimum Matches score and default-versus-tailored resume choice for Autopilot. Reading settings starts no applications.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read Autopilot settings",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_autopilot_status",
+      "title": "Read Autopilot status",
+      "description": "Returns Autopilot state (on or off, matching the product switch, or unavailable when the plan does not include it), daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt, which is null unless the state is on. dailyLimit is today's allowance and usualDailyLimit is the plan's usual daily limit. On the first day Autopilot sends in a monthly window, dailyLimit is a larger first-day allowance; after that day it equals usualDailyLimit. That first day is the first day it sends in the window, not the first day of the calendar month. unavailableReason explains plan restrictions. No last-run timestamp is provided.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read Autopilot status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_career_record",
+      "title": "Read the career record",
+      "description": "Returns resume-derived professional facts, document-vault metadata, person-stated preferences, writing preferences and unconfirmed hypotheses as separate fields. Resume text and document bodies are excluded.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "include": {
+            "description": "Narrow the read. Omit for all four. A section you leave out comes back empty rather than absent, so do not read an omitted section as \"they have none\".",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "facts",
+                "vault",
+                "stated",
+                "hypotheses"
+              ]
+            }
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read the career record",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_communication_preferences",
+      "title": "Read email preferences",
+      "description": "Returns job-alert settings and cadence, Autopilot result-email mode, product-update consent and the all-optional-emails-off state. jobAlertEligibility separately reports delivery restrictions such as bounce or unsubscribe. Account, security, billing and essential employer mail are outside these settings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read email preferences",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_generated_resumes",
+      "title": "Get generated resumes",
+      "description": "Returns tailored resumes generated for the specified account-owned application. Rendered PDFs are not included (pdfBase64 is null).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Application ID"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get generated resumes",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_inbox",
+      "title": "Read recruiter conversations",
+      "description": "Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. unanswered means the employer wrote last; needsReply means that message asks for a response. A threadId returns its messages. Reading does not mark mail read. limit and nextOffset support pagination; mail bodies are third-party content. A page holds 20 threads by default and limit accepts up to 50; for the next page, send the previous nextOffset as offset, and null means the end.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "description": "Read one thread in full instead of listing.",
+            "type": "string"
+          },
+          "unansweredOnly": {
+            "description": "Only threads whose last employer mail needs a reply.",
+            "type": "boolean"
+          },
+          "unreadOnly": {
+            "description": "Only threads holding mail the person has not been shown.",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "offset": {
+            "default": 0,
+            "description": "Threads to skip; the previous result's `nextOffset`.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read recruiter conversations",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_job",
+      "title": "Read one role",
+      "description": "Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no matcher explanation is stored.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "Listing id or private-job id from the feed or envelope."
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read one role",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_listing",
+      "title": "Get listing details",
+      "description": "Returns full details of a platform job listing identified by id. No login is required. url is the Dreamwork listing page; sourceUrl is the employer's direct posting.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Listing ID"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get listing details",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_pack_status",
+      "title": "Check whether materials are ready",
+      "description": "Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. Includes requested and completed assets, edit and lock state, material revision and review-page URL. Reading starts no generation and changes no materials.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationIds": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Application ids from a receipt or a result; a card or listing id on the board also resolves."
+          }
+        },
+        "required": [
+          "applicationIds"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Check whether materials are ready",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_pipeline",
+      "title": "Read the pipeline",
+      "description": "Returns saved and applied roles as board cards with column, application id and last-updated time. total and counts cover all matching records; complete identifies whether cards are truncated by limit. limit defaults to 50 cards and accepts up to 100; there is no next page, so when complete is false narrow the read with status. Column values describe board state and do not establish employer receipt or response.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "SAVED",
+              "APPLIED",
+              "CONFIRMED",
+              "INTERVIEWING",
+              "OFFER_RECEIVED",
+              "ACCEPTED",
+              "REJECTED",
+              "NO_RESPONSE",
+              "WITHDRAWN"
+            ]
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read the pipeline",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_platform_context",
+      "title": "Get platform context",
+      "description": "Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach and interview capabilities, plus its product context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get platform context",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_preferences",
+      "title": "Read job preferences",
+      "description": "Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, seniority, AI-role interest and cover-letter settings. unanswered identifies preference keys the account holder has not supplied. It does not return resume content or work history.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read job preferences",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_profile",
+      "title": "Get profile",
+      "description": "Returns the authenticated account's profile, resume text, preferences and profileIdentityVersion snapshot. resumeUrl is null when the stored resume file is inline rather than a link; resumeText carries its contents.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get profile",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_resume_download_link",
+      "title": "Get a link to the person's resume",
+      "description": "Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. The link opens without login for ten minutes and only for the file that existed when it was made. It returns no file content. status is ready, no_resume_on_file or no_file_for_resume; the last two carry null fields and are not errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get a link to the person's resume",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_resume_work_history",
+      "title": "Read how the resume's experience was understood",
+      "description": "Returns the account's main resume grouped by role: each employer with its title, location, dates and bullets as read from the file's page layout, plus achievements placed under no role and a count of bullets whose extracted-text position disagrees with the layout. status is ready, pending (still being read; call again shortly) or unavailable (no resume, or it could not be read).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read how the resume's experience was understood",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_stats",
+      "title": "Get pipeline stats",
+      "description": "Returns aggregate account-owned job, application, escalation and outreach statistics.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get pipeline stats",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_task",
+      "title": "Read one entry in the record of what ran",
+      "description": "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. Queued work can be followed through its recorded status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "taskId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read one entry in the record of what ran",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_unread_reminders",
+      "title": "Check for unread recruiter mail",
+      "description": "Returns unread recruiter-message and thread counts, oldest unread time and recent message previews with thread, company, role and kind. Reading does not mark messages read. Previews contain third-party email content.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Check for unread recruiter mail",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_updates_since",
+      "title": "Read what changed since a moment",
+      "description": "Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. asOf is the next watermark. Match discovery includes overlapHours, defaulting to 72, before since because listings may become servable after first discovery; repeated ids can appear. Truncation counts identify older changes excluded by caps. Reading marks no mail read and creates no schedule.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "since": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "description": "The previous result's `asOf`, or when the person last checked."
+          },
+          "overlapHours": {
+            "description": "How far before `since` to look for new matches; 72 when omitted.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 168
+          }
+        },
+        "required": [
+          "since"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read what changed since a moment",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_upgrade_link",
+      "title": "Get a link to upgrade",
+      "description": "Returns a browser link to checkout for the requested Pro or Dreamer plan and optional billing interval or promo code. Sign-in precedes checkout when required. No charge occurs until payment is confirmed on the checkout page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "pro",
+              "dreamer"
+            ],
+            "description": "The plan the person asked for."
+          },
+          "billingInterval": {
+            "description": "Only when the person named one. Quarterly is one invoice every three months at about 15% less; a promo code prices a monthly invoice, so the two cannot be combined.",
+            "type": "string",
+            "enum": [
+              "month",
+              "quarter"
+            ]
+          },
+          "promoCode": {
+            "description": "Only when the person supplied one.",
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "plan"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get a link to upgrade",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_usage",
+      "title": "Read what the plan still allows",
+      "description": "Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time. A null limit represents an unlimited allowance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Read what the plan still allows",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "import_job",
+      "title": "Import a job from a URL",
+      "description": "Fetches a public job-posting URL and imports it as a private role in the account's pipeline. Extraction runs asynchronously and the card appears when it finishes. A posting already held by Dreamwork returns completed without another fetch.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Job posting URL, as the person gave it."
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Import a job from a URL",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "list_contacts",
+      "title": "List contacts",
+      "description": "Returns the account's saved recruiter and referrer contacts, optionally filtered by company.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "company": {
+            "description": "Filter by company",
+            "type": "string"
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "List contacts",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_dismissed_matches",
+      "title": "List dismissed matches",
+      "description": "Returns the account's dismissed listings, newest first, with listing id, title, company, Dreamwork page url, dismissal time and whether the listing is still active. total counts all dismissed listings. limit defaults to 20 and accepts up to 50; nextOffset continues the list and null ends it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "description": "Page size, 20 when omitted.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "offset": {
+            "description": "`nextOffset` from the previous page; 0 when omitted.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "List dismissed matches",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_interviews",
+      "title": "List interviews",
+      "description": "Returns all interviews detected for the account, including role, company, time and platform when known. No role filter is applied.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "List interviews",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_matches",
+      "title": "List matches",
+      "description": "Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. A page holds 10 jobs by default and limit accepts up to 50; the next page is the previous nextCursor, which keeps the page size it was issued with. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. notes describe applied filters and coverage.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "description": "Free-text search across the person's match pool.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "function": {
+            "description": "Job-function labels, comma-separated for a union, e.g. \"Engineering,Product\". An unknown label is refused with the list.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "seniority": {
+            "description": "Seniority labels, comma-separated for a union: Junior, Mid-Level, Senior, Staff+, Director+. A hard filter: pass it when the person names a level they want only, because the stored level ranks matches but never removes other levels. It also drops roles whose level was never classified.",
+            "type": "string",
+            "maxLength": 80
+          },
+          "location": {
+            "description": "City, region, or country; a place the gazetteer cannot resolve is refused.",
+            "type": "string",
+            "maxLength": 120
+          },
+          "remoteOnly": {
+            "description": "Shorthand for workSettings [\"remote\"].",
+            "type": "boolean"
+          },
+          "workSettings": {
+            "description": "Work settings to keep, as a union; an unstated setting counts as onsite.",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "remote",
+                "hybrid",
+                "onsite"
+              ]
+            }
+          },
+          "internship": {
+            "description": "Internships, co-ops, and apprenticeships only.",
+            "type": "boolean"
+          },
+          "aiRole": {
+            "description": "AI roles only.",
+            "type": "boolean"
+          },
+          "minSalary": {
+            "description": "Pay floor in whole annual USD, e.g. 200000. Jobs with no posted pay drop out.",
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 9007199254740991
+          },
+          "maxSalary": {
+            "description": "Pay ceiling in whole annual USD.",
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 9007199254740991
+          },
+          "minMatchPercent": {
+            "description": "Lowest match percent to keep, on the 40-97 scale shown.",
+            "type": "integer",
+            "minimum": 40,
+            "maximum": 97
+          },
+          "equity": {
+            "type": "boolean"
+          },
+          "bonus": {
+            "type": "boolean"
+          },
+          "healthcare": {
+            "type": "boolean"
+          },
+          "industry": {
+            "description": "Employer industry, e.g. \"Pharma & Biotech\". An unknown name is refused with the list.",
+            "type": "string",
+            "maxLength": 60
+          },
+          "postedWithinDays": {
+            "description": "Employer posting date within this many days.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 90
+          },
+          "addedAfter": {
+            "description": "Only jobs Dreamwork first saw after this ISO date-time.",
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "sort": {
+            "description": "Order; relevance when omitted.",
+            "type": "string",
+            "enum": [
+              "relevance",
+              "newest",
+              "pay_high",
+              "pay_low"
+            ]
+          },
+          "cursor": {
+            "description": "`nextCursor` from the previous page. Send the same filters and sort, or it is refused.",
+            "type": "string",
+            "maxLength": 512
+          },
+          "limit": {
+            "description": "Page size, 10 when omitted. A cursor keeps the size it was issued with.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "List matches",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_tasks",
+      "title": "List what the assistant has done recently",
+      "description": "Returns recent account-owned assistant actions, newest first, across the site and MCP. status filters ongoing, completed or failed work; limit bounds the result. The ledger records actions rather than conversation text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "completed",
+              "queued",
+              "verifying",
+              "failed",
+              "cancelled",
+              "undone"
+            ]
+          },
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "List what the assistant has done recently",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "mark_applied_offsite",
+      "title": "Record an application made elsewhere",
+      "description": "Records an application the account holder submitted outside Dreamwork. Exactly one of matchId, listingId or url names the role; a role not yet in the pipeline is added in Applied without generating materials, and an unlisted URL is imported in the background. appliedAt (YYYY-MM-DD or ISO 8601, not in the future) is the reported application date and defaults to now; repeating the call with a new appliedAt corrects it. attestation:true is required and represents the person's confirmation that submission occurred. Recorded roles are excluded from matches and Autopilot. Applications Dreamwork is still sending are refused. There is no undo. This call does not send an application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "matchId": {
+            "description": "Board card id from `get_pipeline`.",
+            "type": "string"
+          },
+          "listingId": {
+            "description": "Dreamwork listing id, from `list_matches` or `get_job`. The role does not have to be saved.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The job posting's URL, for a role Dreamwork does not list.",
+            "type": "string",
+            "format": "uri"
+          },
+          "appliedAt": {
+            "description": "When they applied, as YYYY-MM-DD or an ISO 8601 timestamp. Not in the future. Omitted means now.",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              }
+            ]
+          },
+          "attestation": {
+            "type": "boolean",
+            "const": true,
+            "description": "The person stated they applied to this role themselves. Never assumed."
+          }
+        },
+        "required": [
+          "attestation"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Record an application made elsewhere",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "mark_messages_read",
+      "title": "Mark recruiter messages read",
+      "description": "Marks the specified recruiter messages read within one thread. Message ids identify the exact messages presented to the account holder; other messages remain unread. The change has no undo.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "string",
+            "description": "The thread the messages were shown from, as `get_inbox` gave it."
+          },
+          "messageIds": {
+            "minItems": 1,
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ids of the messages the person was shown."
+          }
+        },
+        "required": [
+          "threadId",
+          "messageIds"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Mark recruiter messages read",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "move_pipeline",
+      "title": "Move a pipeline card",
+      "description": "Moves one role's board card to the requested column using the account holder's reported state. No employer is contacted. APPLIED records an application rather than submitting one; INTERVIEWING creates a durable interview record. WITHDRAWN removes the card from the active board. Closing a role can remove its listing from the feed. A receipt offers undo only when reversible.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "matchId": {
+            "type": "string",
+            "description": "Board card id from `get_pipeline`."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SAVED",
+              "APPLIED",
+              "CONFIRMED",
+              "INTERVIEWING",
+              "OFFER_RECEIVED",
+              "ACCEPTED",
+              "REJECTED",
+              "NO_RESPONSE",
+              "WITHDRAWN"
+            ]
+          }
+        },
+        "required": [
+          "matchId",
+          "status"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Move a pipeline card",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "parse_preferences_text",
+      "title": "Set several preferences from one sentence",
+      "description": "Parses a sentence describing job preferences, applies supported fields and returns applied values and unparsed fragments. Compensation and seniority are not set by this parser and remain unparsed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "description": "The person's sentence, verbatim."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Set several preferences from one sentence",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "prepare_applications",
+      "title": "Prepare applications for several roles",
+      "description": "Saves and prepares materials for up to ten specified roles sequentially without submitting applications. Unsaved roles consume the daily save allowance; generation for saved roles consumes pack allowance. Finished or in-flight preparation is reused, and person-edited materials are preserved. Each role returns its own outcome.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobIds": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Listing or private-job ids, each once."
+          },
+          "assets": {
+            "description": "Subset to write for every role. Omit for all three.",
+            "minItems": 1,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "resume",
+                "coverLetter",
+                "answers"
+              ]
+            }
+          }
+        },
+        "required": [
+          "jobIds"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Prepare applications for several roles",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "remember_hypothesis",
+      "title": "Remember a guess about the person",
+      "description": "Stores an unconfirmed career hypothesis separately from established facts. At most twenty hypotheses may be pending; further writes are refused at that limit. The statement does not change matching preferences or become a confirmed profile fact.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "The belief, in one sentence, phrased as a guess."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Remember a guess about the person",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reopen_application_materials",
+      "title": "Edit materials for a safe retry",
+      "description": "Opens a new editable material revision only after the API establishes that a failed application cannot still submit. Access is restricted to the Applications rollout cohort admitted by the API.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Failed application ID"
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Edit materials for a safe retry",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "replace_application_document",
+      "title": "Use the person's own document for one application",
+      "description": "Replaces one application's resume or cover letter with the person's supplied text or raw-base64 PDF, DOCX, TXT or MD. The stored content is not rewritten by a model. A resume becomes the selected tailored copy; a letter becomes included. PDF resumes retain their original file, while other formats are rendered from extracted text. expectedRevision is required; locked or sent applications are refused. The account's main resume is unaffected.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string",
+            "enum": [
+              "resume",
+              "coverLetter"
+            ]
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "The `revision` from get_application_documents or get_application_materials."
+          },
+          "text": {
+            "description": "The whole document as the person wrote it. Send this or `file`.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100000
+          },
+          "file": {
+            "type": "object",
+            "properties": {
+              "contentBase64": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1900000,
+                "description": "The file's raw bytes, base64-encoded; about 1.4 MB at most."
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "pdf",
+                  "docx",
+                  "txt",
+                  "md"
+                ]
+              },
+              "filename": {
+                "type": "string",
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "contentBase64",
+              "format"
+            ]
+          }
+        },
+        "required": [
+          "applicationId",
+          "document",
+          "expectedRevision"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Use the person's own document for one application",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reply_to_recruiter",
+      "title": "Reply to a recruiter",
+      "description": "Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. Sending requires explicit consent and an unambiguous thread; otherwise the result is a confirmation hold containing the draft. Sent mail cannot be recalled. Threads whose ids begin with inbound: cannot receive replies through this endpoint.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "description": "The full reply text, as it will be sent."
+          },
+          "confirmationToken": {
+            "description": "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "threadId",
+          "body"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Reply to a recruiter",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "restore_match",
+      "title": "Restore a dismissed match",
+      "description": "Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot. Restoring a listing that is not dismissed returns a no-op receipt. Restoring does not save the listing. A closed listing stays out of the feed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "Listing id, as `dismiss_match` and `list_dismissed_matches` give it."
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Restore a dismissed match",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "restore_material",
+      "title": "Put a document back the way it was",
+      "description": "Restores a cover letter, tailored resume or answer to a recorded pre-edit version within its undo window. Arguments must match the recorded edit; arbitrary replacement text is refused. Resume restoration uses resumeRevisionId and restores the application's sendable copy.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "asset": {
+            "type": "string",
+            "enum": [
+              "coverLetter",
+              "resume",
+              "answers"
+            ],
+            "description": "Which asset the edit changed."
+          },
+          "question": {
+            "description": "The answer's question text; required for `answers`.",
+            "type": "string",
+            "maxLength": 2000
+          },
+          "text": {
+            "description": "The text that stood before the edit, from its receipt. Required for `coverLetter` and `answers`; a resume restore names a revision instead.",
+            "type": "string",
+            "maxLength": 50000
+          },
+          "resumeRevisionId": {
+            "description": "The tailored-resume revision to put back, from the `edit_resume` receipt. Required for `resume`.",
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "applicationId",
+          "asset"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Put a document back the way it was",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_application_answers",
+      "title": "Save the person's application answers",
+      "description": "Saves person-stated application-answer and contact groups through onboarding validation, then rechecks readiness and completes setup when no requirements remain. statedByPerson:true attests that supplied values came from the person. eligibility.countries replaces the stored list. An empty answer set can finish otherwise-complete onboarding. Returns ready and stillMissing; no application is sent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "object",
+            "properties": {
+              "workPreferences": {
+                "description": "Merged over what is stored.",
+                "type": "object",
+                "properties": {
+                  "acceptedWorkModes": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "remote",
+                        "hybrid",
+                        "onsite"
+                      ]
+                    }
+                  },
+                  "willingToRelocate": {
+                    "type": "boolean"
+                  },
+                  "maxTravelPercent": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                }
+              },
+              "compensation": {
+                "anyOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "open"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "minimum"
+                          },
+                          "minimumAmount": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 100000000
+                          },
+                          "currency": {
+                            "type": "string",
+                            "pattern": "^[A-Z]{3}$",
+                            "description": "ISO-4217 code, e.g. \"USD\"."
+                          },
+                          "period": {
+                            "type": "string",
+                            "enum": [
+                              "hour",
+                              "year"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "minimumAmount",
+                          "currency",
+                          "period"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ],
+                    "description": "A USD per-year minimum must be between 10,000 and 1,000,000; other currencies and hourly rates are unbounded."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "availability": {
+                "anyOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "immediate"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "specific_date"
+                          },
+                          "date": {
+                            "type": "string",
+                            "description": "Local date, YYYY-MM-DD."
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "notice_period"
+                          },
+                          "noticePeriodDays": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 365
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "noticePeriodDays"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "eligibility": {
+                "type": "object",
+                "properties": {
+                  "citizenshipCountryCodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "countries": {
+                    "description": "REPLACES the stored list: include every country, the stored ones too.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "description": "ISO-3166-1 alpha-2, e.g. \"US\"."
+                        },
+                        "authorized": {
+                          "type": "boolean"
+                        },
+                        "requiresSponsorship": {
+                          "type": "boolean"
+                        },
+                        "basis": {
+                          "type": "string",
+                          "enum": [
+                            "citizen",
+                            "permanent_resident",
+                            "eu_freedom_of_movement",
+                            "asylee_or_refugee",
+                            "temporary_work_auth",
+                            "not_authorized"
+                          ]
+                        },
+                        "sponsorshipTiming": {
+                          "description": "Only when requiresSponsorship is true.",
+                          "type": "string",
+                          "enum": [
+                            "now",
+                            "future",
+                            "now_and_future"
+                          ]
+                        },
+                        "authorizationType": {
+                          "description": "Temporary authorization only, e.g. \"H-1B\".",
+                          "type": "string"
+                        },
+                        "authorizationExpiresOn": {
+                          "description": "Temporary authorization only, YYYY-MM-DD.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "authorized",
+                        "requiresSponsorship",
+                        "basis"
+                      ]
+                    }
+                  }
+                }
+              },
+              "qualifications": {
+                "type": "object",
+                "properties": {
+                  "highestEducationLevel": {
+                    "type": "string",
+                    "enum": [
+                      "less_than_high_school",
+                      "high_school_or_equivalent",
+                      "some_college",
+                      "associate",
+                      "bachelor",
+                      "master",
+                      "professional",
+                      "doctorate",
+                      "other",
+                      "prefer_not_to_answer"
+                    ]
+                  },
+                  "languages": {
+                    "description": "Replaces the stored list.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "description": "BCP-47, e.g. \"en\"."
+                        },
+                        "proficiency": {
+                          "type": "string",
+                          "enum": [
+                            "basic",
+                            "conversational",
+                            "professional",
+                            "fluent",
+                            "native_or_bilingual"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "proficiency"
+                      ]
+                    }
+                  }
+                }
+              },
+              "screeningAnswers": {
+                "description": "Merged over what is stored.",
+                "type": "object",
+                "properties": {
+                  "reliableTransportation": {
+                    "type": "boolean"
+                  },
+                  "workplaceAccommodation": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no",
+                      "prefer_not_to_answer"
+                    ]
+                  },
+                  "securityClearance": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "public_trust",
+                      "confidential",
+                      "secret",
+                      "top_secret",
+                      "top_secret_sci",
+                      "other_active"
+                    ]
+                  },
+                  "foreignGovernmentFamilyTies": {
+                    "type": "boolean"
+                  },
+                  "criminalHistory": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "yes",
+                      "prefer_not_to_answer"
+                    ]
+                  },
+                  "criminalHistoryDetails": {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "governmentOrMilitaryEmployment": {
+                    "type": "boolean"
+                  },
+                  "clearanceEligibleToObtain": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no",
+                      "not_sure"
+                    ]
+                  },
+                  "attestationConsent": {
+                    "description": "Whether Dreamwork may sign accuracy statements on their behalf.",
+                    "type": "boolean"
+                  },
+                  "backgroundCheckConsent": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "fullName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "phone": {
+                "type": "string",
+                "maxLength": 40
+              },
+              "phoneDialCode": {
+                "description": "Country calling code with its plus, e.g. \"+1\".",
+                "type": "string"
+              },
+              "mailingAddress": {
+                "type": "object",
+                "properties": {
+                  "line1": {
+                    "type": "string"
+                  },
+                  "line2": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "region": {
+                    "type": "string",
+                    "description": "State, province or region; \"\" where none."
+                  },
+                  "postalCode": {
+                    "type": "string",
+                    "description": "\"\" where the country has none."
+                  },
+                  "country": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "line1",
+                  "city",
+                  "region",
+                  "postalCode",
+                  "country"
+                ]
+              },
+              "currentLocation": {
+                "description": "Where they live now, \"City, Region, Country\". Not where they want to work.",
+                "type": "string",
+                "maxLength": 120
+              },
+              "linkedinUrl": {
+                "type": "string"
+              },
+              "githubUrl": {
+                "type": "string"
+              },
+              "websiteUrl": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              },
+              "portfolioUrl": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              }
+            }
+          },
+          "statedByPerson": {
+            "type": "boolean",
+            "const": true,
+            "description": "The person gave every value here in this conversation. Never assumed."
+          }
+        },
+        "required": [
+          "statedByPerson"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Save the person's application answers",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_job",
+      "title": "Save a job",
+      "description": "Saves one role to the account's pipeline at SAVED as a bookmark. No application is submitted or queued until apply is called. Application materials may start preparing in the background. An already saved role returns a no-op receipt.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "Listing id or private-job id."
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Save a job",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "set_autopilot",
+      "title": "Turn Autopilot on or off",
+      "description": "Sets Autopilot on or off after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval. Off stops sending and keeps the minimum match, resume choice and queue; paused is accepted and means off. Daily and monthly limits remain determined by the plan.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "on",
+              "off",
+              "paused"
+            ]
+          },
+          "confirmationToken": {
+            "description": "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Turn Autopilot on or off",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "start_checkout",
+      "title": "Start checkout",
+      "description": "Returns a checkout URL for the requested plan change after explicit consent. A confirmation hold precedes checkout creation. This call does not charge the account; payment details and payment confirmation occur on the billing page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "pro",
+              "dreamer"
+            ],
+            "description": "The plan the person asked for."
+          },
+          "promoCode": {
+            "description": "Only when the person supplied one.",
+            "type": "string",
+            "maxLength": 64
+          },
+          "billingInterval": {
+            "description": "How often to invoice, only when the person named one; omitted means monthly. Quarterly is one invoice every three months at about 15% less than three monthly ones. A promo code prices a monthly invoice, so the two cannot be combined.",
+            "type": "string",
+            "enum": [
+              "month",
+              "quarter"
+            ]
+          },
+          "confirmationToken": {
+            "description": "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Start checkout",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "strengthen_application",
+      "title": "Strengthen a whole application",
+      "description": "Improves an application's existing materials against its role and recorded career evidence, spending one refine allowance per changed asset. emphasis adding numbers, titles, employers, dates or credentials requires evidenceIds. Unsupported resume entry headers are rejected; previously completed asset edits are retained if a later asset fails.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "emphasis": {
+            "description": "What the person wants foregrounded, when they said. Omit otherwise.",
+            "type": "string",
+            "maxLength": 400
+          },
+          "evidenceIds": {
+            "description": "Ids of the person's work-vault documents, or of facts on them, that support a claim the emphasis adds.",
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "applicationId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Strengthen a whole application",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "undo_last",
+      "title": "Undo the last thing that can be undone",
+      "description": "Reverses the latest action with an available undo, or the action identified by taskId. Sent applications, settled charges, expired undo windows and actions without a reversible outcome are refused with a reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "description": "Undo this specific task instead of the most recent one.",
+            "type": "string"
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Undo the last thing that can be undone",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "update_application_materials",
+      "title": "Update application materials",
+      "description": "Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision. Access is restricted to the Applications rollout cohort admitted by the API. Locked or conflicting revisions are refused.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "Application ID"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "resumeVariant": {
+            "type": "string",
+            "enum": [
+              "default",
+              "tailored"
+            ]
+          },
+          "resumeHtml": {
+            "type": "string",
+            "maxLength": 100000
+          },
+          "coverLetter": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "coverLetterIncluded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "applicationId",
+          "expectedRevision"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Update application materials",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "update_autopilot_settings",
+      "title": "Change Autopilot settings",
+      "description": "Changes the minimum Matches score from 70 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "scoreFloor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 70,
+                "maximum": 97
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resumeVariant": {
+            "type": "string",
+            "enum": [
+              "default",
+              "tailored"
+            ]
+          },
+          "confirmationToken": {
+            "description": "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",
+            "type": "string"
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Change Autopilot settings",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "update_communication_preferences",
+      "title": "Change email preferences",
+      "description": "Changes the supplied optional email categories while preserving omitted settings. allOptionalEmailsOff:true must be supplied alone; conflicting category settings are refused. Disabling Autopilot result mail does not stop applications. Account, security, billing and essential employer mail are unaffected.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobAlerts": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "twice_weekly",
+              "off"
+            ]
+          },
+          "autopilotResults": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "daily_digest",
+              "off"
+            ]
+          },
+          "productUpdates": {
+            "type": "boolean"
+          },
+          "allOptionalEmailsOff": {
+            "description": "Turn every optional email off. Send it on its own.",
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Change email preferences",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "update_preferences",
+      "title": "Update job preferences",
+      "description": "Merges the supplied preference fields into the account's stored preferences and refreshes matching. compensation.kind is open or minimum; minimum requires minimumAmount, an ISO-4217 currency and an hour or year period. seniorities accepts one override level; an empty list restores resume-derived seniority. excludedCompanies, excludedPlaces and excludedSeniorities replace the lists of companies, places and levels hidden from matches, alerts and Autopilot; an excludedPlaces name that cannot be placed refuses the write. Autopilot never applies below the pay floor or outside the accepted work modes. Work modes and relocation are stored together, with omitted values preserved.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patch": {
+            "type": "object",
+            "properties": {
+              "targetFunctions": {
+                "description": "Up to three of these labels; this REPLACES the list, so to add one include the current ones from get_preferences or the situation.",
+                "maxItems": 3,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Engineering",
+                    "Product",
+                    "Design",
+                    "Marketing",
+                    "Data Science",
+                    "Sales",
+                    "Operations",
+                    "Finance",
+                    "Legal",
+                    "HR",
+                    "Customer Success",
+                    "DevRel",
+                    "Security",
+                    "Research",
+                    "Executive"
+                  ]
+                }
+              },
+              "preferredLocations": {
+                "description": "Where they want to work, not where they live.",
+                "maxItems": 5,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              },
+              "acceptedWorkModes": {
+                "description": "Every work setting they accept. Autopilot never applies outside it, and for someone who works only remotely it skips a listing that states no setting.",
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "remote",
+                    "hybrid",
+                    "onsite"
+                  ]
+                }
+              },
+              "willingToRelocate": {
+                "type": "boolean"
+              },
+              "compensation": {
+                "description": "The person's pay floor. This is where salary lives. Autopilot never applies to a role whose posted pay tops out below an annual floor; a role that posts no pay is still judged on the rest. `null` withdraws it, which stops applications until it is answered again.",
+                "anyOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "open"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "minimum"
+                          },
+                          "minimumAmount": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 100000000
+                          },
+                          "currency": {
+                            "type": "string",
+                            "pattern": "^[A-Z]{3}$",
+                            "description": "ISO-4217 code, e.g. \"USD\"."
+                          },
+                          "period": {
+                            "type": "string",
+                            "enum": [
+                              "hour",
+                              "year"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "minimumAmount",
+                          "currency",
+                          "period"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ],
+                    "description": "A USD per-year minimum must be between 10,000 and 1,000,000; other currencies and hourly rates are unbounded."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "availability": {
+                "description": "`null` withdraws it, which stops applications until it is answered again.",
+                "anyOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "immediate"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "specific_date"
+                          },
+                          "date": {
+                            "type": "string",
+                            "description": "Local date, YYYY-MM-DD."
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "notice_period"
+                          },
+                          "noticePeriodDays": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 365
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "noticePeriodDays"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dealBreakers": {
+                "description": "Free-text notes the fit check reads in each posting. They do not hide matches: a term of three words or fewer, such as an industry, only ranks listings whose title, company or industry contains it lower. Job alerts and Autopilot skip a role when the fit check finds a deal-breaker in it, but that is a model's reading, not a rule. A rule that must hold goes in its own key: a company in `excludedCompanies`, a place in `excludedPlaces`, a level in `excludedSeniorities`, pay in `compensation`, work setting in `acceptedWorkModes`. When a deal-breaker names one of those, offer to set the key instead.",
+                "maxItems": 10,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 200
+                }
+              },
+              "excludedCompanies": {
+                "description": "Companies never to show in matches, job alerts or Autopilot. A name hides that company, the companies it owns, the parent brand of a division (`Walmart Global Tech` hides `Walmart`) and longer company names that begin with it (`Amazon` hides `Amazon Web Services`), so use the shortest name that is still specific. A name with no Latin letters or digits, or made only of legal forms like `Inc`, is refused. This REPLACES the list: to add one, include the current ones from get_preferences. It does not block a manual apply or remove saved jobs.",
+                "maxItems": 50,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              },
+              "excludedPlaces": {
+                "description": "Places never to show in matches, job alerts or Autopilot: each a city, a state or region, or a country, as the person names it (`Kirkland`, `Bellevue, WA`, `California`). A city hides that city only, not its metro, so list each suburb. Remote roles are never hidden by a place. A name that cannot be placed refuses the whole write and names it, so ask which city they mean (`Eastside` is not a place; `Bellevue`, `Redmond` and `Kirkland` are). This REPLACES the list: to add one, include the current ones from get_preferences.",
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              },
+              "coverLettersEnabled": {
+                "type": "boolean"
+              },
+              "tailoredResumesEnabled": {
+                "description": "Whether each application gets a resume rewritten for the role, on the person's own Apply and on Autopilot. False sends their default resume instead, unless they picked a version on that application.",
+                "type": "boolean"
+              },
+              "seniorities": {
+                "description": "The level to match at, as a one-item list. It ranks roles; it hides none. `[]` drops back to the level read off the resume. To keep roles at other levels out of matches and Autopilot, use `excludedSeniorities`.",
+                "maxItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "INTERN",
+                    "JUNIOR",
+                    "MID",
+                    "SENIOR",
+                    "STAFF",
+                    "PRINCIPAL",
+                    "DIRECTOR",
+                    "VP",
+                    "C_SUITE"
+                  ]
+                }
+              },
+              "excludedSeniorities": {
+                "description": "Levels never to show in matches, job alerts or Autopilot, such as `[\"STAFF\", \"PRINCIPAL\"]` for someone who wants senior roles and nothing above. A role whose level is not classified is not hidden. This REPLACES the list; `[]` clears it.",
+                "maxItems": 9,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "INTERN",
+                    "JUNIOR",
+                    "MID",
+                    "SENIOR",
+                    "STAFF",
+                    "PRINCIPAL",
+                    "DIRECTOR",
+                    "VP",
+                    "C_SUITE"
+                  ]
+                }
+              },
+              "aiRoleInterest": {
+                "description": "How much they want AI-centred roles. AVOID demotes them.",
+                "type": "string",
+                "enum": [
+                  "HIGH",
+                  "OPEN",
+                  "LOW",
+                  "AVOID"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "patch"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Update job preferences",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "update_profile",
+      "title": "Update profile",
+      "description": "Updates profile text fields such as name, email, phone and tone. Identity-bound changes require profileIdentityVersion matching the current profile snapshot. This endpoint does not upload a resume file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "tonePreferences": {
+            "type": "string"
+          },
+          "coverLettersEnabled": {
+            "description": "Whether generated application packs include a cover letter. false turns cover letters off; Autopilot then skips jobs that require one.",
+            "type": "boolean"
+          },
+          "tailoredResumesEnabled": {
+            "description": "Whether each application gets a resume rewritten for the role, on manual applies and Autopilot. false sends the default resume unless an application picked a version itself.",
+            "type": "boolean"
+          },
+          "expectedProfileIdentityVersion": {
+            "description": "Exact profileIdentityVersion from the prior get_profile snapshot used to prepare identity-bound changes; omit for a tone-only update.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Update profile",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "upload_resume",
+      "title": "Upload resume",
+      "description": "Uploads original resume-file bytes encoded as base64 with PDF, DOCX, TXT, MD, PNG, JPG, JPEG or WEBP format and the current profileIdentityVersion. The server parses text, performs image OCR and generates PDF output. This replaces the account's main resume; stale identity versions are refused.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Base64-encoded file content. Send the raw file bytes, not converted text."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "pdf",
+              "docx",
+              "txt",
+              "md",
+              "png",
+              "jpg",
+              "jpeg",
+              "webp"
+            ],
+            "description": "File format"
+          },
+          "filename": {
+            "description": "Original filename",
+            "type": "string"
+          },
+          "expectedProfileIdentityVersion": {
+            "description": "Exact profileIdentityVersion from the prior get_profile snapshot used to choose this resume.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "content",
+          "format"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Upload resume",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    }
+  ],
+  "prompts": [
+    {
+      "name": "apply_to_prepared",
+      "title": "Apply to prepared roles",
+      "description": "Check nothing is missing, show exactly what each application will send, and apply only to the ones I confirm."
+    },
+    {
+      "name": "autopilot_setup",
+      "title": "Set up Autopilot",
+      "description": "Check Autopilot can run for me, set how picky it is, and turn it on only when I say so."
+    },
+    {
+      "name": "find_and_prepare",
+      "title": "Find roles and prepare applications",
+      "description": "Search my matches for what I describe, let me pick, then write tailored materials for the ones I choose.",
+      "arguments": [
+        {
+          "name": "looking_for",
+          "description": "What the person wants, in their words, e.g. \"senior backend roles over $200k in New York posted this week\".",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "interview_prep",
+      "title": "Prepare for an interview",
+      "description": "Read the recruiter thread and the role, and build a prep brief from my own record.",
+      "arguments": [
+        {
+          "name": "company",
+          "description": "The company the interview is with, when the person named one."
+        }
+      ]
+    },
+    {
+      "name": "morning_brief",
+      "title": "Morning brief",
+      "description": "What changed in my job search since I last checked: new matches, application updates, recruiter mail, Autopilot.",
+      "arguments": [
+        {
+          "name": "since",
+          "description": "When the person last checked, as an ISO date-time. Omit for the last 24 hours."
+        }
+      ]
+    }
+  ]
+}

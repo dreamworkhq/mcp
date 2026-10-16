@@ -29,7 +29,7 @@ import {
 } from "@jobless/assistant-contracts";
 
 import { ApiClient } from "../src/client.js";
-import { createMcpServer } from "../src/mcp.js";
+import { createMcpServer, PUBLIC_MCP_TOOL_NAMES } from "../src/mcp.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const PACKAGE_ROOT = resolve(here, "..");
@@ -126,12 +126,7 @@ async function listRegisteredTools(): Promise<ListedTool[]> {
 }
 
 /** The tools `src/mcp.ts` registers with `requiresAuth: false`. */
-const GUEST_TOOLS = new Set([
-  "get_platform_context",
-  "browse_listings",
-  "get_listing",
-  "get_upgrade_link",
-]);
+const GUEST_TOOLS = PUBLIC_MCP_TOOL_NAMES;
 
 /**
  * One sentence a person can read in a table cell. The registry's descriptions

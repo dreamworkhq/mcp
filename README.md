@@ -96,6 +96,11 @@ guest mode and exposes the public, read-only tools: `browse_listings`,
 the agent it is in guest mode, so the agent can say what works now. Account
 tools answer with a short "No API key" message that lists the steps to get one.
 
+The hosted endpoint does the same for its handshake. `initialize` and
+`tools/list` succeed with no sign-in, and those four tools run. Every account
+tool, and any other method, answers `401` with `WWW-Authenticate` so a
+connector can sign in with OAuth. A bearer the API rejects is that same `401`.
+
 An API key needs a free account. Matches ranked against your resume, saved jobs,
 tailored materials, the pipeline, recruiter mail, and applying need an API key.
 Any Dreamwork account can generate one, including the free plan. Your plan sets
