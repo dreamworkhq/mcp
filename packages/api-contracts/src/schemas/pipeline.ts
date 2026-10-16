@@ -251,6 +251,17 @@ export const pipelineItemSchema = responseComponent(
     submission: applicationSubmissionSummarySchema.nullable(),
     /** Only a manually recorded job with no submission attempt can be reset. */
     canUndoApplied: z.boolean(),
+    /**
+     * An application was asked for: an apply was requested or is running, an
+     * apply is waiting on the pack, Apply was pressed (Autopilot-first,
+     * `generated_materials.applyIntent`), or Autopilot paused it before it
+     * sent. A row with none of these is a plain save.
+     */
+    applyTriggered: z.boolean(),
+    /** Apply was pressed with review on and nothing has been sent yet. */
+    awaitingReview: z.boolean(),
+    /** A job row Autopilot inserted (warm-up or pick) that nothing has triggered. */
+    autopilotShell: z.boolean(),
   }),
   {
     id: "PipelineItem",
