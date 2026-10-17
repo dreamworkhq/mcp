@@ -262,6 +262,8 @@ export const pipelineItemSchema = responseComponent(
     awaitingReview: z.boolean(),
     /** A job row Autopilot inserted (warm-up or pick) that nothing has triggered. */
     autopilotShell: z.boolean(),
+    /** Autopilot, not the person, sent this application. */
+    sentByAutopilot: z.boolean(),
   }),
   {
     id: "PipelineItem",
