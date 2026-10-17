@@ -1,6 +1,6 @@
 {
   "version": "1.7.0",
-  "sourceCommit": "b1b633a2fba1cf61b2a79e5fccea5b992fe0a219",
+  "sourceCommit": "80bbe9a20403a75c8681b1460bb2fa079b14fb50",
   "managedFiles": [
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
@@ -50,6 +50,7 @@
     "glama.json",
     "icon-400.png",
     "lhm.plugin.json",
+    "llms-install.md",
     "package.json",
     "packages/api-contracts/package.json",
     "packages/api-contracts/src/admin-support.ts",

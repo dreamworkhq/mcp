@@ -5,7 +5,7 @@
   "authorUrl": "https://github.com/dreamworkhq",
   "version": "1.7.0",
   "description": "MCP server for job search. Browse listings with no account. With a free Dreamwork key: rank matches, tailor resumes and cover letters, apply, track replies.",
-  "homepage": "https://www.dreamworkhq.com/agents",
+  "homepage": "https://www.dreamworkhq.com/agents?utm_source=lobehub&utm_medium=mcp_directory&utm_campaign=mcp_distribution",
   "category": "productivity",
   "cloudEndpoint": "https://mcp.dreamworkhq.com/mcp",
   "icon": "https://raw.githubusercontent.com/dreamworkhq/mcp/main/icon-400.png",

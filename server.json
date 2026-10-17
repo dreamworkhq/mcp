@@ -3,6 +3,7 @@
   "name": "io.github.dreamworkhq/dreamwork",
   "title": "Dreamwork",
   "description": "Job search, application materials, and application tracking for AI assistants.",
+  "websiteUrl": "https://www.dreamworkhq.com/agents?utm_source=mcp_registry&utm_medium=mcp_directory&utm_campaign=mcp_distribution",
   "repository": {
     "url": "https://github.com/dreamworkhq/mcp",
     "source": "github",
