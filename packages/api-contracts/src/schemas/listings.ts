@@ -219,6 +219,12 @@ export const recommendedListingSchema = responseComponent(
       ),
     matchReasons: z.array(z.string()),
     isNew: z.boolean(),
+    autopilotSkipReason: z
+      .string()
+      .nullable()
+      .describe(
+        "Why Autopilot's fit check turned this job down for the viewer, in one line written to them. Null unless that is the job's latest Autopilot verdict.",
+      ),
   }),
   {
     id: "RecommendedListing",
