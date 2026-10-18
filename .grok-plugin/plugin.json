@@ -1,0 +1,14 @@
+{
+  "name": "dreamwork",
+  "version": "1.8.0",
+  "description": "Job search, application materials, and application tracking for AI assistants.",
+  "author": {
+    "name": "Dreamwork",
+    "url": "https://www.dreamworkhq.com"
+  },
+  "homepage": "https://www.dreamworkhq.com/agents?utm_source=xai&utm_medium=mcp_directory&utm_campaign=mcp_distribution",
+  "repository": "https://github.com/dreamworkhq/mcp",
+  "license": "MIT",
+  "keywords": ["dreamwork", "dreamworkhq", "jobs", "job-search"],
+  "logo": "icon-400.png"
+}

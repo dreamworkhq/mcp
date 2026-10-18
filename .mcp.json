@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "dreamwork": {
+      "type": "http",
+      "url": "https://mcp.dreamworkhq.com/mcp"
+    }
+  }
+}

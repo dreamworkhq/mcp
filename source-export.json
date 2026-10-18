@@ -1,10 +1,14 @@
 {
   "version": "1.8.0",
-  "sourceCommit": "1e8245dbd3f62a250f2e91dc100eb8c40daf1721",
+  "sourceCommit": "f47ae48a229533c3be6a87b6001033acf5a79157",
   "managedFiles": [
+    ".claude-plugin/plugin.json",
+    ".cursor-plugin/plugin.json",
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
     ".gitignore",
+    ".grok-plugin/plugin.json",
+    ".mcp.json",
     "CONTRIBUTING.md",
     "LICENSE",
     "README.md",
