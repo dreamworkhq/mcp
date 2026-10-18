@@ -9,12 +9,12 @@
     "source": "github",
     "subfolder": "apps/mcp"
   },
-  "version": "1.7.0",
+  "version": "1.8.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@dreamworkhq/mcp",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "transport": {
         "type": "stdio"
       },
