@@ -99,7 +99,7 @@ check only keep the map honest about the actions that do exist.
 | `start_checkout` | Begin a plan change by returning a checkout URL for the browser to open. | Writes | Confirmation (explicit_verb) |
 | `strengthen_application` | Improve every asset of one application together: it reads the role, the existing materials and the person's recorded evidence, then composes one edit per asset itself. | Writes | Receipt |
 | `undo_last` | Reverse the most recent action that offered an undo, or the one `taskId` names. | Writes | The key alone |
-| `update_autopilot_settings` | Change the hard minimum score shown in Matches (70–97, null restores 70) or use the person's default resume instead of tailoring. | Writes | Confirmation (explicit_verb) |
+| `update_autopilot_settings` | Change the hard minimum score shown in Matches (50–97, null restores 70) or use the person's default resume instead of tailoring. | Writes | Confirmation (explicit_verb) |
 | `update_communication_preferences` | Change which emails this person receives; send only the categories that change. | Writes | Receipt, undo for 8s |
 | `update_preferences` | Change the person's stated preferences as a merge patch: send only the keys that change. | Writes | Receipt |
 

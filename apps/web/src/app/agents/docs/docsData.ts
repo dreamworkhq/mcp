@@ -761,7 +761,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "update_autopilot_settings",
-    purpose: "Changes the minimum Matches score from 70 to 97, with null restoring 70, or the default-versus-tailored resume choice.",
+    purpose: "Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice.",
     calls: "POST /assistant/actions/update_autopilot_settings",
   },
   {

@@ -87,7 +87,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `start_checkout` | consequential | Returns a checkout URL for the requested plan change after explicit consent. |
 | `strengthen_application` | async | Improves an application's existing materials against its role and recorded career evidence, spending one refine allowance per changed asset. |
 | `undo_last` | cheap | Reverses the latest action with an available undo, or the action identified by taskId. |
-| `update_autopilot_settings` | consequential | Changes the minimum Matches score from 70 to 97, with null restoring 70, or the default-versus-tailored resume choice. |
+| `update_autopilot_settings` | consequential | Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice. |
 | `update_communication_preferences` | cheap | Changes the supplied optional email categories while preserving omitted settings. |
 | `update_preferences` | cheap | Merges the supplied preference fields into the account's stored preferences and refreshes matching. |
 

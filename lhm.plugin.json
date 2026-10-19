@@ -2713,7 +2713,7 @@
     {
       "name": "update_autopilot_settings",
       "title": "Change Autopilot settings",
-      "description": "Changes the minimum Matches score from 70 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
+      "description": "Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2721,7 +2721,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 70,
+                "minimum": 50,
                 "maximum": 97
               },
               {

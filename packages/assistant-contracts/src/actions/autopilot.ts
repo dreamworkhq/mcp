@@ -43,10 +43,10 @@ export const autopilotActions = [
     risk: "consequential",
     title: "Change Autopilot settings",
     description:
-      "Change the hard minimum score shown in Matches (70–97, null restores 70) or use the person's default resume instead of tailoring. Requires an explicit instruction. Applies to waiting applications and is rechecked before submission. Does not enable, resume or start Autopilot. Applications already sent cannot be recalled; stopped applications are not automatically retried.",
+      "Change the hard minimum score shown in Matches (50–97, null restores 70) or use the person's default resume instead of tailoring. Requires an explicit instruction. Applies to waiting applications and is rechecked before submission. Does not enable, resume or start Autopilot. Applications already sent cannot be recalled; stopped applications are not automatically retried.",
     input: z
       .object({
-        scoreFloor: z.number().int().min(70).max(97).nullable().optional(),
+        scoreFloor: z.number().int().min(50).max(97).nullable().optional(),
         resumeVariant: z.enum(["default", "tailored"]).optional(),
       })
       .refine(
@@ -62,7 +62,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Changes the minimum Matches score from 70 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
+        "Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,
