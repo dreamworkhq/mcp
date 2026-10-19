@@ -1,6 +1,6 @@
 # @dreamworkhq/mcp
 
-MCP server for [Dreamwork](https://www.dreamworkhq.com): job-search tools for AI agents. Any MCP client (Claude Desktop, Cursor, the MCP Inspector) can use it to find roles, rank them, tailor applications, apply, and track outcomes for one person over time.
+MCP server for [Dreamwork](https://www.dreamworkhq.com/?utm_source=github_readme&utm_medium=mcp_directory&utm_campaign=mcp_distribution): job-search tools for AI agents. Any MCP client (Claude Desktop, Cursor, the MCP Inspector) can use it to find roles, rank them, tailor applications, apply, and track outcomes for one person over time.
 
 This server is a thin gateway: it calls the Dreamwork API over HTTPS and holds no database access of its own. Transport is stdio, and stdout carries only JSON-RPC frames.
 
@@ -82,7 +82,7 @@ An API key needs a free account. Matches ranked against your resume, saved jobs,
 tailored materials, the pipeline, recruiter mail, and applying need an API key.
 Any Dreamwork account can generate one, including the free plan. Your plan sets
 the key's rate limit and usage allowances. Sign in at
-[dreamworkhq.com](https://www.dreamworkhq.com), open Profile, then MCP (or use
+[dreamworkhq.com](https://www.dreamworkhq.com/?utm_source=github_readme&utm_medium=mcp_directory&utm_campaign=mcp_distribution), open Profile, then MCP (or use
 the Get a key button on the Agents page), then set the key as
 `DREAMWORK_API_KEY` (format `sk_...`) and restart your MCP client.
 
