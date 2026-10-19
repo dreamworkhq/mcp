@@ -91,7 +91,7 @@ check only keep the map honest about the actions that do exist.
 | `remember_hypothesis` | Write down something you believe about the person but were not told outright — "seems to be moving from IC to management". | Writes | Receipt |
 | `replace_application_document` | Replace one application's resume or cover letter with a document the person edited themselves: their pasted text, or their file (PDF, DOCX, TXT or MD) as raw base64. | Writes | Receipt, undo for 900s |
 | `reply_to_recruiter` | Send a reply into an existing recruiter conversation, as the person. | Writes | Confirmation (explicit_verb, unambiguous_target) |
-| `restore_match` | Take back a dismissal, at any time: the role can appear in the person's feed, job alerts and Autopilot again. | Writes | Receipt, undo for 60s |
+| `restore_match` | Take back a dismissal, at any time: the role, with every listing of it, can appear in the person's feed, job alerts and Autopilot again. | Writes | Receipt, undo for 60s |
 | `restore_material` | Put a cover letter, the tailored resume, or one answer back the way it stood before an edit. | Writes | Receipt |
 | `save_application_answers` | Save answers the person just gave you, through the same checks the onboarding wizard runs, then re-check readiness and finish setup once nothing is left. | Writes | Receipt |
 | `save_job` | Put a role into the person's pipeline at SAVED. | Writes | Receipt, undo for 8s |

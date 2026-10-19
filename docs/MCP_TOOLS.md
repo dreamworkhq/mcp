@@ -42,7 +42,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `apply` | consequential | Submits one application to an employer under the account holder's name using the saved materials at expectedRevision. |
 | `cancel_apply` | cheap | Stops a queued or in-progress application when submission can still be prevented. |
 | `confirm_hypothesis` | cheap | Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis. |
-| `dismiss_match` | cheap | Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it. |
+| `dismiss_match` | cheap | Hides one role, every listing with the same employer and title in any location, from the account's match feed, job alerts and Autopilot until the account restores or saves it. |
 | `edit_answer` | cheap | Revises one employer-question answer identified by questionId; other answers and documents remain unchanged. |
 | `edit_cover_letter` | cheap | Revises an existing application's cover letter using the supplied instruction. |
 | `edit_resume` | cheap | Revises one application's tailored resume using the supplied instruction, preserving its formatting and regenerating the PDF. |
@@ -79,7 +79,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `remember_hypothesis` | cheap | Stores an unconfirmed career hypothesis separately from established facts. |
 | `replace_application_document` | cheap | Replaces one application's resume or cover letter with the person's supplied text or raw-base64 PDF, DOCX, TXT or MD. |
 | `reply_to_recruiter` | consequential | Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. |
-| `restore_match` | cheap | Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot. |
+| `restore_match` | cheap | Reverses the dismissal of a role, every listing with the same employer and title, so it can return to the account's match feed, job alerts and Autopilot. |
 | `restore_material` | cheap | Restores a cover letter, tailored resume or answer to a recorded pre-edit version within its undo window. |
 | `save_application_answers` | cheap | Saves person-stated application-answer and contact groups through onboarding validation, then rechecks readiness and completes setup when no requirements remain. |
 | `save_job` | cheap | Saves one role to the account's pipeline at SAVED as a bookmark. |

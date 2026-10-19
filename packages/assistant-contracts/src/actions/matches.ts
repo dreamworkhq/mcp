@@ -349,7 +349,7 @@ export const matchesActions = [
     risk: "cheap",
     title: "Dismiss a match",
     description:
-      "Hide one role from the person's feed, job alerts and Autopilot. It hides that one listing only and does not change which roles are matched later: other roles at the same company keep appearing, so a company they never want goes in `update_preferences.excludedCompanies`, and a level they never want goes in `excludedSeniorities`. The receipt offers an undo for a minute; after that, `restore_match` brings the role back at any time, and `list_dismissed_matches` lists what they have dismissed. Do NOT dismiss a role they merely declined to act on right now, and do NOT dismiss in bulk to 'clean up' a feed nobody complained about. Taking something off the applications board is `move_pipeline`: this would hide the listing and leave the card exactly where it was.",
+      "Hide one role from the person's feed, job alerts and Autopilot. A role is every listing with the same employer and title, so copies posted in other locations, and later reposts, are hidden too. It does not change which roles are matched later: other roles at the same company keep appearing, so a company they never want goes in `update_preferences.excludedCompanies`, and a level they never want goes in `excludedSeniorities`. The receipt offers an undo for a minute; after that, `restore_match` brings the role back at any time, and `list_dismissed_matches` lists what they have dismissed. Do NOT dismiss a role they merely declined to act on right now, and do NOT dismiss in bulk to 'clean up' a feed nobody complained about. Taking something off the applications board is `move_pipeline`: this would hide the listing and leave the card exactly where it was.",
     input: z.object({
       jobId: z.string().describe("Listing id from the feed or `list_matches`."),
       reason: z
@@ -368,7 +368,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        "Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it. The receipt offers undo for one minute; restore_match reverses it at any time and list_dismissed_matches lists dismissed listings. The supplied reason is not stored. It does not hide other listings from the same company and does not move or remove an existing pipeline card.",
+        "Hides one role, every listing with the same employer and title in any location, from the account's match feed, job alerts and Autopilot until the account restores or saves it. The receipt offers undo for one minute; restore_match reverses it at any time and list_dismissed_matches lists dismissed listings. The supplied reason is not stored. It does not hide other roles from the same company and does not move or remove an existing pipeline card.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,
@@ -381,7 +381,7 @@ export const matchesActions = [
     risk: "cheap",
     title: "Restore a dismissed match",
     description:
-      "Take back a dismissal, at any time: the role can appear in the person's feed, job alerts and Autopilot again. Take the id from `list_dismissed_matches` or the `dismiss_match` receipt. Restoring a role that is not dismissed is a no-op receipt, not an error. It saves nothing; bookmarking the role is `save_job`. A role dismissed long ago comes back once the person's match pool is next rebuilt, and a listing the employer has closed stays out of the feed, so say that rather than promising it is on screen now.",
+      "Take back a dismissal, at any time: the role, with every listing of it, can appear in the person's feed, job alerts and Autopilot again. Take the id from `list_dismissed_matches` or the `dismiss_match` receipt. Restoring a role that is not dismissed is a no-op receipt, not an error. It saves nothing; bookmarking the role is `save_job`. A role dismissed long ago comes back once the person's match pool is next rebuilt, and a listing the employer has closed stays out of the feed, so say that rather than promising it is on screen now.",
     input: z.object({
       jobId: z
         .string()
@@ -395,7 +395,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        "Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot. Restoring a listing that is not dismissed returns a no-op receipt. Restoring does not save the listing. A closed listing stays out of the feed.",
+        "Reverses the dismissal of a role, every listing with the same employer and title, so it can return to the account's match feed, job alerts and Autopilot. Restoring a listing that is not dismissed returns a no-op receipt. Restoring does not save the listing. A closed listing stays out of the feed.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,

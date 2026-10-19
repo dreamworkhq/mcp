@@ -471,7 +471,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "dismiss_match",
-    purpose: "Hides one listing from the account's match feed, job alerts and Autopilot until the account restores or saves it.",
+    purpose: "Hides one role, every listing with the same employer and title in any location, from the account's match feed, job alerts and Autopilot until the account restores or saves it.",
     calls: "POST /assistant/actions/dismiss_match",
   },
   {
@@ -716,7 +716,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "restore_match",
-    purpose: "Reverses a dismissal of one listing so it can return to the account's match feed, job alerts and Autopilot.",
+    purpose: "Reverses the dismissal of a role, every listing with the same employer and title, so it can return to the account's match feed, job alerts and Autopilot.",
     calls: "POST /assistant/actions/restore_match",
   },
   {
