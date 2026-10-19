@@ -30,6 +30,12 @@ export const billingCheckoutRequestSchema = requestComponent(
     referral: z.string().max(100).optional(),
     promoCode: z.string().max(64).optional(),
     redditAttribution: z.unknown().optional(),
+    metaAttribution: z
+      .unknown()
+      .optional()
+      .describe(
+        "The browser's Meta _fbc and _fbp cookie values, for server-side conversion matching. Omitted under Global Privacy Control.",
+      ),
     intent: z
       .literal("apply_now")
       .optional()
