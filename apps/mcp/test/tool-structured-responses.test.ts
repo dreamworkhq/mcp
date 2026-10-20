@@ -446,3 +446,62 @@ test("a missing known field fails closed rather than returning a partial payload
   assert.equal(result.structuredContent, undefined);
   assert.match(firstText(result), /malformed data for getStats/);
 });
+
+// `add_jobs` answers with rows whose `url` is the posting link the person
+// supplied — the only tool whose job rows linked the employer's site instead
+// of the role's page on Dreamwork. The Sep-29 connector session caught agents
+// handing out ATS links from it. The projection hands the agent the same
+// convention every other job-bearing tool follows: Dreamwork page in `url`,
+// the posting link demoted to `sourceUrl`.
+
+async function callAddJobs(body: unknown): Promise<Record<string, unknown>> {
+  const result = await callWithStub(
+    "add_jobs",
+    {
+      title: "Growth PM",
+      company: "Iterable",
+      url: "https://iterable.com/careers/growth-pmm",
+    },
+    { status: 201, body },
+  );
+  return JSON.parse(firstText(result) || "{}") as Record<string, unknown>;
+}
+
+test("add_jobs rows carry the Dreamwork page and demote the posting link", async () => {
+  const output = await callAddJobs({
+    jobs: [
+      {
+        id: "private-123",
+        title: "Growth PM",
+        company: "Iterable",
+        url: "https://iterable.com/careers/growth-pmm",
+      },
+    ],
+    count: 1,
+  });
+  const jobs = output.jobs as Array<Record<string, unknown>>;
+  assert.equal(jobs.length, 1);
+  assert.equal(
+    jobs[0]!.url,
+    "https://www.dreamworkhq.com/job/private/private-123",
+    "the row's url must be the role's page on Dreamwork",
+  );
+  assert.equal(
+    jobs[0]!.sourceUrl,
+    "https://iterable.com/careers/growth-pmm",
+    "the person-supplied posting link moves to sourceUrl",
+  );
+  assert.equal(output.count, 1);
+});
+
+test("an add_jobs row without an id passes through unprojected rather than crashing", async () => {
+  const output = await callAddJobs({ jobs: [{ title: "No id yet" }], count: 1 });
+  const jobs = output.jobs as Array<Record<string, unknown>>;
+  assert.equal(jobs.length, 1);
+  assert.equal(jobs[0]!.url, undefined);
+});
+
+test("an add_jobs response without a jobs array passes through unchanged", async () => {
+  const output = await callAddJobs({ count: 0 });
+  assert.deepEqual(output, { count: 0 });
+});

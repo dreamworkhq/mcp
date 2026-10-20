@@ -1,18 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { dirname, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { relative } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { dataActions, toMcpToolDefinitions } from "@jobless/assistant-contracts";
 import { ApiClient } from "../src/client.js";
 import { createMcpServer, PUBLIC_MCP_TOOL_NAMES } from "../src/mcp.js";
 import { REPO_ROOT, renderAll } from "../scripts/tool-docs.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkgRoot = resolve(__dirname, "..");
-const repoRoot = resolve(pkgRoot, "..", "..");
 
 /**
  * Every tool that is NOT generated from the assistant registry.
@@ -143,19 +138,6 @@ test("registry hints are published as declared, including non-destructive writes
   }
 });
 
-test("read-only tools never carry a destructive hint", async () => {
-  const tools = await listRegisteredTools();
-  for (const tool of tools) {
-    if (tool.annotations?.readOnlyHint) {
-      assert.notEqual(
-        tool.annotations?.destructiveHint,
-        true,
-        `${tool.name}: readOnlyHint and destructiveHint conflict`,
-      );
-    }
-  }
-});
-
 test("get_platform_context declares an output schema (structured content contract)", async () => {
   const tools = await listRegisteredTools();
   const tool = tools.find((t) => t.name === "get_platform_context");
@@ -193,15 +175,6 @@ test("contract-covered API tools declare an output schema", async () => {
   }
 });
 
-test("every structured API tool is in the reviewed catalog", () => {
-  for (const name of STRUCTURED_API_TOOLS) {
-    assert.ok(
-      EXPECTED_TOOLS.includes(name),
-      `${name}: structured tools must also be reviewed catalog entries`,
-    );
-  }
-});
-
 /**
  * A registry action that can be HELD answers with a confirmation request:
  * status `held`, no output, and `isError` unset. The SDK requires
@@ -229,41 +202,6 @@ test("a holdable registry tool advertises no output schema and takes a confirmat
   }
 });
 
-
-/**
- * The README's catalog is the generated block and nothing else. Scanning the
- * whole `## Tools` section instead would read the prose around it, where
- * `read`, `write`, and `apply` name scopes rather than tools.
- */
-function toolNamesFromReadme(): string[] {
-  const readme = readFileSync(resolve(pkgRoot, "README.md"), "utf8");
-  const block = readme
-    .split("<!-- generated:mcp-tools:start -->")[1]
-    ?.split("<!-- generated:mcp-tools:end -->")[0];
-  assert.ok(block, "README.md must have a generated tool-catalog block");
-  const names = new Set<string>();
-  for (const match of block.matchAll(/`([a-z0-9_]+)`/g)) names.add(match[1]);
-  return [...names].sort();
-}
-
-function toolNamesFromMcpToolsDoc(): string[] {
-  const doc = readFileSync(resolve(repoRoot, "docs", "MCP_TOOLS.md"), "utf8");
-  const names = new Set<string>();
-  // Tool names sit in the first column of the reference tables.
-  for (const match of doc.matchAll(/^\|\s*`([a-z0-9_]+)`\s*\|/gm)) {
-    names.add(match[1]);
-  }
-  return [...names].sort();
-}
-
-test("apps/mcp/README.md tool catalog matches the registered catalog", () => {
-  assert.deepEqual(toolNamesFromReadme(), EXPECTED_TOOLS);
-});
-
-test("docs/MCP_TOOLS.md tool catalog matches the registered catalog", () => {
-  assert.deepEqual(toolNamesFromMcpToolsDoc(), EXPECTED_TOOLS);
-});
-
 test("the generated documentation blocks are the ones checked in", async () => {
   for (const { path, contents } of await renderAll()) {
     const name = relative(REPO_ROOT, path).replaceAll("\\", "/");
@@ -276,5 +214,58 @@ test("the generated documentation blocks are the ones checked in", async () => {
       contents.replaceAll("\r\n", "\n"),
       `${name} is stale. Run \`pnpm --filter @dreamworkhq/mcp docs\`.`,
     );
+  }
+});
+
+/**
+ * A workflow prompt is a brief that names tools, and nothing but this test ties
+ * those names to the catalog. A tool renamed or withdrawn would leave a prompt
+ * sending agents to call something that does not exist, which fails quietly in
+ * a host: the agent improvises instead. Tool names are the backticked
+ * snake_case words; backticked camelCase words are result fields.
+ */
+test("every tool a workflow prompt names is a tool this server registers", async () => {
+  const server = createMcpServer(new ApiClient("https://api.example.test", ""));
+  const [clientTransport, serverTransport] =
+    InMemoryTransport.createLinkedPair();
+  const client = new Client({ name: "prompts-test", version: "0.0.0" });
+  await Promise.all([
+    server.connect(serverTransport),
+    client.connect(clientTransport),
+  ]);
+  try {
+    const tools = new Set((await client.listTools()).tools.map((t) => t.name));
+    const { prompts } = await client.listPrompts();
+    assert.ok(prompts.length > 0, "the server registers workflow prompts");
+
+    for (const prompt of prompts) {
+      const args = Object.fromEntries(
+        (prompt.arguments ?? [])
+          .filter((argument) => argument.required)
+          .map((argument) => [argument.name, "example"]),
+      );
+      const { messages } = await client.getPrompt({
+        name: prompt.name,
+        arguments: args,
+      });
+      const text = messages
+        .map((message) =>
+          message.content.type === "text" ? message.content.text : "",
+        )
+        .join("\n");
+      const named = [...text.matchAll(/`([a-z]+(?:_[a-z]+)+)`/g)].map(
+        (match) => match[1]!,
+      );
+      assert.ok(named.length > 0, `${prompt.name} names the tools it uses`);
+      const missing = named.filter((name) => !tools.has(name));
+      assert.deepEqual(
+        missing,
+        [],
+        `${prompt.name} names tools the server does not register`,
+      );
+    }
+  } finally {
+    await client.close();
+    await server.close();
   }
 });

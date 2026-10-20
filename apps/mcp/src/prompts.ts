@@ -9,7 +9,7 @@ import { z } from "zod";
  * a terminal). Each one is a short brief for the agent: which tools to call in
  * which order, and the rules that keep a person's application, mail and money
  * in their own hands. Tool names are written in backticks, and
- * `test/workflow-prompts.test.ts` fails when one names a tool this server does
+ * `test/tool-catalog.test.ts` fails when one names a tool this server does
  * not register, so a renamed tool cannot leave a prompt pointing at nothing.
  *
  * The prompts carry no logic of their own. Every step is a tool call, and every
