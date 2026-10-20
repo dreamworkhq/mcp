@@ -3,6 +3,7 @@
 import { spawn, spawnSync } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { availableParallelism } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -92,7 +93,7 @@ export function resolveNodeTestCommand(
       ? [`--test-concurrency=${profile.testWorkers}`]
       : env.GITHUB_ACTIONS === "true" &&
           !testArgs.some((arg) => arg.startsWith("--test-concurrency"))
-        ? ["--test-concurrency=2"]
+        ? [`--test-concurrency=${options.cores ?? availableParallelism()}`]
         : [];
   const runnerArgs = parsed.runner === "node"
     ? []
