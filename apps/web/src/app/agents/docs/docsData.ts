@@ -787,7 +787,9 @@ export const MCP_TOOLS: McpTool[] = [
 ];
 // generated:mcp-tools:end
 
-export function docsHref(slug: string) {
+export function docsHref(
+  slug: string,
+): typeof DOCS_BASE_PATH | `${typeof DOCS_BASE_PATH}/${string}` {
   return slug === "overview" ? DOCS_BASE_PATH : `${DOCS_BASE_PATH}/${slug}`;
 }
 
