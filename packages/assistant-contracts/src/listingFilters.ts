@@ -34,7 +34,7 @@ export type WorkSetting = (typeof WORK_SETTINGS)[number];
 /**
  * Canonical employer industries. Source of truth: `INDUSTRIES` in
  * `apps/api/src/company-registry/industries.ts`, and
- * `apps/api/src/tests/industries-parity.test.ts` holds this copy to it.
+ * `apps/api/src/tests/industries.test.ts` holds this copy to it.
  */
 export const LISTING_INDUSTRIES = [
   "Software & Technology",
