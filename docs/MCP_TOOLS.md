@@ -105,9 +105,11 @@ Tools that call a product route directly, with no registry action behind them. `
 | `get_application_materials` | `GET /applications/:id/pack` | Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. |
 | `get_generated_resumes` | `GET /applications/:id/resumes` | Returns tailored resumes generated for the specified account-owned application. |
 | `get_listing` | `GET /listings/:id` | Returns full details of a platform job listing identified by id. |
+| `get_market_pulse` | `GET /research/index + GET /research/layoffs` | Returns CURRENT worldwide hiring-market context from Dreamwork's live job corpus, refreshed twice daily: companies tracked, open roles, roles added in the last 7 days, growing vs contracting companies, week-over-week movement, plus global layoff pressure by industry and company. |
 | `get_platform_context` | `MCP context` | Returns Dreamwork's job-search, pipeline, resume-tailoring, application, outreach and interview capabilities, plus its product context. |
 | `get_profile` | `GET /profile` | Returns the authenticated account's profile, resume text, preferences and profileIdentityVersion snapshot. |
 | `get_stats` | `GET /stats` | Returns aggregate account-owned job, application, escalation and outreach statistics. |
+| `get_top_hiring_companies` | `GET /research/index` | Returns the companies hiring the most right now, ranked by open roles among companies active in the last 7 days, with hiring trend, week-over-week velocity and median pay. |
 | `get_upgrade_link` | `GET /public/billing/upgrade-link` | Returns a browser link to checkout for the requested Pro or Dreamer plan and optional billing interval or promo code. |
 | `list_contacts` | `GET /contacts` | Returns the account's saved recruiter and referrer contacts, optionally filtered by company. |
 | `list_interviews` | `GET /interviews` | Returns all interviews detected for the account, including role, company, time and platform when known. |

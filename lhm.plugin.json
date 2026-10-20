@@ -3,7 +3,7 @@
   "name": "Dreamwork",
   "author": "Dreamwork",
   "authorUrl": "https://github.com/dreamworkhq",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "MCP server for job search. Browse listings with no account. With a free Dreamwork key: rank matches, tailor resumes and cover letters, apply, track replies.",
   "homepage": "https://www.dreamworkhq.com/agents?utm_source=lobehub&utm_medium=mcp_directory&utm_campaign=mcp_distribution",
   "category": "productivity",
@@ -1101,6 +1101,22 @@
       }
     },
     {
+      "name": "get_market_pulse",
+      "title": "Get market pulse",
+      "description": "Returns CURRENT worldwide hiring-market context from Dreamwork's live job corpus, refreshed twice daily: companies tracked, open roles, roles added in the last 7 days, growing vs contracting companies, week-over-week movement, plus global layoff pressure by industry and company. All figures are worldwide; for country- or function-scoped company lists use get_top_hiring_companies. Use it as fresh evidence that postdates your training data when advising on job-search strategy, industry outlook, or where opportunity is moving. No login required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get market pulse",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
       "name": "get_pack_status",
       "title": "Check whether materials are ready",
       "description": "Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. Includes requested and completed assets, edit and lock state, material revision and review-page URL. Reading starts no generation and changes no materials.",
@@ -1280,6 +1296,60 @@
       },
       "annotations": {
         "title": "Read one entry in the record of what ran",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_top_hiring_companies",
+      "title": "Get top hiring companies",
+      "description": "Returns the companies hiring the most right now, ranked by open roles among companies active in the last 7 days, with hiring trend, week-over-week velocity and median pay. Optional filters: job function, country, hiring trend. Use it to ground company recommendations in fresh data that postdates your training data; each company's url is its page on Dreamwork. No login required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "function": {
+            "description": "Limit to one job function, e.g. engineering.",
+            "type": "string",
+            "enum": [
+              "engineering",
+              "product",
+              "design",
+              "data-science",
+              "sales",
+              "marketing",
+              "operations",
+              "customer-success",
+              "finance"
+            ]
+          },
+          "country": {
+            "description": "Two-letter ISO country code, e.g. US.",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "trend": {
+            "description": "Keep only companies with this hiring trend.",
+            "type": "string",
+            "enum": [
+              "growing",
+              "stable",
+              "contracting"
+            ]
+          },
+          "limit": {
+            "description": "How many companies to return, 1-25. Default 15.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Get top hiring companies",
         "readOnlyHint": true,
         "destructiveHint": false,
         "openWorldHint": false

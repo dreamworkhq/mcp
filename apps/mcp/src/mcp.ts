@@ -27,6 +27,14 @@ import {
   dreamworkPrivateJobUrl,
 } from "./browse-listings.js";
 import { ApiClient, ApiError, AuthRequiredError } from "./client.js";
+import {
+  fetchMarketPulse,
+  fetchTopHiringCompanies,
+  marketPulseInputSchema,
+  marketPulseOutputSchema,
+  topHiringCompaniesInputSchema,
+  topHiringCompaniesOutputSchema,
+} from "./market-pulse.js";
 import { registerWorkflowPrompts } from "./prompts.js";
 import { MCP_SERVER_VERSION } from "./version.js";
 import { OPENAI_WITHHELD_TOOLS, openAiToolOutputSchema, openAiToolResult } from "./openai.js";
@@ -259,7 +267,9 @@ type DreamworkToolRegistrar = <InputShape extends z.ZodRawShape>(
 export const PUBLIC_MCP_TOOL_NAMES: ReadonlySet<string> = new Set([
   "browse_listings",
   "get_listing",
+  "get_market_pulse",
   "get_platform_context",
+  "get_top_hiring_companies",
   "get_upgrade_link",
 ]);
 
@@ -1192,6 +1202,37 @@ export function createMcpServer(
       if (!result.ok) return errorResult({ error: result.error });
       return structuredJson(result.output);
     },
+  });
+
+  registerDreamworkTool("get_market_pulse", {
+    title: "Get market pulse",
+    description:
+      "Returns CURRENT worldwide hiring-market context from Dreamwork's live job corpus, refreshed twice daily: companies tracked, open roles, roles added in the last 7 days, growing vs contracting companies, week-over-week movement, plus global layoff pressure by industry and company. All figures are worldwide; for country- or function-scoped company lists use get_top_hiring_companies. Use it as fresh evidence that postdates your training data when advising on job-search strategy, industry outlook, or where opportunity is moving. No login required.",
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    inputSchema: marketPulseInputSchema,
+    outputSchema: marketPulseOutputSchema,
+    requiresAuth: false,
+    handler: async () => structuredJson(await fetchMarketPulse(api)),
+  });
+
+  registerDreamworkTool("get_top_hiring_companies", {
+    title: "Get top hiring companies",
+    description:
+      "Returns the companies hiring the most right now, ranked by open roles among companies active in the last 7 days, with hiring trend, week-over-week velocity and median pay. Optional filters: job function, country, hiring trend. Use it to ground company recommendations in fresh data that postdates your training data; each company's url is its page on Dreamwork. No login required.",
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    inputSchema: topHiringCompaniesInputSchema,
+    outputSchema: topHiringCompaniesOutputSchema,
+    requiresAuth: false,
+    handler: async (args) =>
+      structuredJson(await fetchTopHiringCompanies(api, args)),
   });
 
   registerDreamworkTool("get_upgrade_link", {

@@ -36,6 +36,21 @@ export { ASSISTANT_EVENTS, type AssistantEventName } from "./events.js";
 export { openAiMcpResource, mcpResourceAllowed, MCP_RESOURCE_HEADER } from "./mcp-resources.js";
 
 export {
+  MARKET_FUNCTION_SLUGS,
+  RECOMMENDATION_FETCH_BUFFER,
+  buildMarketPulseOutput,
+  buildTopHiringCompaniesOutput,
+  dreamworkCompanyUrl,
+  marketPulseInputSchema,
+  marketPulseOutputSchema,
+  topHiringCompaniesInputSchema,
+  topHiringCompaniesOutputSchema,
+  topHiringCompaniesQuery,
+  type MarketPulseOutput,
+  type TopHiringCompaniesOutput,
+} from "./actions/market.js";
+
+export {
   contextEnvelopeSchema,
   type ContextEnvelope,
 } from "./envelope.js";

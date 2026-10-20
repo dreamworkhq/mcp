@@ -105,13 +105,15 @@ check only keep the map honest about the actions that do exist.
 
 ## In our app only
 
-14 capabilities the MCP catalog does not offer. Each declares why in the registry, and the compiler refuses a withheld capability that does not.
+16 capabilities the MCP catalog does not offer. Each declares why in the registry, and the compiler refuses a withheld capability that does not.
 
 | Capability | What it does | Why it is not on MCP |
 |------------|--------------|----------------------|
 | `close_application` | Close whichever row of the Applications board is open and put the person back on the list. | `needs_attached_browser` |
 | `draft_reply` | Write a reply into the Messages composer so the person reads it on their own screen before anything leaves. | `needs_attached_browser` |
 | `get_application_materials` | Read what one application will actually send to this employer: which resume version is selected, whether the cover letter is included, whether a send in flight has locked it, and the `revision` every write against it quotes. | `duplicate_of_mcp_tool`: the hand-written tool of this name returns the document bodies, which an agent reading them for a person needs and this twin withholds. |
+| `get_market_pulse` | Read CURRENT worldwide hiring-market context from Dreamwork's research corpus (a snapshot computed at most twice a day ago; generatedAt names it): companies tracked, open roles, roles added in the last 7 days, growing vs contracting companies, week-over-week movement, median salary, AI-role volume, plus global layoff pressure by industry and company. | `duplicate_of_mcp_tool`: apps/mcp serves the same payload as a PUBLIC (guest-capable) hand-written tool; a registry twin would add an auth wall for the same data. |
+| `get_top_hiring_companies` | List the companies hiring the most right now, ranked by open roles among companies active in the last 7 days, each with hiring trend, week-over-week velocity, median pay and its page on Dreamwork. | `duplicate_of_mcp_tool`: apps/mcp serves the same payload as a PUBLIC (guest-capable) hand-written tool; a registry twin would add an auth wall for the same data. |
 | `highlight` | Mark one element on screen — a card, a row, a control, a block of a document — by its anchor, with an optional `note` beside it. | `needs_attached_browser` |
 | `open` | Move the person's browser to one of the product's named pages, from the fixed set in `destination` — you do not type a URL. | `needs_attached_browser` |
 | `open_application` | Open one row of the Applications board — its review station if nothing has been sent yet, its record if something has — and select `doc` inside it. | `needs_attached_browser` |

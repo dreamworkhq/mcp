@@ -2,6 +2,7 @@ import type { ActionDefinition } from "./action.js";
 import { applyActions } from "./actions/apply.js";
 import { autopilotActions } from "./actions/autopilot.js";
 import { digestActions } from "./actions/digest.js";
+import { marketActions } from "./actions/market.js";
 import { matchesActions } from "./actions/matches.js";
 import { materialsActions } from "./actions/materials.js";
 import { pipelineActions } from "./actions/pipeline.js";
@@ -27,6 +28,7 @@ export const ACTIONS = [
   ...autopilotActions,
   ...statusActions,
   ...digestActions,
+  ...marketActions,
   ...applyActions,
   ...viewActionDefinitions,
 ] as const;

@@ -131,7 +131,7 @@ picks the right workflow.
 
 **Public (no key):**
 
-`browse_listings`, `get_listing`, `get_platform_context`, `get_upgrade_link`
+`browse_listings`, `get_listing`, `get_market_pulse`, `get_platform_context`, `get_top_hiring_companies`, `get_upgrade_link`
 
 **Assistant actions:** one tool per capability in Dreamwork's assistant registry, each running through the same authorization ladder and receipt ledger the on-site assistant uses. A consequential one holds on its first call, answering with a summary and a confirmationToken; send that token back with identical arguments to go ahead.
 

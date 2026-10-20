@@ -575,6 +575,11 @@ export const MCP_TOOLS: McpTool[] = [
     calls: "GET /listings/:id",
   },
   {
+    name: "get_market_pulse",
+    purpose: "Returns CURRENT worldwide hiring-market context from Dreamwork's live job corpus, refreshed twice daily: companies tracked, open roles, roles added in the last 7 days, growing vs contracting companies, week-over-week movement, plus global layoff pressure by industry and company.",
+    calls: "GET /research/index + GET /research/layoffs",
+  },
+  {
     name: "get_pack_status",
     purpose: "Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found.",
     calls: "POST /assistant/actions/get_pack_status",
@@ -618,6 +623,11 @@ export const MCP_TOOLS: McpTool[] = [
     name: "get_task",
     purpose: "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times.",
     calls: "POST /assistant/actions/get_task",
+  },
+  {
+    name: "get_top_hiring_companies",
+    purpose: "Returns the companies hiring the most right now, ranked by open roles among companies active in the last 7 days, with hiring trend, week-over-week velocity and median pay.",
+    calls: "GET /research/index",
   },
   {
     name: "get_unread_reminders",
