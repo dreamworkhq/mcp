@@ -637,6 +637,14 @@ function createUnreadNotices(api: ApiClient, options: UnreadNoticeOptions) {
 
 type UnreadNotices = ReturnType<typeof createUnreadNotices>;
 
+/**
+ * Array elements plus object keys one `tools/call` may carry. The SDK counts
+ * them before the input schema runs, so a guest on the hosted endpoint cannot
+ * spend its heap validating millions of elements (GHSA-46jr-4wx8-v453). Tool
+ * inputs are instructions, ids and short lists, far below this.
+ */
+const MAX_TOOL_INPUT_ELEMENTS = 10_000;
+
 /** Create an MCP server backed by an ApiClient. No DB access: all tools call the REST API. */
 export function createMcpServer(
   api: ApiClient,
@@ -655,6 +663,7 @@ export function createMcpServer(
       instructions: api.isAuthenticated || distribution === "openai"
         ? instructions
         : DREAMWORK_MCP_GUEST_INSTRUCTIONS + instructions,
+      maxToolInputElements: MAX_TOOL_INPUT_ELEMENTS,
     },
   );
 
