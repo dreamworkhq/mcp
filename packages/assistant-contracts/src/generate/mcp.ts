@@ -22,16 +22,21 @@ export interface McpToolDefinition {
   requiresAuth: boolean;
 }
 
+/** `openai` is the catalog served at `/mcp/openai` for the ChatGPT plugin directory. */
+export type McpDistribution = "default" | "openai";
+
 /**
  * Project the registry onto the MCP surface.
  *
- * Only `data` actions with `mcp.expose` come through. A `view` action is
+ * Only `data` actions with `mcp.expose` come through, and for the OpenAI
+ * distribution only those without `mcp.openai`. A `view` action is
  * dropped because an MCP client has no screen to move, and every data action
  * reads or writes one user's records, so `requiresAuth` is true for all of
  * them — there is no anonymous read in this registry.
  */
 export function toMcpToolDefinitions(
   actions: readonly ActionDefinition[],
+  distribution: McpDistribution = "default",
 ): McpToolDefinition[] {
   const definitions: McpToolDefinition[] = [];
   // A `for` loop rather than `filter().map()` because the exposure is a
@@ -39,6 +44,7 @@ export function toMcpToolDefinitions(
   // which a withheld action does not carry at all.
   for (const action of actions) {
     if (action.kind !== "data" || !action.mcp.expose) continue;
+    if (distribution === "openai" && action.mcp.openai) continue;
     definitions.push({
       name: action.id,
       title: action.title,

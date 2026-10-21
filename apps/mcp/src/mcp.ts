@@ -304,7 +304,7 @@ function createDreamworkToolRegistrar(
         `${name}: requiresAuth is ${definition.requiresAuth}, which does not match PUBLIC_MCP_TOOL_NAMES`,
       );
     }
-    if (distribution === "openai" && OPENAI_WITHHELD_TOOLS.has(name)) return;
+    if (distribution === "openai" && Object.hasOwn(OPENAI_WITHHELD_TOOLS, name)) return;
     type Args = Parameters<typeof definition.handler>[0];
     const run = async (args: Args): Promise<CallToolResult> => {
       if (!api.hasClientInfo) {
@@ -650,7 +650,9 @@ export function createMcpServer(
       version: MCP_SERVER_VERSION,
     },
     {
-      instructions: api.isAuthenticated
+      // A guest on the OpenAI endpoint is a directory scan or a ChatGPT
+      // install before sign-in; it connects through OAuth, never an API key.
+      instructions: api.isAuthenticated || distribution === "openai"
         ? instructions
         : DREAMWORK_MCP_GUEST_INSTRUCTIONS + instructions,
     },
@@ -685,7 +687,7 @@ export function createMcpServer(
   // the authorization ladder, and the receipt ledger. There are no
   // hand-written tool definitions here: a capability lands in the registry or
   // it does not exist.
-  for (const definition of toMcpToolDefinitions(dataActions)) {
+  for (const definition of toMcpToolDefinitions(dataActions, distribution)) {
     const action = actionById(definition.name);
     // `toMcpToolDefinitions` projects the very registry `actionById` reads, so
     // this cannot miss. The guard exists because the compiler cannot know it.
@@ -1178,7 +1180,7 @@ export function createMcpServer(
   registerDreamworkTool("browse_listings", {
     title: "Browse job listings",
     description:
-      `Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported; a paid plan raises the page-size limit. ${BROWSE_PAGING_HINT} An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.`,
+      `Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported. ${BROWSE_PAGING_HINT} An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.`,
     annotations: { readOnlyHint: true, openWorldHint: false },
     inputSchema: browseListingsInputSchema,
     outputSchema: browseListingsOutputSchema,
@@ -1198,7 +1200,7 @@ export function createMcpServer(
               "listListings",
               listingsResponseSchema,
             );
-      const result = browseResult(request, page);
+      const result = browseResult(request, page, distribution);
       if (!result.ok) return errorResult({ error: result.error });
       return structuredJson(result.output);
     },

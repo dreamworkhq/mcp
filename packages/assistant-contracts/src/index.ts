@@ -25,10 +25,12 @@ export type {
   ActionRisk,
   InvalidationKey,
   McpHiddenReason,
+  OpenAiHiddenReason,
 } from "./action.js";
 export {
   INVALIDATION_KEYS,
   MCP_HIDDEN_REASONS,
+  OPENAI_HIDDEN_REASONS,
   defineAction,
 } from "./action.js";
 
@@ -153,6 +155,7 @@ export {
 } from "./generate/intent.js";
 export {
   toMcpToolDefinitions,
+  type McpDistribution,
   type McpToolDefinition,
 } from "./generate/mcp.js";
 export { toDocsCatalog, type DocsCatalogRow } from "./generate/docs.js";
@@ -160,5 +163,6 @@ export {
   toCapabilityMap,
   type CapabilityMap,
   type CapabilityMapRow,
+  type OpenAiWithheldCapabilityRow,
   type WithheldCapabilityRow,
 } from "./generate/capabilityMap.js";

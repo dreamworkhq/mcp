@@ -3,6 +3,7 @@ import type {
   ActionDefinition,
   ActionRisk,
   McpHiddenReason,
+  OpenAiHiddenReason,
 } from "../action.js";
 
 /**
@@ -27,6 +28,12 @@ export interface WithheldCapabilityRow extends CapabilityMapRow {
   note: string | null;
 }
 
+/** A capability on MCP that the OpenAI distribution leaves out, and why. */
+export interface OpenAiWithheldCapabilityRow extends CapabilityMapRow {
+  reason: OpenAiHiddenReason;
+  note: string | null;
+}
+
 /**
  * The two channels, side by side.
  *
@@ -34,10 +41,12 @@ export interface WithheldCapabilityRow extends CapabilityMapRow {
  * `inAppOnly` is everything else, each entry carrying the declared reason it
  * is not in the first list. Every action in the registry lands in exactly one
  * of them, so the map is a partition rather than a selection.
+ * `notOnOpenAi` is the subset of `overMcp` the OpenAI distribution omits.
  */
 export interface CapabilityMap {
   overMcp: CapabilityMapRow[];
   inAppOnly: WithheldCapabilityRow[];
+  notOnOpenAi: OpenAiWithheldCapabilityRow[];
 }
 
 function byId(a: { id: string }, b: { id: string }): number {
@@ -61,10 +70,18 @@ export function toCapabilityMap(
 ): CapabilityMap {
   const overMcp: CapabilityMapRow[] = [];
   const inAppOnly: WithheldCapabilityRow[] = [];
+  const notOnOpenAi: OpenAiWithheldCapabilityRow[] = [];
 
   for (const action of actions) {
     if (action.mcp.expose) {
       overMcp.push(base(action));
+      if (action.mcp.openai) {
+        notOnOpenAi.push({
+          ...base(action),
+          reason: action.mcp.openai.reason,
+          note: action.mcp.openai.note ?? null,
+        });
+      }
       continue;
     }
     inAppOnly.push({
@@ -77,5 +94,6 @@ export function toCapabilityMap(
   return {
     overMcp: overMcp.sort(byId),
     inAppOnly: inAppOnly.sort(byId),
+    notOnOpenAi: notOnOpenAi.sort(byId),
   };
 }

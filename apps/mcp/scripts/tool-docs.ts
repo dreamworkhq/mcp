@@ -25,6 +25,7 @@ import {
   type ActionAuthorization,
   type ActionRisk,
   type CapabilityMapRow,
+  type OpenAiWithheldCapabilityRow,
   type WithheldCapabilityRow,
 } from "@jobless/assistant-contracts";
 
@@ -284,7 +285,7 @@ function overMcpRow(row: CapabilityMapRow): string {
   return `| \`${row.id}\` | ${firstSentence(row.description)} | ${direction} | ${authorizationCell(row.authorization)} |`;
 }
 
-function inAppOnlyRow(row: WithheldCapabilityRow): string {
+function withheldRow(row: WithheldCapabilityRow | OpenAiWithheldCapabilityRow): string {
   const why = row.note
     ? `\`${row.reason}\`: ${row.note.replace(/\|/g, "\\|")}`
     : `\`${row.reason}\``;
@@ -293,10 +294,11 @@ function inAppOnlyRow(row: WithheldCapabilityRow): string {
 
 /**
  * The whole registry as two tables, split by whether a person's own agent can
- * reach the capability. Every action appears in exactly one of them.
+ * reach the capability. Every action appears in exactly one of them. A third
+ * table names the MCP capabilities the OpenAI distribution leaves out.
  */
 export function renderCapabilityMap(): string {
-  const { overMcp, inAppOnly } = toCapabilityMap(ACTIONS);
+  const { overMcp, inAppOnly, notOnOpenAi } = toCapabilityMap(ACTIONS);
 
   return [
     CAPABILITY_MAP_START,
@@ -316,7 +318,15 @@ export function renderCapabilityMap(): string {
     "",
     "| Capability | What it does | Why it is not on MCP |",
     "|------------|--------------|----------------------|",
-    ...inAppOnly.map(inAppOnlyRow),
+    ...inAppOnly.map(withheldRow),
+    "",
+    "## Not in the OpenAI distribution",
+    "",
+    `\`https://mcp.dreamworkhq.com/mcp/openai\`, the endpoint the ChatGPT plugin directory listing uses, leaves out ${notOnOpenAi.length} of the MCP capabilities above. The default endpoint and the npm package keep them. Each declares why in the registry as \`mcp.openai\`.`,
+    "",
+    "| Capability | What it does | Why it is not on the OpenAI endpoint |",
+    "|------------|--------------|--------------------------------------|",
+    ...notOnOpenAi.map(withheldRow),
     "",
     CAPABILITY_MAP_END,
   ].join("\n");

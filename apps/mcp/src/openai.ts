@@ -1,17 +1,28 @@
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { profileResponseSchema } from "@jobless/api-contracts";
+import { ACTIONS, type ActionDefinition, type OpenAiHiddenReason } from "@jobless/assistant-contracts";
 import { z } from "zod";
 
-export const OPENAI_WITHHELD_TOOLS: ReadonlySet<string> = new Set([
-  "start_checkout",
-  "get_upgrade_link",
-]);
+/** Hand-written tools the OpenAI distribution leaves out. Registry tools declare theirs as `mcp.openai`. */
+export const OPENAI_WITHHELD_TOOLS: Readonly<Record<string, OpenAiHiddenReason>> = {
+  get_upgrade_link: "digital_commerce",
+};
 
-const PRIVATE_KEYS: ReadonlySet<string> = new Set([
+/** The task ledger also holds acts started on the site or the default endpoint; these never surface here. */
+const registry: readonly ActionDefinition[] = ACTIONS;
+const WITHHELD_ACTION_IDS: ReadonlySet<string> = new Set([
+  ...registry.flatMap(action => action.mcp.expose && action.mcp.openai ? [action.id] : []),
+  ...Object.keys(OPENAI_WITHHELD_TOOLS),
+]);
+const WITHHELD_ACTIVITY_SUMMARY = "An account step taken outside this connector.";
+
+/** Keys never sent to OpenAI: internal identifiers, credentials, purchase links and the plan tier. */
+const OMITTED_KEYS: ReadonlySet<string> = new Set([
   "userId", "profileId", "sessionId", "traceId", "requestId",
   "checkoutUrl", "upgradeUrl", "upgradeLink", "apiKey", "accessToken", "refreshToken",
+  "tier",
 ]);
-const ENTITLEMENT_MESSAGE = "This feature is unavailable under the account's current entitlement. No purchase or plan change was started.";
+const ENTITLEMENT_MESSAGE = "The account's current plan does not include this, or the account has used its limit for it. Nothing was purchased and the plan was not changed.";
 
 const careerPreferencesSchema = profileResponseSchema.shape.profile.shape.preferences.unwrap().pick({
   roles: true, salaryMin: true, salaryMax: true, preferredLocations: true,
@@ -33,9 +44,9 @@ const openAiProfileSchema = profileResponseSchema.extend({ profile: careerProfil
 export function openAiOutputSchema(schema: z.ZodType): z.ZodType {
   if (schema instanceof z.ZodObject) {
     const kept = Object.fromEntries(Object.entries(schema.shape)
-      .filter(([key]) => !PRIVATE_KEYS.has(key))
+      .filter(([key]) => !OMITTED_KEYS.has(key))
       .map(([key, field]) => [key, openAiOutputSchema(field as z.ZodType)]));
-    const removed = Object.fromEntries(Object.keys(schema.shape).filter(key => PRIVATE_KEYS.has(key)).map(key => [key, true as const]));
+    const removed = Object.fromEntries(Object.keys(schema.shape).filter(key => OMITTED_KEYS.has(key)).map(key => [key, true as const]));
     return schema.omit(removed as Parameters<typeof schema.omit>[0]).extend(kept);
   }
   if (schema instanceof z.ZodArray) return z.array(openAiOutputSchema(schema.element as z.ZodType));
@@ -59,15 +70,29 @@ function transactionalUrl(raw: string): boolean {
   } catch { return false; }
 }
 
+/**
+ * Refusal wording that sells a plan rather than explaining the account's entitlement. Error text only, so career text
+ * is never rewritten; plan names count only beside each other or "plan", because errors can echo a place or an industry.
+ */
+function promotesPurchase(text: string): boolean {
+  return /\b(upgrad(e|es|ed|ing)|subscribe (to|now)|purchase (credits|a plan)|free trial)\b/iu.test(text) ||
+    /\b(Pro|Dreamer|Ultra) (and|or|plan|plans)\b/u.test(text);
+}
+
+function withheldActivity(value: unknown): boolean {
+  return value !== null && typeof value === "object" &&
+    WITHHELD_ACTION_IDS.has((value as { actionId?: unknown }).actionId as string);
+}
+
 function safeText(text: string, errorContext = false): string {
   const urls = text.match(/https?:\/\/[^\s<>"\\]+/giu) ?? [];
-  if (urls.some(transactionalUrl) || (errorContext && /\b(upgrade (to (pro|dreamer)|your plan|the plan)|subscribe (to|now)|purchase (credits|a plan))\b/iu.test(text))) return ENTITLEMENT_MESSAGE;
+  if (urls.some(transactionalUrl) || (errorContext && promotesPurchase(text))) return ENTITLEMENT_MESSAGE;
   return text;
 }
 
 function project(value: unknown, errorContext = false): unknown {
   if (typeof value === "string") return safeText(value, errorContext);
-  if (Array.isArray(value)) return value.map(field => project(field, errorContext));
+  if (Array.isArray(value)) return value.filter(field => !withheldActivity(field)).map(field => project(field, errorContext));
   if (value === null || typeof value !== "object") return value;
   const object = value as Record<string, unknown>;
   if (object.handoff && typeof object.handoff === "object") {
@@ -78,7 +103,15 @@ function project(value: unknown, errorContext = false): unknown {
       return project({ ...object, handoff: null, summary: ENTITLEMENT_MESSAGE, ...(Object.hasOwn(object, "webUrl") ? { webUrl: null } : {}) }, errorContext);
     }
   }
-  return Object.fromEntries(Object.entries(object).filter(([key]) => !PRIVATE_KEYS.has(key)).map(([key, field]) => [key, project(field, errorContext || key === "error")]));
+  // A plan refusal, whether a failed action or one role of a batch, says so in one fixed sentence: the API's own wording may name plans or upgrades.
+  const planRefusal = object.code === "action_paywalled" || object.outcome === "quota_blocked";
+  const withheld = withheldActivity(object);
+  return Object.fromEntries(Object.entries(object)
+    .filter(([key]) => !OMITTED_KEYS.has(key) && !(planRefusal && key === "nextStep"))
+    .map(([key, field]) => [key,
+      planRefusal && key === "message" ? ENTITLEMENT_MESSAGE
+        : withheld && key === "summary" ? WITHHELD_ACTIVITY_SUMMARY
+          : project(field, errorContext || key === "error")]));
 }
 
 /** Applied only after canonical API decoding; text and structured data undergo the same projection. */

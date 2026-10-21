@@ -13,6 +13,7 @@ import {
   canonicalListingIndustry,
   type JobFunction,
   type MatchSeniority,
+  type McpDistribution,
   type WorkSetting,
 } from "@jobless/assistant-contracts";
 import { z } from "zod";
@@ -79,7 +80,7 @@ const MAX_BROWSE_PAGE_SIZE = 100;
 const FREE_PLAN_BROWSE_PAGE_SIZE = 25;
 
 /** How `browse_listings` pages, for the tool description. */
-export const BROWSE_PAGING_HINT = `A page holds ${DEFAULT_SORTED_PAGE_SIZE} listings by default and limit accepts up to ${MAX_BROWSE_PAGE_SIZE}, which the API clamps to ${FREE_PLAN_BROWSE_PAGE_SIZE} without a key or on the free plan; the next page is the previous nextCursor.`;
+export const BROWSE_PAGING_HINT = `A page holds ${DEFAULT_SORTED_PAGE_SIZE} listings by default and limit accepts up to ${MAX_BROWSE_PAGE_SIZE}, which the API clamps to ${FREE_PLAN_BROWSE_PAGE_SIZE} without a key or when the account's plan caps it there; the next page is the previous nextCursor.`;
 
 /**
  * Annual US dollars. Under 1,000 is refused rather than read as thousands:
@@ -186,7 +187,7 @@ export const browseListingsInputSchema = z.object({
     .max(MAX_BROWSE_PAGE_SIZE)
     .optional()
     .describe(
-      `Page size, ${DEFAULT_SORTED_PAGE_SIZE} when omitted. Without a key or on the free plan the API caps it at ${FREE_PLAN_BROWSE_PAGE_SIZE}.`,
+      `Page size, ${DEFAULT_SORTED_PAGE_SIZE} when omitted. Without a key, or when the account's plan caps it, the API returns at most ${FREE_PLAN_BROWSE_PAGE_SIZE}.`,
     ),
 });
 
@@ -543,6 +544,12 @@ function appliedFilters(
 type InventoryPage = z.output<typeof listingInventoryResponseSchema>;
 type OffsetPage = z.output<typeof listingsResponseSchema>;
 
+/** A keyless walk at the guest cap. The OpenAI endpoint connects through a sign-in, never an API key. */
+const GUEST_WALK_CAPPED_NOTE: Record<McpDistribution, string> = {
+  default: "This walk served its 1,000-listing guest limit and stopped early. Add a Dreamwork API key to walk every match.",
+  openai: "This walk stopped at the 1,000-listing limit for guests. Sign in to Dreamwork to walk every listing.",
+};
+
 /** The agent's page, or a refusal when the route could not apply a filter. */
 export function browseResult(
   request: {
@@ -553,6 +560,7 @@ export function browseResult(
     askedLimit: number;
   },
   page: InventoryPage | OffsetPage,
+  distribution: McpDistribution = "default",
 ): { ok: true; output: BrowseListingsOutput } | BrowseRefusal {
   const { search, digest } = request;
   if (search.location && !page.locationFilter) {
@@ -575,9 +583,7 @@ export function browseResult(
       // The API capped this walk because it is keyless: without a key the
       // unsorted inventory serves at most 1,000 rows per walk. The note names
       // the fix rather than letting "no nextCursor" read as "everything".
-      notes.push(
-        "This walk served its 1,000-listing guest limit and stopped early. Add a Dreamwork API key to walk every match.",
-      );
+      notes.push(GUEST_WALK_CAPPED_NOTE[distribution]);
     }
   } else {
     total = page.total;

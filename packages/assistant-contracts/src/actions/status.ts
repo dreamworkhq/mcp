@@ -324,7 +324,7 @@ export const statusActions = [
     mcp: {
       expose: true,
       description:
-        "Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time. A null limit represents an unlimited allowance.",
+        "Returns packs and applications used today, the account's limit for each and the next reset time. A null limit represents an unlimited allowance.",
       readOnlyHint: true,
       openWorldHint: false,
     },

@@ -66,7 +66,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_task` | read | Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. |
 | `get_unread_reminders` | read | Returns unread recruiter-message and thread counts, oldest unread time and recent message previews with thread, company, role and kind. |
 | `get_updates_since` | read | Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. |
-| `get_usage` | read | Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time. |
+| `get_usage` | read | Returns packs and applications used today, the account's limit for each and the next reset time. |
 | `import_job` | async | Fetches a public job-posting URL and imports it as a private role in the account's pipeline. |
 | `list_dismissed_matches` | read | Returns the account's dismissed listings, newest first, with listing id, title, company, Dreamwork page url, dismissal time and whether the listing is still active. |
 | `list_matches` | read | Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. |

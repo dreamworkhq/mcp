@@ -126,4 +126,12 @@ check only keep the map honest about the actions that do exist.
 | `set_filters` | Change the Matches feed's filter tray, and show or hide the tray itself with `tray`: match quality, posted-within, work setting, location, function, seniority, internships, AI roles, pay, benefits, industry, plus the search box, the sort order, and the Matches/All jobs switch. | `needs_attached_browser` |
 | `update_application_materials` | Change what this one application will send: `resumeVariant` picks the person's own uploaded resume or the tailored one, `coverLetterIncluded` decides whether the letter goes with it. | `duplicate_of_mcp_tool`: the hand-written tool of this name also writes `resumeHtml` and `coverLetter` as free text, which nothing in this registry does. |
 
+## Not in the OpenAI distribution
+
+`https://mcp.dreamworkhq.com/mcp/openai`, the endpoint the ChatGPT plugin directory listing uses, leaves out 1 of the MCP capabilities above. The default endpoint and the npm package keep them. Each declares why in the registry as `mcp.openai`.
+
+| Capability | What it does | Why it is not on the OpenAI endpoint |
+|------------|--------------|--------------------------------------|
+| `start_checkout` | Begin a plan change by returning a checkout URL for the browser to open. | `digital_commerce` |
+
 <!-- generated:capability-map:end -->

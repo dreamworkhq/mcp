@@ -104,6 +104,19 @@ export const MCP_HIDDEN_REASONS = [
 export type McpHiddenReason = (typeof MCP_HIDDEN_REASONS)[number];
 
 /**
+ * Why the OpenAI distribution (`/mcp/openai`, the ChatGPT plugin directory
+ * listing) leaves out a tool the default MCP catalog offers.
+ *
+ * - `digital_commerce` — it starts, links to, or prices a purchase of a
+ *   Dreamwork plan. OpenAI's directory allows commerce for physical goods only
+ *   and bars plugins from showing plans, starting subscriptions or promoting
+ *   upgrades.
+ */
+export const OPENAI_HIDDEN_REASONS = ["digital_commerce"] as const;
+
+export type OpenAiHiddenReason = (typeof OPENAI_HIDDEN_REASONS)[number];
+
+/**
  * Behaviour hints carried into every generated tool definition.
  *
  * `readOnlyHint` and `openWorldHint` are mandatory. A tool that writes also
@@ -117,6 +130,8 @@ interface ActionMcpExposedCommon {
   /** Factual operation description for external MCP clients, without model instructions. */
   description: string;
   openWorldHint: boolean;
+  /** Present only when the OpenAI distribution leaves the tool out, with the ground for that. */
+  openai?: { expose: false; reason: OpenAiHiddenReason; note?: string };
 }
 
 export type ActionMcpExposed =

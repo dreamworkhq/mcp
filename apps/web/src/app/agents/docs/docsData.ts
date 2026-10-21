@@ -646,7 +646,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_usage",
-    purpose: "Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time.",
+    purpose: "Returns packs and applications used today, the account's limit for each and the next reset time.",
     calls: "POST /assistant/actions/get_usage",
   },
   {

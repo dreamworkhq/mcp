@@ -121,6 +121,7 @@ export const applyActions = [
       readOnlyHint: false,
       openWorldHint: true,
       destructiveHint: false,
+      openai: { expose: false, reason: "digital_commerce" },
     },
   }),
 ] as const;

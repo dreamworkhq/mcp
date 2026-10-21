@@ -151,7 +151,7 @@
     {
       "name": "browse_listings",
       "title": "Browse job listings",
-      "description": "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported; a paid plan raises the page-size limit. A page holds 25 listings by default and limit accepts up to 100, which the API clamps to 25 without a key or on the free plan; the next page is the previous nextCursor. An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.",
+      "description": "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported. A page holds 25 listings by default and limit accepts up to 100, which the API clamps to 25 without a key or when the account's plan caps it there; the next page is the previous nextCursor. An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -295,7 +295,7 @@
             "maxLength": 1024
           },
           "limit": {
-            "description": "Page size, 25 when omitted. Without a key or on the free plan the API caps it at 25.",
+            "description": "Page size, 25 when omitted. Without a key, or when the account's plan caps it, the API returns at most 25.",
             "type": "integer",
             "minimum": 1,
             "maximum": 100
@@ -1447,7 +1447,7 @@
     {
       "name": "get_usage",
       "title": "Read what the plan still allows",
-      "description": "Returns the account's plan tier, packs and applications used today, their allowance limits and the next reset time. A null limit represents an unlimited allowance.",
+      "description": "Returns packs and applications used today, the account's limit for each and the next reset time. A null limit represents an unlimited allowance.",
       "inputSchema": {
         "type": "object",
         "properties": {},
