@@ -1,6 +1,6 @@
 {
-  "version": "1.9.0",
-  "sourceCommit": "f676f4c86ffc6c1cf52190e277c3d3081e393185",
+  "version": "1.9.1",
+  "sourceCommit": "227321467facec244b53bb9177ea0668a56c080a",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -34,6 +34,7 @@
     "apps/mcp/test/bundle-purity.test.ts",
     "apps/mcp/test/client-headers.test.ts",
     "apps/mcp/test/install-id.test.ts",
+    "apps/mcp/test/market-pulse.test.ts",
     "apps/mcp/test/mcp-application-materials.test.ts",
     "apps/mcp/test/mcp-client-capture.test.ts",
     "apps/mcp/test/mcp-profile-identity.test.ts",

@@ -52,7 +52,9 @@ export async function fetchMarketPulse(
   ]);
   return buildMarketPulseOutput({
     index: indexBody,
-    layoffs: (layoffsBody as { layoffs?: unknown }).layoffs ?? null,
+    // The builder's schema expects the route's FULL response
+    // ({ layoffs: ... }); unwrap here and zod rejects it.
+    layoffs: layoffsBody,
   });
 }
 
