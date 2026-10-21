@@ -267,7 +267,7 @@ export const materialsActions = [
       }),
     }),
     authorization: { mode: "receipt" },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: ["pipeline", "pack-usage"],
     event: ASSISTANT_EVENTS.ASSET_GENERATED,
     mcp: {
@@ -596,7 +596,7 @@ export const materialsActions = [
         .describe("A send is in flight; nothing about it can be changed."),
     }),
     authorization: { mode: "none" },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -626,7 +626,7 @@ export const materialsActions = [
     }),
     output: receiptSchema,
     authorization: { mode: "receipt", undoWindowMs: MATERIAL_UNDO_WINDOW_MS },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: ["application-materials", "pipeline"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -648,7 +648,7 @@ export const materialsActions = [
     }),
     output: receiptSchema,
     authorization: { mode: "receipt" },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: ["application-materials", "pipeline"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -700,7 +700,7 @@ export const materialsActions = [
       packPageUrl: z.string(),
     }),
     authorization: { mode: "none" },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -752,7 +752,7 @@ export const materialsActions = [
       }),
     output: receiptSchema,
     authorization: { mode: "receipt", undoWindowMs: MATERIAL_UNDO_WINDOW_MS },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: ["application-materials", "pipeline"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {

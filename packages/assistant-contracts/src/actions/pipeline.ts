@@ -68,7 +68,7 @@ export const pipelineActions = [
       complete: z.boolean(),
     }),
     authorization: { mode: "none" },
-    anchor: { route: "/applications", target: "pipeline.board" },
+    anchor: { route: "/dashboard", target: "pipeline.board" },
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -100,7 +100,7 @@ export const pipelineActions = [
     // once a card is off the board nothing on screen points at it, which is
     // what `recentActions` in the envelope exists to carry.
     authorization: { mode: "receipt", undoWindowMs: 60_000 },
-    anchor: { route: "/applications", target: "pipeline.row:<id>" },
+    anchor: { route: "/dashboard", target: "pipeline.row:<id>" },
     invalidates: ["pipeline"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -157,7 +157,7 @@ export const pipelineActions = [
       ),
     output: receiptSchema,
     authorization: { mode: "receipt" },
-    anchor: { route: "/applications", target: "pipeline.row:<id>" },
+    anchor: { route: "/dashboard", target: "pipeline.row:<id>" },
     invalidates: ["pipeline", "matches"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -183,7 +183,7 @@ export const pipelineActions = [
     }),
     output: receiptSchema,
     authorization: { mode: "receipt" },
-    anchor: { route: "/applications", target: "pipeline.row:<id>" },
+    anchor: { route: "/dashboard", target: "pipeline.row:<id>" },
     invalidates: ["pipeline"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -208,7 +208,7 @@ export const pipelineActions = [
     }),
     output: receiptSchema,
     authorization: { mode: "receipt" },
-    anchor: { route: "/applications", target: "pipeline.row:<id>" },
+    anchor: { route: "/dashboard", target: "pipeline.row:<id>" },
     invalidates: ["pipeline"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {

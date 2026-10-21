@@ -26,7 +26,7 @@ export const autopilotActions = [
       resumeVariant: z.enum(["default", "tailored"]),
     }),
     authorization: { mode: "none" },
-    anchor: { route: "/applications", target: "autopilot.settings" },
+    anchor: { route: "/dashboard", target: "autopilot.settings" },
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -56,7 +56,7 @@ export const autopilotActions = [
       ),
     output: receiptSchema,
     authorization: { mode: "command", requires: ["explicit_verb"] },
-    anchor: { route: "/applications", target: "autopilot.settings" },
+    anchor: { route: "/dashboard", target: "autopilot.settings" },
     invalidates: ["autopilot"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -98,7 +98,7 @@ export const autopilotActions = [
       unavailableReason: z.string().nullable(),
     }),
     authorization: { mode: "none" },
-    anchor: { route: "/applications", target: "autopilot.switch" },
+    anchor: { route: "/dashboard", target: "autopilot.switch" },
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
@@ -124,7 +124,7 @@ export const autopilotActions = [
     }),
     output: receiptSchema,
     authorization: { mode: "command", requires: ["explicit_verb"] },
-    anchor: { route: "/applications", target: "autopilot.switch" },
+    anchor: { route: "/dashboard", target: "autopilot.switch" },
     invalidates: ["autopilot"],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {

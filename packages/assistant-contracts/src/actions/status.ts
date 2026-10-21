@@ -131,7 +131,7 @@ export const statusActions = [
         .default(null),
     }),
     authorization: { mode: "none" },
-    anchor: { route: "/applications", target: "pipeline.row:<id>" },
+    anchor: { route: "/dashboard", target: "pipeline.row:<id>" },
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: {
