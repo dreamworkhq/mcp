@@ -46,6 +46,18 @@ export type RecruitCandidate = {
   vote: RecruitVote | null;
 };
 
+/** The job as one compact header: what the role is, where, and for how much. */
+export type RecruitJobCard = {
+  title: string;
+  company: string | null;
+  companyDomain: string | null;
+  logoUrl: string | null;
+  location: string | null;
+  salary: string | null;
+  /** Under ten words. */
+  tagline: string | null;
+};
+
 export type RecruitSearch = {
   id: string;
   status: RecruitSearchStatus;
@@ -55,6 +67,8 @@ export type RecruitSearch = {
   poolSize: number;
   /** One line of what we read from the job description. */
   summary: string | null;
+  /** Null until the description is read, and for searches saved before it existed. */
+  job: RecruitJobCard | null;
   jobText: string;
   error: string | null;
   createdAt: string;

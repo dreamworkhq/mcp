@@ -304,6 +304,7 @@ export type {
   RecruitCreateSearchRequest,
   RecruitDimension,
   RecruitDimensionKey,
+  RecruitJobCard,
   RecruitParseFileResponse,
   RecruitSearch,
   RecruitSearchStage,
