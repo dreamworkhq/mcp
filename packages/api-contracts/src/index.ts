@@ -294,6 +294,24 @@ export {
 } from "./schemas/filtered-mail.js";
 export { conversationMessageContentSchema, type ConversationMessageContent, type EmailReplyAttachment } from "./schemas/messages.js";
 export type { AdminSupportAssignment, AdminSupportAssignee } from "./admin-support.js";
+export type {
+  AdminRecruitAllowlistCreate,
+  AdminRecruitAllowlistEntry,
+  AdminRecruitAllowlistResponse,
+  AdminRecruitWaitingAccount,
+  RecruitAccess,
+  RecruitCandidate,
+  RecruitCreateSearchRequest,
+  RecruitDimension,
+  RecruitDimensionKey,
+  RecruitParseFileResponse,
+  RecruitSearch,
+  RecruitSearchStage,
+  RecruitSearchStatus,
+  RecruitSession,
+  RecruitVote,
+  RecruitVoteRequest,
+} from "./recruit.js";
 
 export type { AdminSupportReplyRequest } from "./schemas/admin-support.js";
 

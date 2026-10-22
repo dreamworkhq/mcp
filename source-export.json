@@ -1,6 +1,6 @@
 {
   "version": "1.9.1",
-  "sourceCommit": "422332d2e4604b8cf48da5b5d0f47eb7907acb2f",
+  "sourceCommit": "733a009752b46aa592a9730f0c67514bdaebc5ee",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -60,6 +60,7 @@
     "packages/api-contracts/src/index.ts",
     "packages/api-contracts/src/operation.ts",
     "packages/api-contracts/src/operations.ts",
+    "packages/api-contracts/src/recruit.ts",
     "packages/api-contracts/src/registry.ts",
     "packages/api-contracts/src/schemas/admin-support.ts",
     "packages/api-contracts/src/schemas/application-materials.ts",
