@@ -66,15 +66,6 @@ export const subscriptionSourceSchema = sharedComponent(
   },
 );
 
-export const generationModelKeySchema = sharedComponent(
-  z.enum(["haiku", "opus", "mythos"]),
-  {
-    id: "GenerationModelKey",
-    description:
-      "Selectable pack-generation model key. \"mythos\" is reserved and not yet available.",
-  },
-);
-
 /** Worker-side job/application status enum (`application_status` in Postgres). */
 export const jobStatusSchema = sharedComponent(
   z.enum([
@@ -119,22 +110,6 @@ export const errorResponseSchema = responseComponent(
     id: "ErrorResponse",
     description:
       "Plain handler error message. The `error` field is human-readable, not a stable machine code.",
-  },
-);
-
-/**
- * Error with a machine-readable code plus human copy, e.g.
- * `{ error: "model_requires_upgrade", message: "..." }`.
- */
-export const codedErrorResponseSchema = responseComponent(
-  z.object({
-    error: z.string(),
-    message: z.string(),
-  }),
-  {
-    id: "CodedErrorResponse",
-    description:
-      "Error with a stable machine-readable `error` code and human-readable `message` copy.",
   },
 );
 

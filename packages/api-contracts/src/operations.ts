@@ -36,7 +36,6 @@ import {
 } from "./schemas/billing.js";
 import type { OperationDescriptor, OperationResponse } from "./operation.js";
 import {
-  codedErrorResponseSchema,
   errorResponseSchema,
   validationErrorResponseSchema,
   uuidString,
@@ -82,8 +81,6 @@ import {
   communicationPreferencesUpdateRequestSchema,
   productActivityRequestSchema,
   applicationUsageResponseSchema,
-  generationModelUpdateRequestSchema,
-  generationModelUpdateResponseSchema,
   meResponseSchema,
   onboardingIncompleteResponseSchema,
   packUsageResponseSchema,
@@ -96,8 +93,8 @@ const unauthorized: OperationResponse = {
 
 /**
  * The typed-contract operation registry. Covers the PON-3393 canary set (six
- * schema-stable, high-traffic user-session reads) plus the two PON-3395
- * starter operations (pack usage read, generation-model write).
+ * schema-stable, high-traffic user-session reads) plus the PON-3395 pack
+ * usage read.
  *
  * Kept sorted by (path, method); `assertRegistryInvariants` in the generator
  * enforces ordering and operationId uniqueness.
@@ -1865,44 +1862,6 @@ export const operations: readonly OperationDescriptor[] = [
     summary: "Update communication preferences", tags: ["users"], auth: "user-session", contractMaturity: "consumer-adopted",
     requestBody: { description: "Edited preference", contentType: "application/json", required: true, schema: communicationPreferencesUpdateRequestSchema },
     responses: { "200": { description: "Current preferences and delivery eligibility", schema: communicationPreferencesResponseSchema }, "400": { description: "Invalid preference update", schema: errorResponseSchema }, "401": unauthorized, "409": { description: "A retired guest account cannot re-enable communications", schema: errorResponseSchema }, "404": { description: "User not found", schema: errorResponseSchema } },
-  },
-  {
-    operationId: "setGenerationModel",
-    method: "post",
-    path: "/users/me/generation-model",
-    fastifyPath: "/users/me/generation-model",
-    summary: "Set the preferred generation model",
-    description:
-      "Stores the user's pack-generation model choice. Tier-gated: Opus requires Pro or Dreamer; Mythos is not available yet.",
-    tags: ["users"],
-    auth: "user-session",
-    contractMaturity: "consumer-adopted",
-    requestBody: {
-      description: "The model to prefer.",
-      contentType: "application/json",
-      required: true,
-      schema: generationModelUpdateRequestSchema,
-    },
-    responses: {
-      "200": {
-        description: "Stored preference and the resolved effective model.",
-        schema: generationModelUpdateResponseSchema,
-      },
-      "400": {
-        description: "Body validation failed (`invalid_model`).",
-        schema: codedErrorResponseSchema,
-      },
-      "401": unauthorized,
-      "403": {
-        description:
-          "Model not available (`mythos_unavailable`) or requires an upgrade (`model_requires_upgrade`).",
-        schema: codedErrorResponseSchema,
-      },
-      "404": {
-        description: "Session user no longer exists.",
-        schema: errorResponseSchema,
-      },
-    },
   },
   {
     operationId: "completeOnboarding",

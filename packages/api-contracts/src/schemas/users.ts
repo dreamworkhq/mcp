@@ -3,7 +3,6 @@ import { requestComponent, responseComponent } from "../registry.js";
 import {
   accountRoleSchema,
   billingIntervalSchema,
-  generationModelKeySchema,
   isoDateTime,
   subscriptionSourceSchema,
   subscriptionTierSchema,
@@ -85,11 +84,6 @@ export const meUserSchema = responseComponent(
     onboardingVersion: z.int(),
     onboardingRequiredVersion: z.int(),
     onboardingGate: onboardingGateSchema,
-    // Raw stored choice (null when the user never chose) vs the model that
-    // will actually run after tier and monthly-budget resolution.
-    preferredGenerationModel: generationModelKeySchema.nullable(),
-    effectiveGenerationModel: generationModelKeySchema,
-    opusMonthlyCapReached: z.boolean(),
     createdAt: isoDateTime,
     proTrialEligible: z.boolean(),
     // The apply-now paywall trial: 7 free days, then the regular Pro price, one
@@ -101,7 +95,7 @@ export const meUserSchema = responseComponent(
   {
     id: "MeUser",
     description:
-      "Authenticated user identity, entitlements, and generation-model resolution for GET /users/me.",
+      "Authenticated user identity and entitlements for GET /users/me.",
   },
 );
 
@@ -291,33 +285,6 @@ export const packUsageResponseSchema = responseComponent(
       "Daily application-pack allowance and today's usage for the signed-in user.",
   },
 );
-
-/** `POST /users/me/generation-model` request body. */
-export const generationModelUpdateRequestSchema = requestComponent(
-  z.object({
-    model: generationModelKeySchema,
-  }),
-  {
-    id: "GenerationModelUpdateRequest",
-    description:
-      "Preferred pack-generation model choice. Unknown body keys are ignored by the server.",
-  },
-);
-
-/** `POST /users/me/generation-model` 200 body. */
-export const generationModelUpdateResponseSchema = responseComponent(
-  z.object({
-    preferredGenerationModel: generationModelKeySchema,
-    effectiveGenerationModel: generationModelKeySchema,
-    opusMonthlyCapReached: z.boolean(),
-  }),
-  {
-    id: "GenerationModelUpdateResponse",
-    description:
-      "Stored preference plus the tier- and budget-resolved model that will actually run.",
-  },
-);
-
 
 export const communicationPreferencesResponseSchema = responseComponent(z.object({
   jobAlerts: z.enum(["daily", "twice_weekly", "off"]),

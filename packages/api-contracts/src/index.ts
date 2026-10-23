@@ -59,10 +59,8 @@ export { applyNowTrialOfferSchema, billingCancellationReasonRequestSchema, billi
 
 export {
   applicationMethodSchema,
-  codedErrorResponseSchema,
   errorResponseSchema,
   accountRoleSchema,
-  generationModelKeySchema,
   isoDateTime,
   jobStatusSchema,
   subscriptionSourceSchema,
@@ -147,8 +145,6 @@ export {
 } from "./schemas/stats.js";
 export {
   applicationUsageResponseSchema,
-  generationModelUpdateRequestSchema,
-  generationModelUpdateResponseSchema,
   instantApplyAccessSchema,
   meCountsSchema,
   meExperiencesSchema,
@@ -214,8 +210,6 @@ import type {
 import type { statsResponseSchema } from "./schemas/stats.js";
 import type {
   applicationUsageResponseSchema,
-  generationModelUpdateRequestSchema,
-  generationModelUpdateResponseSchema,
   meResponseSchema,
   onboardingIncompleteResponseSchema,
   packUsageResponseSchema,
@@ -277,12 +271,6 @@ export type ApplicationUsageResponse = z.infer<
   typeof applicationUsageResponseSchema
 >;
 export type PackUsageResponse = z.infer<typeof packUsageResponseSchema>;
-export type GenerationModelUpdateRequest = z.infer<
-  typeof generationModelUpdateRequestSchema
->;
-export type GenerationModelUpdateResponse = z.infer<
-  typeof generationModelUpdateResponseSchema
->;
 
 export {
   filteredMailDetailResponseSchema,
