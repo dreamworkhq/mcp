@@ -1,6 +1,6 @@
 {
   "version": "1.9.1",
-  "sourceCommit": "a645306f158d0240da5f9caa1c390c7ea6ef9714",
+  "sourceCommit": "7c5329d266e6471dbb6a72d2073a66b405155e71",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -64,6 +64,7 @@
     "packages/api-contracts/src/registry.ts",
     "packages/api-contracts/src/schemas/admin-support.ts",
     "packages/api-contracts/src/schemas/application-materials.ts",
+    "packages/api-contracts/src/schemas/application-needs-info.ts",
     "packages/api-contracts/src/schemas/application-record.ts",
     "packages/api-contracts/src/schemas/application-timeline.ts",
     "packages/api-contracts/src/schemas/assistant-memory.ts",

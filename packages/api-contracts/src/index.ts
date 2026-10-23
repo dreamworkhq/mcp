@@ -43,6 +43,12 @@ export {
   applicationTimelineResponseSchema,
 } from "./schemas/application-timeline.js";
 export {
+  applicationNeedsInfoAnswerRequestSchema,
+  applicationNeedsInfoAnswerResponseSchema,
+  applicationNeedsInfoQuestionSchema,
+  applicationNeedsInfoResponseSchema,
+} from "./schemas/application-needs-info.js";
+export {
   assistantHypothesisConfirmResponseSchema,
   assistantHypothesisCreateRequestSchema,
   assistantHypothesisCreateResponseSchema,

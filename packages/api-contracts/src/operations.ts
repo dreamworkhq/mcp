@@ -11,6 +11,16 @@ import {
   applicationResumeVariantSchema,
   resumeDocumentSeedSchema,
 } from "./schemas/application-materials.js";
+import {
+  applicationNeedsInfoAnswerRequestSchema,
+  applicationNeedsInfoAnswerResponseSchema,
+  applicationNeedsInfoBadRequestSchema,
+  applicationNeedsInfoCodedErrorSchema,
+  applicationNeedsInfoConflictSchema,
+  applicationNeedsInfoDismissResponseSchema,
+  applicationNeedsInfoInvalidAnswersSchema,
+  applicationNeedsInfoResponseSchema,
+} from "./schemas/application-needs-info.js";
 import { applicationTimelineResponseSchema } from "./schemas/application-timeline.js";
 import {
   assistantHypothesisConfirmResponseSchema,
@@ -193,6 +203,135 @@ export const operations: readonly OperationDescriptor[] = [
         description:
           "The attempt is not proven safe to retry or its material/submission state changed.",
         schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "getApplicationNeedsInfo",
+    method: "get",
+    path: "/applications/{id}/needs-info",
+    fastifyPath: "/applications/:id/needs-info",
+    summary: "Read the questions an application is waiting on",
+    description:
+      "When the apply engine stops on questions only the person can answer, the application waits for them once instead of failing. This lists the open questions in form order, the version to answer against, and when the wait expires. `state` is `none` for an application that is not waiting.",
+    tags: ["applications"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned application id.",
+        schema: uuidString,
+      },
+    ],
+    responses: {
+      "200": {
+        description: "The wait, if any, and its open questions.",
+        schema: applicationNeedsInfoResponseSchema,
+      },
+      "401": unauthorized,
+      "404": {
+        description:
+          "No application with that id is owned by the caller. Unknown, non-owned and malformed ids are indistinguishable.",
+        schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "answerApplicationNeedsInfo",
+    method: "post",
+    path: "/applications/{id}/needs-info",
+    fastifyPath: "/applications/:id/needs-info",
+    summary: "Answer the questions an application is waiting on",
+    description:
+      "Saves answers to some or all open questions. Every answer is checked before any is saved, then they are saved in order; a question that changed underneath stops the save there (409) with the answers before it kept. Answering the last open question puts the application back in the apply queue; a question that may be reused saves its answer so the person is not asked again.",
+    tags: ["applications"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned application id.",
+        schema: uuidString,
+      },
+    ],
+    requestBody: {
+      description: "The version that was read and one answer per question.",
+      contentType: "application/json",
+      required: true,
+      schema: applicationNeedsInfoAnswerRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The answers were saved.",
+        schema: applicationNeedsInfoAnswerResponseSchema,
+      },
+      "400": {
+        description:
+          "A malformed body (Zod issue list), or an answer that names a question that is not open or names one twice (`field_not_actionable`).",
+        schema: applicationNeedsInfoBadRequestSchema,
+      },
+      "401": unauthorized,
+      "404": {
+        description:
+          "No application with that id is owned by the caller. Unknown, non-owned and malformed ids are indistinguishable.",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description:
+          "The questions changed since they were read (`action_changed`, with the fresh questions), or the application is not waiting (`not_waiting`).",
+        schema: applicationNeedsInfoConflictSchema,
+      },
+      "422": {
+        description:
+          "One or more answers would not be accepted by the form. Checked before saving, so normally nothing was saved.",
+        schema: applicationNeedsInfoInvalidAnswersSchema,
+      },
+      "503": {
+        description:
+          "An answer was stored but projecting it into the application failed (`projection_failed`); the input reconciler finishes it and resumes the application.",
+        schema: applicationNeedsInfoCodedErrorSchema,
+      },
+    },
+  },
+  {
+    operationId: "dismissApplicationNeedsInfo",
+    method: "post",
+    path: "/applications/{id}/needs-info/dismiss",
+    fastifyPath: "/applications/:id/needs-info/dismiss",
+    summary: "Stop an application that is waiting on the person",
+    description:
+      "The person's way out of a wait: the application is canceled as an in-flight one is canceled, and its open questions are closed.",
+    tags: ["applications"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned application id.",
+        schema: uuidString,
+      },
+    ],
+    responses: {
+      "200": {
+        description: "The application is canceled.",
+        schema: applicationNeedsInfoDismissResponseSchema,
+      },
+      "401": unauthorized,
+      "404": {
+        description:
+          "No application with that id is owned by the caller. Unknown, non-owned and malformed ids are indistinguishable.",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description: "The application is not waiting on the person (`not_waiting`).",
+        schema: applicationNeedsInfoConflictSchema,
       },
     },
   },
