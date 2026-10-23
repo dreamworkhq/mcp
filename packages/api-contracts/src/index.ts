@@ -309,7 +309,6 @@ export type {
   RecruitVote,
   RecruitVoteRequest,
 } from "./recruit.js";
-export { RECRUIT_MONTHLY_INTRO_LIMIT } from "./recruit.js";
 
 export type { AdminSupportReplyRequest } from "./schemas/admin-support.js";
 

@@ -21,9 +21,6 @@ export type RecruitVote = "up" | "down";
  */
 export type RecruitIntroStatus = "requested" | "contacted" | "introduced" | "declined";
 
-/** Accepted intros a recruiter may request per calendar month (UTC). */
-export const RECRUIT_MONTHLY_INTRO_LIMIT = 100;
-
 /** The ten boxes on a card, in display order. */
 export type RecruitDimensionKey =
   | "skills"
