@@ -52,7 +52,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_application_documents` | read | Returns version-specific resume PDF and DOCX, cover-letter PDF and combined-pack PDF download links for one application, plus source, inclusion, lock state and revision. |
 | `get_application_readiness` | read | Returns readiness for one-off submission and Autopilot, plan entitlement and missing onboarding answers. |
 | `get_application_status` | read | Returns an application's event timeline and separate submitted, employerConfirmed and replied facts. |
-| `get_autopilot_settings` | read | Returns the saved minimum Matches score and default-versus-tailored resume choice for Autopilot. |
+| `get_autopilot_settings` | read | Returns the saved minimum Matches score, the default-versus-tailored resume choice, and whether Autopilot skips roles whose posted pay tops out below the person's minimum salary, with that minimum. |
 | `get_autopilot_status` | read | Returns Autopilot state (on or off, matching the product switch, or unavailable when the plan does not include it), daily and monthly sent counts and plan limits, match-score floor, eligible and in-flight counts and nextRunAt, which is null unless the state is on. |
 | `get_career_record` | read | Returns resume-derived professional facts, document-vault metadata, person-stated preferences, writing preferences and unconfirmed hypotheses as separate fields. |
 | `get_communication_preferences` | read | Returns job-alert settings and cadence, Autopilot result-email mode, product-update consent and the all-optional-emails-off state. |
@@ -87,7 +87,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `start_checkout` | consequential | Returns a checkout URL for the requested plan change after explicit consent. |
 | `strengthen_application` | async | Improves an application's existing materials against its role and recorded career evidence, spending one refine allowance per changed asset. |
 | `undo_last` | cheap | Reverses the latest action with an available undo, or the action identified by taskId. |
-| `update_autopilot_settings` | consequential | Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice. |
+| `update_autopilot_settings` | consequential | Changes the minimum Matches score from 50 to 97, with null restoring 70, the default-versus-tailored resume choice, or whether roles whose posted pay tops out below the profile's minimum salary are skipped. |
 | `update_communication_preferences` | cheap | Changes the supplied optional email categories while preserving omitted settings. |
 | `update_preferences` | cheap | Merges the supplied preference fields into the account's stored preferences and refreshes matching. |
 

@@ -536,7 +536,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_autopilot_settings",
-    purpose: "Returns the saved minimum Matches score and default-versus-tailored resume choice for Autopilot.",
+    purpose: "Returns the saved minimum Matches score, the default-versus-tailored resume choice, and whether Autopilot skips roles whose posted pay tops out below the person's minimum salary, with that minimum.",
     calls: "POST /assistant/actions/get_autopilot_settings",
   },
   {
@@ -771,7 +771,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "update_autopilot_settings",
-    purpose: "Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice.",
+    purpose: "Changes the minimum Matches score from 50 to 97, with null restoring 70, the default-versus-tailored resume choice, or whether roles whose posted pay tops out below the profile's minimum salary are skipped.",
     calls: "POST /assistant/actions/update_autopilot_settings",
   },
   {

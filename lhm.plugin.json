@@ -907,7 +907,7 @@
     {
       "name": "get_autopilot_settings",
       "title": "Read Autopilot settings",
-      "description": "Returns the saved minimum Matches score and default-versus-tailored resume choice for Autopilot. Reading settings starts no applications.",
+      "description": "Returns the saved minimum Matches score, the default-versus-tailored resume choice, and whether Autopilot skips roles whose posted pay tops out below the person's minimum salary, with that minimum. Reading settings starts no applications.",
       "inputSchema": {
         "type": "object",
         "properties": {},
@@ -2783,7 +2783,7 @@
     {
       "name": "update_autopilot_settings",
       "title": "Change Autopilot settings",
-      "description": "Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
+      "description": "Changes the minimum Matches score from 50 to 97, with null restoring 70, the default-versus-tailored resume choice, or whether roles whose posted pay tops out below the profile's minimum salary are skipped. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2805,6 +2805,9 @@
               "default",
               "tailored"
             ]
+          },
+          "requireSalaryMinimum": {
+            "type": "boolean"
           },
           "confirmationToken": {
             "description": "Echo the token from a previous `held` result to carry out the act it described, and only after the person has seen that result's summary and agreed to it. Send identical arguments: the token is bound to the exact call it was issued for, so a changed argument is held again with a fresh token and a fresh summary. It lasts two minutes and is spent once.",

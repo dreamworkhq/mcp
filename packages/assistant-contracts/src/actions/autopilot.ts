@@ -18,12 +18,16 @@ export const autopilotActions = [
     risk: "read",
     title: "Read Autopilot settings",
     description:
-      "Read the saved minimum Matches score and whether Autopilot sends the default or tailored resume. This does not start applications. Cover-letter settings are available through profile preferences.",
+      "Read the saved minimum Matches score, whether Autopilot sends the default or tailored resume, and whether it skips roles whose posted pay tops out below the person's minimum salary (`requireSalaryMinimum`, with that minimum as `salaryMinimum`, null when none is saved). This does not start applications. Cover-letter settings and the minimum salary itself are available through profile preferences.",
     input: z.object({}),
     output: z.object({
       scoreFloor: z.number().nullable(),
       scoreFloorDefault: z.number(),
       resumeVariant: z.enum(["default", "tailored"]),
+      requireSalaryMinimum: z.boolean(),
+      salaryMinimum: z
+        .object({ amount: z.number(), currency: z.string(), period: z.string() })
+        .nullable(),
     }),
     authorization: { mode: "none" },
     anchor: { route: "/dashboard", target: "autopilot.settings" },
@@ -32,7 +36,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Returns the saved minimum Matches score and default-versus-tailored resume choice for Autopilot. Reading settings starts no applications.",
+        "Returns the saved minimum Matches score, the default-versus-tailored resume choice, and whether Autopilot skips roles whose posted pay tops out below the person's minimum salary, with that minimum. Reading settings starts no applications.",
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -43,15 +47,18 @@ export const autopilotActions = [
     risk: "consequential",
     title: "Change Autopilot settings",
     description:
-      "Change the hard minimum score shown in Matches (50–97, null restores 70) or use the person's default resume instead of tailoring. Requires an explicit instruction. Applies to waiting applications and is rechecked before submission. Does not enable, resume or start Autopilot. Applications already sent cannot be recalled; stopped applications are not automatically retried.",
+      "Change the hard minimum score shown in Matches (50–97, null restores 70), use the person's default resume instead of tailoring, or turn on or off `requireSalaryMinimum`, which skips roles whose posted pay tops out below the minimum salary in profile preferences (roles with no posted pay still go). Requires an explicit instruction. Applies to waiting applications and is rechecked before submission. Does not enable, resume or start Autopilot. Applications already sent cannot be recalled; stopped applications are not automatically retried.",
     input: z
       .object({
         scoreFloor: z.number().int().min(50).max(97).nullable().optional(),
         resumeVariant: z.enum(["default", "tailored"]).optional(),
+        requireSalaryMinimum: z.boolean().optional(),
       })
       .refine(
         (input) =>
-          input.scoreFloor !== undefined || input.resumeVariant !== undefined,
+          input.scoreFloor !== undefined ||
+          input.resumeVariant !== undefined ||
+          input.requireSalaryMinimum !== undefined,
         "Specify a setting to change",
       ),
     output: receiptSchema,
@@ -62,7 +69,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Changes the minimum Matches score from 50 to 97, with null restoring 70, or the default-versus-tailored resume choice. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
+        "Changes the minimum Matches score from 50 to 97, with null restoring 70, the default-versus-tailored resume choice, or whether roles whose posted pay tops out below the profile's minimum salary are skipped. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
       readOnlyHint: false,
       openWorldHint: false,
       destructiveHint: false,
