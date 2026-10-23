@@ -15,6 +15,15 @@ export type RecruitSearchStage = "parsing" | "retrieving" | "scoring" | "done";
 export type RecruitSearchStatus = "running" | "complete" | "failed";
 export type RecruitVote = "up" | "down";
 
+/**
+ * Where a requested intro stands. Staff move it past `requested`, and only
+ * `requested` can be undone by the recruiter.
+ */
+export type RecruitIntroStatus = "requested" | "contacted" | "introduced" | "declined";
+
+/** Accepted intros a recruiter may request per calendar month (UTC). */
+export const RECRUIT_MONTHLY_INTRO_LIMIT = 100;
+
 /** The ten boxes on a card, in display order. */
 export type RecruitDimensionKey =
   | "skills"
@@ -44,6 +53,8 @@ export type RecruitCandidate = {
   skills: Array<{ name: string; matched: boolean }>;
   dimensions: RecruitDimension[];
   vote: RecruitVote | null;
+  /** The signed-in recruiter's intro request for this candidate on this search. */
+  intro: RecruitIntroStatus | null;
 };
 
 /** The job as one compact header: what the role is, where, and for how much. */
@@ -77,6 +88,27 @@ export type RecruitSearch = {
   candidates: RecruitCandidate[];
 };
 
+/** How many intros the signed-in recruiter has requested this calendar month. */
+export type RecruitIntroUsage = { usedThisMonth: number; monthlyLimit: number };
+
+/** One saved search, as the Roles list shows it. */
+export type RecruitRole = {
+  id: string;
+  status: RecruitSearchStatus;
+  job: RecruitJobCard | null;
+  summary: string | null;
+  createdAt: string;
+  candidateCount: number;
+  introCount: number;
+};
+
+export type RecruitRolesResponse = { roles: RecruitRole[]; usage: RecruitIntroUsage };
+
+export type RecruitIntroResponse = {
+  intro: RecruitIntroStatus | null;
+  usage: RecruitIntroUsage;
+};
+
 export type RecruitCreateSearchRequest = { jobText: string };
 export type RecruitParseFileResponse = { text: string };
 export type RecruitVoteRequest = { vote: RecruitVote | null };
@@ -102,3 +134,23 @@ export type AdminRecruitAllowlistResponse = {
 };
 
 export type AdminRecruitAllowlistCreate = { email: string; note?: string | null };
+
+export type AdminRecruitIntroRequest = {
+  id: string;
+  status: RecruitIntroStatus;
+  createdAt: string;
+  updatedAt: string;
+  recruiterEmail: string;
+  searchId: string;
+  roleTitle: string | null;
+  company: string | null;
+  rank: number;
+  score: number;
+  candidateName: string;
+  candidateEmail: string;
+  candidateTitle: string | null;
+};
+
+export type AdminRecruitIntrosResponse = { requests: AdminRecruitIntroRequest[] };
+
+export type AdminRecruitIntroUpdate = { status: RecruitIntroStatus };

@@ -298,14 +298,22 @@ export type {
   AdminRecruitAllowlistCreate,
   AdminRecruitAllowlistEntry,
   AdminRecruitAllowlistResponse,
+  AdminRecruitIntroRequest,
+  AdminRecruitIntroUpdate,
+  AdminRecruitIntrosResponse,
   AdminRecruitWaitingAccount,
   RecruitAccess,
   RecruitCandidate,
   RecruitCreateSearchRequest,
   RecruitDimension,
   RecruitDimensionKey,
+  RecruitIntroResponse,
+  RecruitIntroStatus,
+  RecruitIntroUsage,
   RecruitJobCard,
   RecruitParseFileResponse,
+  RecruitRole,
+  RecruitRolesResponse,
   RecruitSearch,
   RecruitSearchStage,
   RecruitSearchStatus,
@@ -313,6 +321,7 @@ export type {
   RecruitVote,
   RecruitVoteRequest,
 } from "./recruit.js";
+export { RECRUIT_MONTHLY_INTRO_LIMIT } from "./recruit.js";
 
 export type { AdminSupportReplyRequest } from "./schemas/admin-support.js";
 
