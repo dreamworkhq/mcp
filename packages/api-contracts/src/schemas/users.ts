@@ -158,6 +158,20 @@ export const meFreeApplicationsSchema = responseComponent(
   },
 );
 
+export const meOneTapApplicationsSchema = responseComponent(
+  z.object({
+    limit: z.int(),
+    used: z.int(),
+    remaining: z.int(),
+    resetsAt: isoDateTime,
+  }),
+  {
+    id: "MeOneTapApplications",
+    description:
+      "A paid account's one-tap applications this UTC calendar month: sends through Apply that reached the employer or may have, counted apart from Autopilot; a failure that did not gives its count back. `resetsAt` is the first of next month.",
+  },
+);
+
 export const applyPreferencesSchema = responseComponent(
   z.object({
     reviewBeforeSending: z
@@ -191,6 +205,11 @@ export const meResponseSchema = responseComponent(
       .nullable()
       .describe(
         "Non-null only for a free account in the Autopilot-first experience.",
+      ),
+    oneTapApplications: meOneTapApplicationsSchema
+      .nullable()
+      .describe(
+        "Non-null only for Pro and Dreamer; null for Free and for an admin without a tier preview.",
       ),
     applyPreferences: applyPreferencesSchema,
     recruiterReplyReceived: z.boolean(),
