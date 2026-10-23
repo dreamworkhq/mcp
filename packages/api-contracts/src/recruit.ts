@@ -65,6 +65,8 @@ export type RecruitSearch = {
   /** Candidates scored so far, out of `poolSize`. */
   scored: number;
   poolSize: number;
+  /** Seekers the search covers; null until retrieval starts, and on searches saved before it was counted. */
+  corpusSize: number | null;
   /** One line of what we read from the job description. */
   summary: string | null;
   /** Null until the description is read, and for searches saved before it existed. */
