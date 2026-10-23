@@ -66,7 +66,12 @@ export const meUserSchema = responseComponent(
       "Account role. `isAdmin` is derived from it (role === \"admin\") and kept for existing readers.",
     ),
     isAdmin: z.boolean(),
-    applicationsEnabled: z.boolean().optional(),
+    applicationsEnabled: z
+      .literal(true)
+      .optional()
+      .describe(
+        "Deprecated: always true. Web bundles built before the Applications queue reached every account read it to choose the queue over the old board.",
+      ),
     resumeDocumentEditorEnabled: z.boolean().optional(),
     accountPurpose: z.enum(["customer", "production_canary"]),
     emailUnsubscribed: z.boolean(),
