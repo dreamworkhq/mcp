@@ -530,7 +530,7 @@ export const profileActions = [
         "Merges the supplied preference fields into the account's stored preferences and refreshes matching. compensation.kind is open or minimum; minimum requires minimumAmount, an ISO-4217 currency and an hour or year period. seniorities accepts one override level; an empty list restores resume-derived seniority. excludedCompanies, excludedPlaces and excludedSeniorities replace the lists of companies, places and levels hidden from matches, alerts and Autopilot; an excludedPlaces name that cannot be placed refuses the write. Autopilot never applies below the pay floor or outside the accepted work modes. Work modes and relocation are stored together, with omitted values preserved.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -587,7 +587,7 @@ export const profileActions = [
         "Saves person-stated application-answer and contact groups through onboarding validation, then rechecks readiness and completes setup when no requirements remain. statedByPerson:true attests that supplied values came from the person. eligibility.countries replaces the stored list. An empty answer set can finish otherwise-complete onboarding. Returns ready and stillMissing; no application is sent.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -708,7 +708,7 @@ export const profileActions = [
         "Stores an unconfirmed career hypothesis separately from established facts. At most twenty hypotheses may be pending; further writes are refused at that limit. The statement does not change matching preferences or become a confirmed profile fact.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -733,7 +733,7 @@ export const profileActions = [
         "Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis. A stated refusal becomes a matching deal-breaker; other confirmations become work-vault notes that do not filter matches. The receipt identifies which record changed.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -906,7 +906,7 @@ export const profileActions = [
         "Changes the supplied optional email categories while preserving omitted settings. allOptionalEmailsOff:true must be supplied alone; conflicting category settings are refused. Disabling Autopilot result mail does not stop applications. Account, security, billing and essential employer mail are unaffected.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 ] as const;

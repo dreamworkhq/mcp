@@ -881,7 +881,7 @@ export function createMcpServer(
       "Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision. Access is restricted to the Applications rollout cohort admitted by the API. Locked or conflicting revisions are refused.",
     annotations: {
       readOnlyHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
       idempotentHint: false,
       openWorldHint: false,
     },

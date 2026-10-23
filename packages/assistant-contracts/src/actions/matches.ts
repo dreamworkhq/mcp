@@ -339,7 +339,7 @@ export const matchesActions = [
         "Saves one role to the account's pipeline at SAVED as a bookmark. No application is submitted or queued until apply is called. Application materials may start preparing in the background. An already saved role returns a no-op receipt.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -371,7 +371,7 @@ export const matchesActions = [
         "Hides one role, every listing with the same employer and title in any location, from the account's match feed, job alerts and Autopilot until the account restores or saves it. The receipt offers undo for one minute; restore_match reverses it at any time and list_dismissed_matches lists dismissed listings. The supplied reason is not stored. It does not hide other roles from the same company and does not move or remove an existing pipeline card.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -398,7 +398,7 @@ export const matchesActions = [
         "Reverses the dismissal of a role, every listing with the same employer and title, so it can return to the account's match feed, job alerts and Autopilot. Restoring a listing that is not dismissed returns a no-op receipt. Restoring does not save the listing. A closed listing stays out of the feed.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 

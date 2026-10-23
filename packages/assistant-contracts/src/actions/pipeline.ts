@@ -109,7 +109,7 @@ export const pipelineActions = [
         "Moves one role's board card to the requested column using the account holder's reported state. No employer is contacted. APPLIED records an application rather than submitting one; INTERVIEWING creates a durable interview record. WITHDRAWN removes the card from the active board. Closing a role can remove its listing from the feed. A receipt offers undo only when reversible.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -167,7 +167,7 @@ export const pipelineActions = [
       readOnlyHint: false,
       // An unlisted URL is fetched in the background to read the posting.
       openWorldHint: true,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -192,7 +192,7 @@ export const pipelineActions = [
         "Fetches a public job-posting URL and imports it as a private role in the account's pipeline. Extraction runs asynchronously and the card appears when it finishes. A posting already held by Dreamwork returns completed without another fetch.",
       readOnlyHint: false,
       openWorldHint: true,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 

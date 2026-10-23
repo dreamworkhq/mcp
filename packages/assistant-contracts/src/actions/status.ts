@@ -298,7 +298,7 @@ export const statusActions = [
         "Marks the specified recruiter messages read within one thread. Message ids identify the exact messages presented to the account holder; other messages remain unread. The change has no undo.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -438,7 +438,7 @@ export const statusActions = [
         "Reverses the latest action with an available undo, or the action identified by taskId. Sent applications, settled charges, expired undo windows and actions without a reversible outcome are refused with a reason.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 ] as const;

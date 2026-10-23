@@ -221,7 +221,7 @@ export const materialsActions = [
         "Queues a tailored resume, cover letter and employer-question answers for one saved role. assets optionally selects a subset; omission requests all three. Each request spends one pack allowance, regardless of subset, and generation settles asynchronously. Existing materials can be overwritten by generation.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -276,7 +276,7 @@ export const materialsActions = [
         "Saves and prepares materials for up to ten specified roles sequentially without submitting applications. Unsaved roles consume the daily save allowance; generation for saved roles consumes pack allowance. Finished or in-flight preparation is reused, and person-edited materials are preserved. Each role returns its own outcome.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -360,7 +360,7 @@ export const materialsActions = [
         "Revises an existing application's cover letter using the supplied instruction. scope can identify a paragraph or selected passage. Without scope, the targeted passage is located from the instruction; a whole-letter instruction revises the whole letter. Existing materials are required.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -387,7 +387,7 @@ export const materialsActions = [
         "Revises one application's tailored resume using the supplied instruction, preserving its formatting and regenerating the PDF. scope identifies a section block or selected passage; otherwise the target is located from the instruction. The person's default uploaded resume is not modified; an active default variant is refused. Existing materials are required.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -452,7 +452,7 @@ export const materialsActions = [
         "Changes alignment, bold, italic or underline formatting of a tailored resume without changing its words. line identifies a passage and section identifies a heading; selected text can supply the target when neither is given. No writing model or allowance is used. The receipt includes undo.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -479,7 +479,7 @@ export const materialsActions = [
         "Revises one employer-question answer identified by questionId; other answers and documents remain unchanged. This edits application prose rather than the account's factual screening, work-authorization, compensation or availability settings.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -524,7 +524,7 @@ export const materialsActions = [
         "Improves an application's existing materials against its role and recorded career evidence, spending one refine allowance per changed asset. emphasis adding numbers, titles, employers, dates or credentials requires evidenceIds. Unsupported resume entry headers are rejected; previously completed asset edits are retained if a later asset fails.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 
@@ -571,7 +571,7 @@ export const materialsActions = [
         "Restores a cover letter, tailored resume or answer to a recorded pre-edit version within its undo window. Arguments must match the recorded edit; arbitrary replacement text is refused. Resume restoration uses resumeRevisionId and restores the application's sendable copy.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
   defineAction({

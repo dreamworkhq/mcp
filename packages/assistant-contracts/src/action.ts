@@ -120,10 +120,13 @@ export type OpenAiHiddenReason = (typeof OPENAI_HIDDEN_REASONS)[number];
  * Behaviour hints carried into every generated tool definition.
  *
  * `readOnlyHint` and `openWorldHint` are mandatory. A tool that writes also
- * states `destructiveHint`: true when the call deletes, replaces, sends, or
- * otherwise cannot be undone, false when it only adds or updates. A read-only
- * tool is not destructive, so it leaves the flag off rather than repeating
- * itself. Clients then see `destructiveHint: false` on the wire.
+ * states `destructiveHint`: true when the call deletes, overwrites, replaces,
+ * hides, cancels, spends an allowance, sends, or cannot be undone; false only
+ * for a purely additive write. An undo window does not make a write
+ * non-destructive. This is the ChatGPT directory's rule, and its review
+ * withholds a tool whose hint drops from true to false. A read-only tool is
+ * not destructive, so it leaves the flag off rather than repeating itself.
+ * Clients then see `destructiveHint: false` on the wire.
  */
 interface ActionMcpExposedCommon {
   expose: true;

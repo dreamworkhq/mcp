@@ -352,7 +352,7 @@
       "annotations": {
         "title": "Confirm a guess",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -381,7 +381,7 @@
       "annotations": {
         "title": "Dismiss a match",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -414,7 +414,7 @@
       "annotations": {
         "title": "Edit one application answer",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -523,7 +523,7 @@
       "annotations": {
         "title": "Edit the cover letter",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -631,7 +631,7 @@
       "annotations": {
         "title": "Edit the tailored resume",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -714,7 +714,7 @@
       "annotations": {
         "title": "Change how part of the resume looks",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -785,7 +785,7 @@
       "annotations": {
         "title": "Generate application materials",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -1481,7 +1481,7 @@
       "annotations": {
         "title": "Import a job from a URL",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": true
       }
     },
@@ -1763,7 +1763,7 @@
       "annotations": {
         "title": "Record an application made elsewhere",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": true
       }
     },
@@ -1797,7 +1797,7 @@
       "annotations": {
         "title": "Mark recruiter messages read",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -1836,7 +1836,7 @@
       "annotations": {
         "title": "Move a pipeline card",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -1905,7 +1905,7 @@
       "annotations": {
         "title": "Prepare applications for several roles",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -1931,7 +1931,7 @@
       "annotations": {
         "title": "Remember a guess about the person",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2087,7 +2087,7 @@
       "annotations": {
         "title": "Restore a dismissed match",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2135,7 +2135,7 @@
       "annotations": {
         "title": "Put a document back the way it was",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2568,7 +2568,7 @@
       "annotations": {
         "title": "Save the person's application answers",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2592,7 +2592,7 @@
       "annotations": {
         "title": "Save a job",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2705,7 +2705,7 @@
       "annotations": {
         "title": "Strengthen a whole application",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2726,7 +2726,7 @@
       "annotations": {
         "title": "Undo the last thing that can be undone",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2776,7 +2776,7 @@
       "annotations": {
         "title": "Update application materials",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2857,7 +2857,7 @@
       "annotations": {
         "title": "Change email preferences",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -3139,7 +3139,7 @@
       "annotations": {
         "title": "Update job preferences",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
