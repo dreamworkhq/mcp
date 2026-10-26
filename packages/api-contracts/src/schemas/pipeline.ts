@@ -253,8 +253,8 @@ export const pipelineItemSchema = responseComponent(
     canUndoApplied: z.boolean(),
     /**
      * An application was asked for: an apply was requested or is running, an
-     * apply is waiting on the pack, Apply was pressed (Autopilot-first,
-     * `generated_materials.applyIntent`), or Autopilot paused it before it
+     * apply is waiting on the pack, Apply was pressed
+     * (`generated_materials.applyIntent`), or Autopilot paused it before it
      * sent. A row with none of these is a plain save.
      */
     applyTriggered: z.boolean(),

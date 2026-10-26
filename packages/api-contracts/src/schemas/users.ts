@@ -127,15 +127,15 @@ export const meCountsSchema = responseComponent(
 export const meExperiencesSchema = responseComponent(
   z.object({
     autopilotFirst: z
-      .boolean()
+      .literal(true)
       .describe(
-        "The Autopilot-first first week: Applications as the default page, the post-checkout launch sheet, the trial meter, free applications, and apply-after-pack. Set by the `autopilot_first_experience_mode` setting (off, admins, everyone).",
+        "Deprecated and always true. The Autopilot-first experience reached everyone and its ramp was deleted; web builds from before that read this key to choose the Dashboard layout. Removed in a later release.",
       ),
   }),
   {
     id: "MeExperiences",
     description:
-      "Product experiences being ramped for this account. Each key is removed once its experience reaches everyone.",
+      "Product experiences once ramped per account. Every experience here has reached everyone; the object leaves the response in a later release.",
   },
 );
 
@@ -148,7 +148,7 @@ export const meFreeApplicationsSchema = responseComponent(
   {
     id: "MeFreeApplications",
     description:
-      "A free account's lifetime applications in the Autopilot-first experience: sends through Apply that reached the employer or may have; a failure that did not gives its credit back.",
+      "A free account's lifetime free applications: sends through Apply that reached the employer or may have; a failure that did not gives its credit back.",
   },
 );
 
@@ -198,7 +198,7 @@ export const meResponseSchema = responseComponent(
     freeApplications: meFreeApplicationsSchema
       .nullable()
       .describe(
-        "Non-null only for a free account in the Autopilot-first experience.",
+        "Non-null only for a free account with free applications, which staff and admin roles have while free applications ramp.",
       ),
     oneTapApplications: meOneTapApplicationsSchema
       .nullable()
