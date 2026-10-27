@@ -233,9 +233,6 @@ const layoffEventSchema = z.object({
   workforcePct: z.number().nullable(),
   date: z.string(),
   industry: z.string(),
-  source: z.string(),
-  country: z.string().nullable(),
-  inIndex: z.boolean(),
 });
 
 const layoffsResponseSchema = z.object({
@@ -264,7 +261,6 @@ const layoffsResponseSchema = z.object({
           eventCount: z.number(),
           latestDate: z.string(),
           industry: z.string().nullable(),
-          inIndex: z.boolean(),
         }),
       ),
       windowStart: z.string(),
@@ -348,7 +344,14 @@ export function buildMarketPulseOutput(bodies: {
           ),
           topCompanies: topFive(
             [...layoffs.topCompanies].sort((a, b) => b.totalLaidOff - a.totalLaidOff),
-          ),
+          ).map((company) => ({
+            company: company.company,
+            domain: company.domain,
+            totalLaidOff: company.totalLaidOff,
+            eventCount: company.eventCount,
+            latestDate: company.latestDate,
+            industry: company.industry,
+          })),
           recentEvents: topFive(layoffs.recent).map((event) => ({
             company: event.company,
             domain: event.domain,

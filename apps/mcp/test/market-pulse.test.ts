@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
+import { ApiClient } from "../src/client.js";
 import { fetchMarketPulse } from "../src/market-pulse.js";
+import { createMcpServer } from "../src/mcp.js";
 
 /**
  * The CALLERS of the shared market builders, fed the research routes' FULL
@@ -80,6 +84,7 @@ const layoffsRouteBody = {
         eventCount: 2,
         latestDate: "2026-10-18",
         industry: "Technology",
+        latestSource: "https://example.com",
         inIndex: true,
       },
     ],
@@ -101,18 +106,45 @@ function apiServing(responses: Record<string, unknown>) {
   };
 }
 
-test("fetchMarketPulse succeeds on the routes' FULL responses", async () => {
-  const output = await fetchMarketPulse(
-    apiServing({
-      "/research/index?sort=active&limit=1": indexRouteBody,
-      "/research/layoffs": layoffsRouteBody,
-    }),
-  );
-  assert.equal(output.hiring.companiesTracked, 41_874);
-  // The live bug: this caller pre-unwrapped `body.layoffs`, the builder's
-  // schema rejected it, and every pulse call failed.
-  assert.equal(output.layoffs?.peopleImpacted, 87_707);
-  assert.equal(output.generatedAt, "2026-10-20T17:01:43.740Z");
+/**
+ * Calls the tool through a real MCP client, which checks `structuredContent`
+ * against the advertised `outputSchema` the way a host connector does. The
+ * advertised object schemas forbid keys they do not list, so a route field
+ * the builder passes through (`inIndex`, `latestSource`) fails the call.
+ */
+test("get_market_pulse answers the routes' FULL responses within its advertised schema", async () => {
+  const bodies: Record<string, unknown> = {
+    "/research/index?sort=active&limit=1": indexRouteBody,
+    "/research/layoffs": layoffsRouteBody,
+  };
+  const original = globalThis.fetch;
+  const server = createMcpServer(new ApiClient("https://api.example.test", ""));
+  const client = new Client({ name: "market-pulse-test", version: "0.0.0" });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  try {
+    globalThis.fetch = (async (url: string) => {
+      const { pathname, search } = new URL(url);
+      const body = bodies[`${pathname}${search}`];
+      assert.ok(body !== undefined, `unexpected request: ${url}`);
+      return { status: 200, ok: true, json: async () => body } as Response;
+    }) as typeof fetch;
+    await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+    // The client validates a call only against a schema it has listed.
+    const { tools } = await client.listTools();
+    assert.ok(tools.find((tool) => tool.name === "get_market_pulse")?.outputSchema);
+    const result = await client.callTool({ name: "get_market_pulse", arguments: {} });
+    assert.equal(result.isError, undefined);
+    const output = result.structuredContent as Awaited<ReturnType<typeof fetchMarketPulse>>;
+    assert.equal(output.hiring.companiesTracked, 41_874);
+    // The builder takes the route's whole body; a caller that unwraps
+    // `body.layoffs` first fails every call.
+    assert.equal(output.layoffs?.peopleImpacted, 87_707);
+    assert.equal(output.layoffs?.topCompanies[0]?.company, "Example Corp");
+  } finally {
+    await client.close();
+    await server.close();
+    globalThis.fetch = original;
+  }
 });
 
 test("fetchMarketPulse succeeds when the route stored a legitimate null", async () => {
