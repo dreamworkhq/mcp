@@ -1,6 +1,6 @@
 {
   "version": "1.9.2",
-  "sourceCommit": "8ffc01ebca45edb91283adab30a47536f21f076a",
+  "sourceCommit": "6c31351b1ac65c14d3133ece654596fd2d82bc9f",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -54,6 +54,7 @@
     "llms-install.md",
     "package.json",
     "packages/api-contracts/package.json",
+    "packages/api-contracts/src/admin-scorecard.ts",
     "packages/api-contracts/src/admin-support.ts",
     "packages/api-contracts/src/generator/openapi.ts",
     "packages/api-contracts/src/generator/validate.ts",

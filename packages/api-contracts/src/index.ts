@@ -289,6 +289,16 @@ export {
 export { conversationMessageContentSchema, type ConversationMessageContent, type EmailReplyAttachment } from "./schemas/messages.js";
 export type { AdminSupportAssignment, AdminSupportAssignee } from "./admin-support.js";
 export type {
+  AdminScorecard,
+  ScorecardCountMetric,
+  ScorecardDay,
+  ScorecardNewUsersDay,
+  ScorecardRateMetric,
+  ScorecardSignupMix,
+  ScorecardStockMetric,
+  ScorecardTrialWeek,
+} from "./admin-scorecard.js";
+export type {
   AdminRecruitAllowlistCreate,
   AdminRecruitAllowlistEntry,
   AdminRecruitAllowlistResponse,
