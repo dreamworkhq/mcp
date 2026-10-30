@@ -51,14 +51,25 @@ export type ScorecardTrialWeek = {
   pct: number | null;
 };
 
+/** One day's MRR change in US cents, split by why it moved; losses are negative. */
+export type ScorecardMrrMove = {
+  date: string;
+  new: number;
+  reactivation: number;
+  expansion: number;
+  contraction: number;
+  churn: number;
+};
+
 export type AdminScorecard = {
   generatedAt: string;
-  cachedAt: string;
-  /** A newer payload is being computed; ask again in a moment for it. */
-  refreshing: boolean;
+  /** Latest write to the Postgres copy of Stripe, by webhook or full read. */
+  stripeSyncedAt: string | null;
   /** Last day of the "last 7" window. */
   throughDate: string;
   mrr: ScorecardStockMetric | null;
+  /** One per `mrr.days` point after the first, for the same day. */
+  mrrMoves: ScorecardMrrMove[] | null;
   payingUsers: ScorecardStockMetric | null;
   /** Each day's value is the rate over the 7 days ending that day. */
   applicationSuccess: ScorecardRateMetric | null;

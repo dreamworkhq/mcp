@@ -292,6 +292,7 @@ export type {
   AdminScorecard,
   ScorecardCountMetric,
   ScorecardDay,
+  ScorecardMrrMove,
   ScorecardNewUsersDay,
   ScorecardRateMetric,
   ScorecardSignupMix,
