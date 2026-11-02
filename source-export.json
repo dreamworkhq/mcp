@@ -1,6 +1,6 @@
 {
   "version": "1.9.2",
-  "sourceCommit": "7ef32410b7453afdc39acb12e4daa206af78db4f",
+  "sourceCommit": "434bd561cf39c86411ac07b2f53c344c18271102",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -72,6 +72,7 @@
     "packages/api-contracts/src/schemas/billing.ts",
     "packages/api-contracts/src/schemas/common.ts",
     "packages/api-contracts/src/schemas/filtered-mail.ts",
+    "packages/api-contracts/src/schemas/ghosting-index.ts",
     "packages/api-contracts/src/schemas/job-landings.ts",
     "packages/api-contracts/src/schemas/jobs.ts",
     "packages/api-contracts/src/schemas/listing-stats.ts",
