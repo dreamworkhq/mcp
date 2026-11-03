@@ -35,6 +35,7 @@ export {
   ghostingModerationStatusSchema,
   ghostingReportRequestSchema,
   ghostingReportSubmitResponseSchema,
+  ghostingSortSchema,
 } from "./schemas/ghosting-index.js";
 export type {
   GhostingCommentRequest,

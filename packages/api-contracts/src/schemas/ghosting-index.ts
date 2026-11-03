@@ -11,6 +11,12 @@ export const ghostingGradeSchema = sharedComponent(
   },
 );
 
+export const ghostingSortSchema = sharedComponent(z.enum(["worst", "best"]), {
+  id: "GhostingSort",
+  description:
+    "Board order: `worst` ranks graded companies worst first, then reported ones; `best` ranks graded companies best first. Mirrors GHOSTING_SORTS in @jobless/shared.",
+});
+
 export const ghostingModerationStatusSchema = sharedComponent(
   z.enum(["approved", "rejected", "held"]),
   {
@@ -94,11 +100,12 @@ export const ghostingBoardResponseSchema = responseComponent(
     pageSize: z.int().positive(),
     total: z.int().nonnegative(),
     query: z.string(),
+    sort: ghostingSortSchema,
   }),
   {
     id: "GhostingBoardResponse",
     description:
-      "One page of the board over the whole company directory: graded companies worst first by the 95% lower bound of their ghost rate, then companies people reported, then every other company unranked.",
+      "One page of the board over the whole company directory: graded companies worst first by the 95% lower bound of their ghost rate, then companies people reported, then every other company unranked. With `sort=best`, graded companies best first by the 95% upper bound, then every other company unranked.",
   },
 );
 

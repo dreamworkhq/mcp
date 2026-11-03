@@ -9,6 +9,7 @@ import {
   ghostingMineResponseSchema,
   ghostingReportRequestSchema,
   ghostingReportSubmitResponseSchema,
+  ghostingSortSchema,
 } from "./schemas/ghosting-index.js";
 import {
   companyRoleLandingResponseSchema,
@@ -776,6 +777,7 @@ export const operations: readonly OperationDescriptor[] = [
     parameters: [
       { name: "page", in: "query", required: false, description: "1-based page number.", schema: z.int().min(1).max(10000) },
       { name: "q", in: "query", required: false, description: "Company name or domain; under two characters is ignored.", schema: z.string().max(80) },
+      { name: "sort", in: "query", required: false, description: "`worst` (default) or `best`.", schema: ghostingSortSchema },
     ],
     responses: {
       "200": { description: "One page of the board.", schema: ghostingBoardResponseSchema },
