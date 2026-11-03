@@ -770,7 +770,7 @@ export const operations: readonly OperationDescriptor[] = [
     fastifyPath: "/ghosting-index",
     summary: "Read one page of the Ghosting Index board",
     description:
-      "Every directory company, 50 to a page: graded companies worst first, then reported companies, then the rest unranked. `q` filters by name or domain and keeps each company's rank.",
+      "Every directory company, 25 to a page: graded companies worst first, then reported companies, then the rest unranked. `q` filters by name or domain and keeps each company's rank.",
     tags: ["ghosting-index"],
     auth: "public",
     contractMaturity: "consumer-adopted",
