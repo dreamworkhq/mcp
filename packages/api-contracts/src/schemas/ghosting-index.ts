@@ -50,7 +50,14 @@ const ghostingVerifiedSchema = z.discriminatedUnion("status", [
     windowStart: isoDateTime,
     windowEnd: isoDateTime,
   }),
-  z.object({ status: z.literal("insufficient") }),
+  z.object({
+    status: z.literal("insufficient"),
+    applicationsJudged: z
+      .int()
+      .nonnegative()
+      .describe("Applications judged so far; below the grading floor, so no rate or grade."),
+    applicationsAnswered: z.int().nonnegative(),
+  }),
 ]);
 
 export const ghostingCommentSchema = responseComponent(
@@ -101,6 +108,19 @@ export const ghostingBoardResponseSchema = responseComponent(
     total: z.int().nonnegative(),
     query: z.string(),
     sort: ghostingSortSchema,
+    summary: z
+      .object({
+        applicationsJudged: z.int().nonnegative(),
+        applicationsGhosted: z.int().nonnegative(),
+        companiesJudged: z.int().nonnegative(),
+        companiesGraded: z.int().nonnegative(),
+        peopleReported: z.int().nonnegative(),
+        latestComments: z
+          .array(z.object({ company: ghostingCompanySchema, comment: ghostingCommentSchema }))
+          .max(5)
+          .describe("The newest approved comments across every company."),
+      })
+      .describe("Totals across the whole board, the same on every page and search."),
   }),
   {
     id: "GhostingBoardResponse",
