@@ -162,7 +162,7 @@ export const meOneTapApplicationsSchema = responseComponent(
   {
     id: "MeOneTapApplications",
     description:
-      "A paid account's one-tap applications this UTC calendar month: sends through Apply that reached the employer or may have, counted apart from Autopilot; a failure that did not gives its count back. `resetsAt` is the first of next month.",
+      "A paid account's applications this UTC calendar month against the one allowance Apply and Autopilot share: sends that reached the employer or may have, from either; a failure that did not gives its count back. `resetsAt` is the first of next month.",
   },
 );
 

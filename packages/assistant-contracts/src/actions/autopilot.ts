@@ -91,6 +91,8 @@ export const autopilotActions = [
       dailyLimit: z.int().nullable(),
       /** The plan's steady daily limit, whichever allowance applies today. */
       usualDailyLimit: z.int().nullable(),
+      /** This month's use of the plan's monthly allowance, which Autopilot
+       *  shares with one-tap Apply: both paths' sends, in-flight included. */
       sentThisMonth: z.int(),
       monthlyLimit: z.int().nullable(),
       /** Display-percentage match floor a role must clear to be picked up. */
