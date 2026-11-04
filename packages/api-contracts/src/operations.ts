@@ -32,6 +32,7 @@ import {
   applicationNeedsInfoDismissResponseSchema,
   applicationNeedsInfoInvalidAnswersSchema,
   applicationNeedsInfoResponseSchema,
+  applicationsAwaitingAnswersResponseSchema,
 } from "./schemas/application-needs-info.js";
 import { applicationTimelineResponseSchema } from "./schemas/application-timeline.js";
 import {
@@ -122,6 +123,25 @@ const unauthorized: OperationResponse = {
  * enforces ordering and operationId uniqueness.
  */
 export const operations: readonly OperationDescriptor[] = [
+  {
+    operationId: "getApplicationsAwaitingAnswers",
+    method: "get",
+    path: "/applications/awaiting-answers",
+    fastifyPath: "/applications/awaiting-answers",
+    summary: "Count the applications waiting on the person's answers",
+    description:
+      "How many of the caller's applications are held for answers only they can give, the one that expires soonest, and up to three company names. Kept off `/users/me` so the session probe's strict client parser never meets a new field.",
+    tags: ["applications"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    responses: {
+      "200": {
+        description: "The waiting applications, possibly none.",
+        schema: applicationsAwaitingAnswersResponseSchema,
+      },
+      "401": unauthorized,
+    },
+  },
   {
     operationId: "updateApplicationMaterials",
     method: "patch",

@@ -77,6 +77,7 @@ export {
   applicationNeedsInfoInvalidAnswersSchema,
   applicationNeedsInfoQuestionSchema,
   applicationNeedsInfoResponseSchema,
+  applicationsAwaitingAnswersResponseSchema,
 } from "./schemas/application-needs-info.js";
 import type {
   applicationNeedsInfoAnswerRequestSchema as needsInfoAnswerRequestSchema,
@@ -85,7 +86,9 @@ import type {
   applicationNeedsInfoInvalidAnswersSchema as needsInfoInvalidAnswersSchema,
   applicationNeedsInfoQuestionSchema as needsInfoQuestionSchema,
   applicationNeedsInfoResponseSchema as needsInfoResponseSchema,
+  applicationsAwaitingAnswersResponseSchema as awaitingAnswersResponseSchema,
 } from "./schemas/application-needs-info.js";
+export type ApplicationsAwaitingAnswers = z.infer<typeof awaitingAnswersResponseSchema>;
 export type ApplicationNeedsInfo = z.infer<typeof needsInfoResponseSchema>;
 export type ApplicationNeedsInfoQuestion = z.infer<typeof needsInfoQuestionSchema>;
 export type ApplicationNeedsInfoAnswerRequest = z.infer<typeof needsInfoAnswerRequestSchema>;

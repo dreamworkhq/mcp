@@ -172,3 +172,28 @@ export const applicationNeedsInfoDismissResponseSchema = responseComponent(
       "The application is canceled, as the cancel action cancels an in-flight one, and its open questions are closed.",
   },
 );
+
+export const applicationsAwaitingAnswersResponseSchema = responseComponent(
+  z.object({
+    /** How many of the person's applications are waiting on their answers. */
+    count: z.number().int().nonnegative(),
+    /** The wait that expires soonest; the card links to it. Null when nothing waits. */
+    first: z
+      .object({
+        /** The job id the dashboard's `?app=` parameter opens. */
+        jobId: uuidString,
+        company: z.string(),
+        title: z.string(),
+        /** How many of its questions are still open. */
+        questions: z.number().int().positive(),
+      })
+      .nullable(),
+    /** Up to three company names, soonest expiry first. */
+    companies: z.array(z.string()).max(3),
+  }),
+  {
+    id: "ApplicationsAwaitingAnswersResponse",
+    description:
+      "The person's applications that wait on their answers, for the card every product page shows until they act on it.",
+  },
+);
