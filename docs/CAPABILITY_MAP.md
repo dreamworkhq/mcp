@@ -47,13 +47,15 @@ check only keep the map honest about the actions that do exist.
 
 ## Over MCP
 
-51 capabilities any agent holding the person's Dreamwork key can call, each as a tool of the same name in `@dreamworkhq/mcp` and as `POST /assistant/actions/<id>`. "Authorization" is what the executor demands on top of the key: a receipt is written and can be undone inside the stated window, and a confirmation means the first call answers `held` with a summary and a token rather than acting.
+54 capabilities any agent holding the person's Dreamwork key can call, each as a tool of the same name in `@dreamworkhq/mcp` and as `POST /assistant/actions/<id>`. "Authorization" is what the executor demands on top of the key: a receipt is written and can be undone inside the stated window, and a confirmation means the first call answers `held` with a summary and a token rather than acting.
 
 | Capability | What it does | Reads or writes | Authorization |
 |------------|--------------|-----------------|---------------|
+| `answer_application_questions` | Send the person's own answers to the questions an application is waiting on, read first with get_application_questions. | Writes | Confirmation (explicit_verb, unambiguous_target) |
 | `apply` | Submit the person's application to a real employer, under their name, with the materials currently saved for it. | Writes | Confirmation (explicit_verb, unambiguous_target, reviewed_revision) |
 | `cancel_apply` | Stop an application that is queued or mid-submission. | Writes | Receipt |
 | `confirm_hypothesis` | Promote a stored hypothesis into the career record after the person has agreed with it, and delete the hypothesis. | Writes | Receipt |
+| `dismiss_application_questions` | Stop an application that is waiting on the person's answers, when they say they don't want to apply after all. | Writes | Receipt |
 | `dismiss_match` | Hide one role from the person's feed, job alerts and Autopilot. | Writes | Receipt, undo for 60s |
 | `edit_answer` | Revise a single answer to one of the employer's application questions. | Writes | Receipt, undo for 900s |
 | `edit_cover_letter` | Revise an existing cover letter against an instruction in the person's own words. | Writes | Receipt, undo for 900s |
@@ -62,6 +64,7 @@ check only keep the map honest about the actions that do exist.
 | `format_resume` | Change how part of the tailored resume looks without changing its words: center or left-align it, or bold/italic/underline it or a phrase in it. | Writes | Receipt, undo for 900s |
 | `generate_pack` | Write the person's materials for one saved role: a tailored resume, a cover letter, and answers to the employer's questions. | Writes | Receipt |
 | `get_application_documents` | Links to download what one application will send: its resume as PDF and as DOCX, its cover letter as PDF (there is no letter DOCX), and the whole pack as one PDF. | Reads | The key alone |
+| `get_application_questions` | Read the questions an application is waiting on: the employer's form asked something the person's profile and resume don't cover, so the application is held instead of sent. | Reads | The key alone |
 | `get_application_readiness` | Read whether Dreamwork can apply for the person right now and, if not, exactly what is missing. | Reads | The key alone |
 | `get_application_status` | Read what actually happened to one application: a timeline of events plus the three facts the product may claim — submitted, confirmed by the employer, replied to. | Reads | The key alone |
 | `get_autopilot_settings` | Read the saved minimum Matches score, whether Autopilot sends the default or tailored resume, and whether it skips roles whose posted pay tops out below the person's minimum salary (`requireSalaryMinimum`, with that minimum as `salaryMinimum`, null when none is saved). | Reads | The key alone |

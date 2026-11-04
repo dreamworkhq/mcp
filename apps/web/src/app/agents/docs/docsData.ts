@@ -450,6 +450,11 @@ export const MCP_TOOLS: McpTool[] = [
     calls: "POST /jobs",
   },
   {
+    name: "answer_application_questions",
+    purpose: "Submits person-stated answers to an application's open questions against actionVersion and each requestRevision.",
+    calls: "POST /assistant/actions/answer_application_questions",
+  },
+  {
     name: "apply",
     purpose: "Submits one application to an employer under the account holder's name using the saved materials at expectedRevision.",
     calls: "POST /assistant/actions/apply",
@@ -468,6 +473,11 @@ export const MCP_TOOLS: McpTool[] = [
     name: "confirm_hypothesis",
     purpose: "Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis.",
     calls: "POST /assistant/actions/confirm_hypothesis",
+  },
+  {
+    name: "dismiss_application_questions",
+    purpose: "Cancels an application that is waiting on the account holder's answers and closes its open questions; the held application allowance is returned.",
+    calls: "POST /assistant/actions/dismiss_application_questions",
   },
   {
     name: "dismiss_match",
@@ -523,6 +533,11 @@ export const MCP_TOOLS: McpTool[] = [
     name: "get_application_materials",
     purpose: "Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type.",
     calls: "GET /applications/:id/pack",
+  },
+  {
+    name: "get_application_questions",
+    purpose: "Returns the open questions an application waits on, in form order, with kind, options, revision, actionVersion and expiry.",
+    calls: "POST /assistant/actions/get_application_questions",
   },
   {
     name: "get_application_readiness",

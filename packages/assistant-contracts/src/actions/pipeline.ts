@@ -25,6 +25,11 @@ const pipelineCard = z.object({
   status: pipelineStatusSchema,
   appliedAt: z.string().nullable(),
   updatedAt: z.string(),
+  /**
+   * The application is held for answers only the person can give; read them
+   * with get_application_questions.
+   */
+  awaitingYourAnswers: z.boolean(),
 });
 
 const PIPELINE_LIMIT_DEFAULT = 50;

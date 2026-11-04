@@ -73,9 +73,25 @@ export {
 export {
   applicationNeedsInfoAnswerRequestSchema,
   applicationNeedsInfoAnswerResponseSchema,
+  applicationNeedsInfoConflictSchema,
+  applicationNeedsInfoInvalidAnswersSchema,
   applicationNeedsInfoQuestionSchema,
   applicationNeedsInfoResponseSchema,
 } from "./schemas/application-needs-info.js";
+import type {
+  applicationNeedsInfoAnswerRequestSchema as needsInfoAnswerRequestSchema,
+  applicationNeedsInfoAnswerResponseSchema as needsInfoAnswerResponseSchema,
+  applicationNeedsInfoConflictSchema as needsInfoConflictSchema,
+  applicationNeedsInfoInvalidAnswersSchema as needsInfoInvalidAnswersSchema,
+  applicationNeedsInfoQuestionSchema as needsInfoQuestionSchema,
+  applicationNeedsInfoResponseSchema as needsInfoResponseSchema,
+} from "./schemas/application-needs-info.js";
+export type ApplicationNeedsInfo = z.infer<typeof needsInfoResponseSchema>;
+export type ApplicationNeedsInfoQuestion = z.infer<typeof needsInfoQuestionSchema>;
+export type ApplicationNeedsInfoAnswerRequest = z.infer<typeof needsInfoAnswerRequestSchema>;
+export type ApplicationNeedsInfoAnswerResponse = z.infer<typeof needsInfoAnswerResponseSchema>;
+export type ApplicationNeedsInfoConflict = z.infer<typeof needsInfoConflictSchema>;
+export type ApplicationNeedsInfoInvalidAnswers = z.infer<typeof needsInfoInvalidAnswersSchema>;
 export {
   assistantHypothesisConfirmResponseSchema,
   assistantHypothesisCreateRequestSchema,

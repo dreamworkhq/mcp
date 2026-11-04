@@ -5,6 +5,7 @@ import { digestActions } from "./actions/digest.js";
 import { marketActions } from "./actions/market.js";
 import { matchesActions } from "./actions/matches.js";
 import { materialsActions } from "./actions/materials.js";
+import { needsInfoActions } from "./actions/needs-info.js";
 import { pipelineActions } from "./actions/pipeline.js";
 import { profileActions } from "./actions/profile.js";
 import { statusActions } from "./actions/status.js";
@@ -23,6 +24,7 @@ import { viewActions as viewActionDefinitions } from "./actions/view.js";
 export const ACTIONS = [
   ...matchesActions,
   ...pipelineActions,
+  ...needsInfoActions,
   ...materialsActions,
   ...profileActions,
   ...autopilotActions,
@@ -62,11 +64,12 @@ export const viewActions: readonly ActionDefinition[] = ACTIONS.filter(
  * restate it and would otherwise drift silently: the live eval
  * (`scripts/assistant-live-eval.mjs`, which refuses to let one of these
  * complete in a hold case) and the Slack-routed `Assistant: consequential
- * actions are failing` alert, whose PostHog filter names the same four
+ * actions are failing` alert, whose PostHog filter names the same set
  * (`docs/runbooks/assistant.md`). Adding a fifth consequential action fails
  * that assertion, and its message names both.
  */
 export const CONSEQUENTIAL_ACTION_IDS = [
+  "answer_application_questions",
   "apply",
   "reply_to_recruiter",
   "set_autopilot",

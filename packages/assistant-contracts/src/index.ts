@@ -118,6 +118,7 @@ export {
 } from "./registry.js";
 
 export { pipelineStatusSchema } from "./actions/pipeline.js";
+export { APPLICATION_QUESTION_LABEL_MAX } from "./actions/needs-info.js";
 export {
   diffSummarySchema,
   editScopeSchema,

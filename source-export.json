@@ -1,6 +1,6 @@
 {
   "version": "1.9.2",
-  "sourceCommit": "056fe68e5566cb6bd59b520ba87bafc105a3162a",
+  "sourceCommit": "b6731b5c73220784a2ac6653225eaaf8684875ac",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -91,6 +91,7 @@
     "packages/assistant-contracts/src/actions/market.ts",
     "packages/assistant-contracts/src/actions/matches.ts",
     "packages/assistant-contracts/src/actions/materials.ts",
+    "packages/assistant-contracts/src/actions/needs-info.ts",
     "packages/assistant-contracts/src/actions/pipeline.ts",
     "packages/assistant-contracts/src/actions/profile.ts",
     "packages/assistant-contracts/src/actions/status.ts",

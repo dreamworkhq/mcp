@@ -39,9 +39,11 @@ A `consequential` action does not run on the first call. It answers `held` with 
 
 | Tool | Risk | What it does |
 |------|------|--------------|
+| `answer_application_questions` | consequential | Submits person-stated answers to an application's open questions against actionVersion and each requestRevision. |
 | `apply` | consequential | Submits one application to an employer under the account holder's name using the saved materials at expectedRevision. |
 | `cancel_apply` | cheap | Stops a queued or in-progress application when submission can still be prevented. |
 | `confirm_hypothesis` | cheap | Promotes a stored hypothesis after the person confirms it, then deletes the hypothesis. |
+| `dismiss_application_questions` | cheap | Cancels an application that is waiting on the account holder's answers and closes its open questions; the held application allowance is returned. |
 | `dismiss_match` | cheap | Hides one role, every listing with the same employer and title in any location, from the account's match feed, job alerts and Autopilot until the account restores or saves it. |
 | `edit_answer` | cheap | Revises one employer-question answer identified by questionId; other answers and documents remain unchanged. |
 | `edit_cover_letter` | cheap | Revises an existing application's cover letter using the supplied instruction. |
@@ -50,6 +52,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `format_resume` | cheap | Changes alignment, bold, italic or underline formatting of a tailored resume without changing its words. |
 | `generate_pack` | async | Queues a tailored resume, cover letter and employer-question answers for one saved role. |
 | `get_application_documents` | read | Returns version-specific resume PDF and DOCX, cover-letter PDF and combined-pack PDF download links for one application, plus source, inclusion, lock state and revision. |
+| `get_application_questions` | read | Returns the open questions an application waits on, in form order, with kind, options, revision, actionVersion and expiry. |
 | `get_application_readiness` | read | Returns readiness for one-off submission and Autopilot, plan entitlement and missing onboarding answers. |
 | `get_application_status` | read | Returns an application's event timeline and separate submitted, employerConfirmed and replied facts. |
 | `get_autopilot_settings` | read | Returns the saved minimum Matches score, the default-versus-tailored resume choice, and whether Autopilot skips roles whose posted pay tops out below the person's minimum salary, with that minimum. |
