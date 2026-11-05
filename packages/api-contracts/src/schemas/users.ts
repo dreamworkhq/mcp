@@ -171,7 +171,7 @@ export const applyPreferencesSchema = responseComponent(
     reviewBeforeSending: z
       .boolean()
       .describe(
-        "When true, Apply saves the job and the person sends it from Applications; when false (the default), Apply sends once the pack is ready.",
+        "When true, Apply saves the job and the person sends it from Applications; when false, Apply sends once the pack is ready. New accounts start true; accounts created before that keep their stored value.",
       ),
   }),
   { id: "ApplyPreferences", description: "How Apply behaves for this account." },
