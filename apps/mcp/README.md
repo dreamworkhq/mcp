@@ -96,7 +96,7 @@ agent should not do. A key can do less than you can, never more.
 | --- | --- | --- | --- |
 | `DREAMWORK_API_KEY` | For account tools | none | API key (`sk_...`). Unlocks pipeline, resume, apply, outreach, profile, interviews. |
 | `DREAMWORK_API_URL` | No | `https://api.dreamworkhq.com` | Override the API endpoint (local dev / self-host). |
-| `DREAMWORK_UNREAD_NOTICES` | No | on | `off` (also `0`/`false`/`no`) stops tool results from carrying a note about unread recruiter mail. At most one check every five minutes; checking never marks mail read. |
+| `DREAMWORK_UNREAD_NOTICES` | No | on | `off` (also `0`/`false`/`no`) stops tool results from carrying a note about unread recruiter mail, and the agent is no longer told to check mail when a session starts. At most one check every five minutes; checking never marks mail read. |
 
 `JOBLESS_API_TOKEN` and `JOBLESS_API_URL` are still accepted as backward-compatible
 aliases for `DREAMWORK_API_KEY` and `DREAMWORK_API_URL`; prefer the `DREAMWORK_`
