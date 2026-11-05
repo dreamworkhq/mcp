@@ -44,6 +44,8 @@ import {
 } from "./schemas/assistant-memory.js";
 import { z } from "zod";
 import {
+  billingCancelAtPeriodEndRequestSchema,
+  billingCancelAtPeriodEndResponseSchema,
   billingCancellationReasonRequestSchema,
   billingCancellationReasonResponseSchema,
   billingCheckoutRequestSchema,
@@ -436,6 +438,56 @@ export const operations: readonly OperationDescriptor[] = [
       "404": {
         description:
           "No application with that id is owned by the caller. Unknown, non-owned and malformed ids are indistinguishable.",
+        schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "cancelBillingSubscriptionAtPeriodEnd",
+    method: "post",
+    path: "/billing/cancel-at-period-end",
+    fastifyPath: "/billing/cancel-at-period-end",
+    summary: "Cancel the caller's subscription at the end of its period",
+    description:
+      "The billing page's fallback for when Stripe's own cancel screen fails. Reads the caller's own subscription live from Stripe, refuses one whose customer is not the caller's, and sets `cancel_at_period_end` on it. A subscription already set to end, or already ended, is left as it is and answers 200. Dreamwork's account row changes only through the Stripe subscription webhook. Off unless `BILLING_CANCEL_FALLBACK_ENABLED` is set; `GET /billing/subscription` reports whether it is on.",
+    tags: ["billing"],
+    auth: "user-session",
+    contractMaturity: "consumer-adopted",
+    requestBody: {
+      description: "The confirmation and a per-confirmation idempotency key.",
+      contentType: "application/json",
+      required: true,
+      schema: billingCancelAtPeriodEndRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The subscription will not renew.",
+        schema: billingCancelAtPeriodEndResponseSchema,
+      },
+      "400": {
+        description: "Missing confirmation or a malformed idempotency key.",
+        schema: errorResponseSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description:
+          "An API key (`session_required`), an account that may not change billing (`production_canary_side_effect_denied`), or a subscription whose Stripe customer is not the caller's (`subscription_not_owned`).",
+        schema: errorResponseSchema,
+      },
+      "404": {
+        description: "The fallback is switched off (`not_found`).",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description: "The account has no Stripe subscription (`stripe_subscription_missing`).",
+        schema: errorResponseSchema,
+      },
+      "502": {
+        description: "Stripe refused or did not answer (`stripe_cancel_failed`). Nothing changed unless a retry shows `already_scheduled`.",
+        schema: errorResponseSchema,
+      },
+      "503": {
+        description: "Stripe is not configured on this server (`billing_not_configured`).",
         schema: errorResponseSchema,
       },
     },
