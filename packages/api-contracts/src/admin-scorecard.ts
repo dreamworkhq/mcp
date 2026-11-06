@@ -61,12 +61,103 @@ export type ScorecardMrrMove = {
   churn: number;
 };
 
+/**
+ * One day of corpus intake health, one row per lane.
+ * INTERNAL = our own crawlers (company_sources registry). EXTERNAL = the
+ * SourceStack vendor feed (single lane, automated daily delivery).
+ */
+export type ScorecardCorpusLane = "internal" | "external";
+
+export type ScorecardCorpusDay = {
+  date: string;
+  /** New listings first-seen that day (lane split). */
+  added: number | null;
+  /** Servable listings at end of day; null before the rollup existed. */
+  servable: number | null;
+};
+
+export type ScorecardCorpusLaneState = {
+  lane: ScorecardCorpusLane;
+  days: ScorecardCorpusDay[];
+  /** Servable listings right now (latest rollup value). */
+  servable: number;
+  /** Active listings right now (latest rollup value). */
+  active: number;
+  /** Servable share of active, in percent, one decimal. Null before history exists. */
+  servablePct: number | null;
+  /**
+   * Servable share of active as recorded on the same day last week, in
+   * percent, one decimal. The share itself is not a change; the card's
+   * delta is this subtracted from `servablePct`, in percentage points.
+   * Null when that day has no recorded servable and active counts.
+   */
+  servablePct7dAgo: number | null;
+  /** New listings in the 7 complete days ending yesterday. */
+  last7Added: number;
+  /** New listings in the 7 days before that. */
+  prior7Added: number;
+};
+
+export type ScorecardCorpusSourceHealth = {
+  /** Enabled sources at read time (live registry count). */
+  enabled: number;
+  /** 0 consecutive failures and crawled within 7 days. */
+  reliable: number;
+  /** 1-2 consecutive failures, or last crawl older than 7 days. */
+  fragile: number;
+  /** 3+ consecutive failures, or enabled and never crawled. */
+  broken: number;
+  /** Same count as at the rollup 7 days ago; null before history exists. */
+  fragilePlusBroken7dAgo: number | null;
+};
+
+export type ScorecardCorpusFeed = {
+  /** Receipt fields; null when no completed delivery has ever been recorded. */
+  publishedAt: string | null;
+  completedAt: string | null;
+  rows: number;
+  created: number;
+  rowErrors: number;
+  /** Receipt age in hours, one decimal. */
+  ageHours: number;
+  /** Receipt older than 36 hours at read time. */
+  stale: boolean;
+  /** Vendor freshness of active external rows: share seen within 7 days, in percent. */
+  vendorFresh7dPct: number | null;
+  /** Share of active external rows seen within 30 days, in percent. */
+  vendorFresh30dPct: number | null;
+  /** Days until the signed-delivery URLs expire (2027-09-09). */
+  licenseDaysLeft: number;
+};
+
+export type AdminScorecardCorpus = {
+  internal: ScorecardCorpusLaneState;
+  external: ScorecardCorpusLaneState;
+  sourceHealth: ScorecardCorpusSourceHealth;
+  feed: ScorecardCorpusFeed | null;
+  /** Platform rows under watch: servable share under 50% with 1000+ active listings, plus stale giants. */
+  watch: Array<{
+    kind: "low-servable" | "stale-source" | "disabled-dead-weight";
+    platform: string;
+    label: string;
+    /** Servable share in percent, one decimal; null when not a ratio. */
+    servablePct: number | null;
+    active: number;
+    detail: string;
+  }>;
+};
+
 export type AdminScorecard = {
   generatedAt: string;
   /** Latest write to the Postgres copy of Stripe, by webhook or full read. */
   stripeSyncedAt: string | null;
   /** Last day of the "last 7" window. */
   throughDate: string;
+  /**
+   * Daily corpus intake health. INTERNAL = our crawlers; EXTERNAL = the
+   * SourceStack vendor feed. Null when the corpus read failed.
+   */
+  corpus: AdminScorecardCorpus | null;
   mrr: ScorecardStockMetric | null;
   /** One per `mrr.days` point after the first, for the same day. */
   mrrMoves: ScorecardMrrMove[] | null;

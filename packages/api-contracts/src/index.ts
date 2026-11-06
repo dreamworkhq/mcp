@@ -337,6 +337,12 @@ export { conversationMessageContentSchema, type ConversationMessageContent, type
 export type { AdminSupportAssignment, AdminSupportAssignee } from "./admin-support.js";
 export type {
   AdminScorecard,
+  AdminScorecardCorpus,
+  ScorecardCorpusDay,
+  ScorecardCorpusFeed,
+  ScorecardCorpusLane,
+  ScorecardCorpusLaneState,
+  ScorecardCorpusSourceHealth,
   ScorecardCountMetric,
   ScorecardDay,
   ScorecardMrrMove,
