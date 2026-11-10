@@ -46,7 +46,8 @@ export function formatApiErrorMessage(err: unknown, status: number): string {
 }
 
 /**
- * The hourly key quota's 429 carries whole seconds until the window resets.
+ * The hourly key quota's 429 and the daily cap's both carry whole seconds
+ * until the window resets.
  * A bare "rate limit exceeded" invites an immediate retry (another refusal);
  * the wait turns it into "tell the person, come back in N minutes" — so the
  * agent needs it inside the message, the only text it reliably reads.
@@ -64,9 +65,11 @@ function withRetryAfter(message: string, err: unknown): string {
   }
   const seconds = retryAfter;
   const wait =
-    seconds >= 90
-      ? `${Math.ceil(seconds / 60)} minutes`
-      : `${Math.ceil(seconds)} seconds`;
+    seconds >= 2 * 3600
+      ? `${Math.ceil(seconds / 3600)} hours`
+      : seconds >= 90
+        ? `${Math.ceil(seconds / 60)} minutes`
+        : `${Math.ceil(seconds)} seconds`;
   const joiner = /[.!?]$/.test(message) ? "" : ".";
   return `${message}${joiner} Try again in about ${wait}.`;
 }

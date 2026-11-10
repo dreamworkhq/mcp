@@ -157,7 +157,7 @@ The MCP server needs a Dreamwork API key to authenticate as your account.
 3. Tick what the key may do, then generate it
 4. Copy the `sk_...` key once and store it in your MCP client configuration
 
-The key is scoped to your candidate account, carries the scopes you picked, and is subject to rate limits. A key's scopes are fixed when it is made: to change them, revoke it and generate another. Do not expose it in browser code or public repositories.
+The key is scoped to your candidate account, carries the scopes you picked, and is subject to rate limits: an hourly allowance set by your plan, and 500 requests a day through MCP for every caller, signed in or not (status reads such as the inbox and pipeline do not count). A key's scopes are fixed when it is made: to change them, revoke it and generate another. Do not expose it in browser code or public repositories.
 
 ---
 
