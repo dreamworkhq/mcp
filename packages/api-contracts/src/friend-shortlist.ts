@@ -76,3 +76,31 @@ export type FriendShortlistResponse = { shortlist: FriendShortlist };
 export type PublicFriendShortlistResponse = { shortlist: PublicFriendShortlist };
 export type FriendInviteResponse = { invite: FriendInvite };
 export type PublicFriendInviteResponse = { invite: PublicFriendInvite };
+
+/**
+ * `POST /friend-referrals/claim`: a signed-in account names the link that
+ * brought it, by invite code or shortlist token. The first link an account
+ * claims is the one that counts.
+ */
+export type FriendReferralClaimRequest =
+  | { invite: string }
+  | { shortlist: string };
+
+/** Why a claim was refused, as the `code` of its reply. */
+export type FriendReferralRefusalCode =
+  /** The link names no invite or no ready pack. */
+  | "LINK_NOT_FOUND"
+  /** The account is the link's own sender. */
+  | "OWN_LINK"
+  /** The account has paid before, so it is not new. */
+  | "NOT_ELIGIBLE";
+
+export type FriendReferralRefusal = {
+  error: string;
+  code: FriendReferralRefusalCode;
+};
+
+/** The referral on this account and the trial it carries. */
+export type FriendReferralClaimResponse = {
+  referral: { senderFirstName: string | null; friendFreeDays: number };
+};

@@ -58,6 +58,7 @@ export const subscriptionSourceSchema = sharedComponent(
     "admin",
     "legacy",
     "reply_free_week",
+    "friend_referral_week",
   ]),
   {
     id: "SubscriptionSource",

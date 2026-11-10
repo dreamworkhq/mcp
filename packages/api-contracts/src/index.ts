@@ -387,6 +387,10 @@ export { applyPreferencesSchema, applyPreferencesUpdateRequestSchema, meFreeAppl
 export type {
   FriendInvite,
   FriendInviteResponse,
+  FriendReferralClaimRequest,
+  FriendReferralClaimResponse,
+  FriendReferralRefusal,
+  FriendReferralRefusalCode,
   FriendShortlist,
   FriendShortlistJob,
   FriendShortlistOffer,
