@@ -1,6 +1,6 @@
 {
   "version": "1.10.0",
-  "sourceCommit": "f2a934f0dc75cfe1f7d3c219d4e1b645d2df684e",
+  "sourceCommit": "ab5846ef0fba8755c556a0f8d03b9a28110512b3",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -56,6 +56,7 @@
     "packages/api-contracts/package.json",
     "packages/api-contracts/src/admin-scorecard.ts",
     "packages/api-contracts/src/admin-support.ts",
+    "packages/api-contracts/src/friend-shortlist.ts",
     "packages/api-contracts/src/generator/openapi.ts",
     "packages/api-contracts/src/generator/validate.ts",
     "packages/api-contracts/src/index.ts",
