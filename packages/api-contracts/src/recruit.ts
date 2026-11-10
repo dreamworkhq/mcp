@@ -146,6 +146,8 @@ export type AdminRecruitIntroRequest = {
   candidateName: string;
   candidateEmail: string;
   candidateTitle: string | null;
+  /** The candidate has since turned recruiter introductions off; staff must not reach out. */
+  candidateOptedOut: boolean;
 };
 
 export type AdminRecruitIntrosResponse = { requests: AdminRecruitIntroRequest[] };

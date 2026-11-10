@@ -292,6 +292,7 @@ export const communicationPreferencesResponseSchema = responseComponent(z.object
   productUpdates: z.boolean(),
   allOptionalEmailsOff: z.boolean(),
   autopilotResultsOffAt: isoDateTime.nullable(),
+  recruiterIntroductions: z.boolean().describe("Whether recruiters may find an anonymized summary of this profile and Dreamwork may introduce the person. On unless they turned it off."),
   jobAlertEligibility: z.object({
     eligible: z.boolean(),
     reason: z.enum(["eligible", "off", "inactive", "unsubscribed", "address_suppressed", "banned", "retired"]),
@@ -304,7 +305,8 @@ export const communicationPreferencesUpdateRequestSchema = requestComponent(z.st
   autopilotResults: z.enum(["individual", "daily_digest", "off"]).optional(),
   productUpdates: z.boolean().optional(),
   allOptionalEmailsOff: z.literal(true).optional(),
-}).refine((value) => Object.keys(value).length > 0 && (!value.allOptionalEmailsOff || Object.keys(value).length === 1), "Choose a category or turn off all optional emails"), { id: "CommunicationPreferencesUpdateRequest", description: "Updates only the supplied category, or disables every optional email." });
+  recruiterIntroductions: z.boolean().optional(),
+}).refine((value) => Object.keys(value).length > 0 && (!value.allOptionalEmailsOff || Object.keys(value).length === 1), "Choose a category or turn off all optional emails"), { id: "CommunicationPreferencesUpdateRequest", description: "Updates only the supplied category, or disables every optional email. Recruiter introductions are a separate consent that the all-optional-emails switch does not change." });
 export type CommunicationPreferencesResponse = z.infer<typeof communicationPreferencesResponseSchema>;
 export type CommunicationPreferencesUpdateRequest = z.infer<typeof communicationPreferencesUpdateRequestSchema>;
 
