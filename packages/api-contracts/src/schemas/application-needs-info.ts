@@ -46,6 +46,12 @@ export const applicationNeedsInfoQuestionSchema = responseComponent(
       pattern: z.string().optional(),
       format: z.enum(["email", "phone", "url", "integer", "decimal"]).optional(),
     }),
+    /**
+     * True when the question asks a fact about the person (a LinkedIn URL, a
+     * phone number): the answer is also saved to their profile where it fits
+     * and answers the same question on their other waiting applications.
+     */
+    profileFact: z.literal(true).optional(),
   }),
   {
     id: "ApplicationNeedsInfoQuestion",
