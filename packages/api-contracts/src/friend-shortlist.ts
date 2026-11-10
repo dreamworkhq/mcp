@@ -60,6 +60,18 @@ export type PublicFriendInvite = {
   friendFreeDays: number;
 };
 
+/** Why `POST /friend-shortlists` refused a link, as the `code` of its reply. */
+export type FriendShortlistRefusalCode =
+  | "LINKEDIN_URL_INVALID"
+  | "LINKEDIN_PROFILE_NOT_FOUND"
+  | "LINKEDIN_PROFILE_EMPTY"
+  | "LINKEDIN_UNAVAILABLE";
+
+export type FriendShortlistRefusal = {
+  error: string;
+  code: FriendShortlistRefusalCode;
+};
+
 export type FriendShortlistResponse = { shortlist: FriendShortlist };
 export type PublicFriendShortlistResponse = { shortlist: PublicFriendShortlist };
 export type FriendInviteResponse = { invite: FriendInvite };

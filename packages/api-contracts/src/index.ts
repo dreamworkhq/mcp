@@ -390,6 +390,8 @@ export type {
   FriendShortlist,
   FriendShortlistJob,
   FriendShortlistOffer,
+  FriendShortlistRefusal,
+  FriendShortlistRefusalCode,
   FriendShortlistResponse,
   FriendShortlistStatus,
   PublicFriendInvite,
