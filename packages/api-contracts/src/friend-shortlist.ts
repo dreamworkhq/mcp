@@ -1,8 +1,8 @@
 /**
- * Wire types for "Get a friend hired": a signed-in sender adds a friend's
- * resume and shares the friend's ten best matches, or shares their own invite
- * link. The friend never has an account here, so nothing on the wire carries
- * more of them than the first name on their resume.
+ * Wire types for "Get a friend hired": a signed-in sender pastes a friend's
+ * LinkedIn link and shares the friend's ten best matches, or shares their own
+ * invite link. The friend never has an account here, so nothing on the wire
+ * carries more of them than the first name on their profile.
  */
 
 /** One matched job, as it was when the shortlist was built. */
@@ -28,8 +28,8 @@ export type FriendShortlistOffer = {
 
 /**
  * The sender's view. `token` is null until the matches are ready to share.
- * `friendFirstName` is read from the resume, and is null while the shortlist
- * builds and when the resume shows no plain name.
+ * `friendFirstName` is the first name on the LinkedIn profile, and is null
+ * when that is not a plain name or the shortlist failed.
  */
 export type FriendShortlist = {
   id: string;
@@ -40,7 +40,7 @@ export type FriendShortlist = {
   offer: FriendShortlistOffer;
 };
 
-/** What a shared shortlist link shows. It never carries resume content. */
+/** What a shared shortlist link shows. It never carries profile content. */
 export type PublicFriendShortlist = {
   friendFirstName: string | null;
   senderFirstName: string | null;
@@ -48,7 +48,7 @@ export type PublicFriendShortlist = {
   friendFreeDays: number;
 };
 
-/** The sender's own link, for a friend whose resume they don't have. */
+/** The sender's own link, for a friend whose LinkedIn they don't have. */
 export type FriendInvite = {
   code: string;
   offer: FriendShortlistOffer;
