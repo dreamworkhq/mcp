@@ -120,6 +120,17 @@ export const applyNowTrialOfferSchema = responseComponent(
       .string()
       .describe("Tracked billing offer id, echoed on checkout_started and Stripe metadata."),
     terms: billingPromoCardTermsSchema,
+    giftedBy: z
+      .object({
+        firstName: z
+          .string()
+          .nullable()
+          .describe("The sender's first name, or null when their profile gives none."),
+      })
+      .nullable()
+      .describe(
+        "The friend whose link granted this trial, or null for the apply-now trial. A gifted trial is also offered on the billing page.",
+      ),
   }),
   {
     id: "ApplyNowTrialOffer",
@@ -235,6 +246,10 @@ export const billingTrialStatusSchema = responseComponent(
             "The first charge after the trial, after any coupon, in the currency's minor unit. Null when Stripe gave no price; show no price then.",
           ),
         currency: z.string().describe("Lowercase ISO currency code."),
+        giftedBy: z
+          .object({ firstName: z.string().nullable() })
+          .nullable()
+          .describe("The friend whose link brought this account, when the trial is theirs to thank; null otherwise."),
         interval: z
           .enum(["month", "quarter", "year"])
           .nullable()
