@@ -72,6 +72,11 @@ export const meUserSchema = responseComponent(
         "Deprecated: always true. Web bundles built before the Applications queue reached every account read it to choose the queue over the old board.",
       ),
     resumeDocumentEditorEnabled: z.boolean().optional(),
+    friendInvitesEnabled: z
+      .boolean()
+      .describe(
+        "This account may make friend invite links and shortlists (FRIEND_SHORTLIST_ROLLOUT).",
+      ),
     accountPurpose: z.enum(["customer", "production_canary"]),
     emailUnsubscribed: z.boolean(),
     // Onboarding gate. `onboardingCompletedAt` is null until the wizard's last
