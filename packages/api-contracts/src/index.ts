@@ -336,8 +336,27 @@ export {
 export { conversationMessageContentSchema, type ConversationMessageContent, type EmailReplyAttachment } from "./schemas/messages.js";
 export type { AdminSupportAssignment, AdminSupportAssignee } from "./admin-support.js";
 export type {
+  AdminAiTraffic,
+  AiTrafficAeoRow,
+  AiTrafficChannelGroup,
+  AiTrafficConversionRow,
+  AiTrafficCrawlerRow,
+  AiTrafficFirstTouchRow,
+  AiTrafficHeadline,
+  AiTrafficLandingPageTypes,
+  AiTrafficLandingsWeek,
+  AiTrafficSearchShare,
+  AiTrafficSection,
+  AiTrafficSectionKey,
+  AiTrafficSelfReportedWeek,
+  AiTrafficShareWeek,
+  AiTrafficTopPage,
+  AiTrafficWeeklySeries,
+} from "./admin-ai-traffic.js";
+export type {
   AdminScorecard,
   AdminScorecardCorpus,
+  ScorecardAiLandings,
   ScorecardCorpusDay,
   ScorecardCorpusFeed,
   ScorecardCorpusLane,

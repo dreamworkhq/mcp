@@ -1,6 +1,6 @@
 {
   "version": "1.10.0",
-  "sourceCommit": "b12961ee1a340099b2e05cb7f712c61991bd54fd",
+  "sourceCommit": "7e07c3d7cfe8f0485a7e4494ddd04cc95e5fcc83",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -54,6 +54,7 @@
     "llms-install.md",
     "package.json",
     "packages/api-contracts/package.json",
+    "packages/api-contracts/src/admin-ai-traffic.ts",
     "packages/api-contracts/src/admin-scorecard.ts",
     "packages/api-contracts/src/admin-support.ts",
     "packages/api-contracts/src/friend-shortlist.ts",

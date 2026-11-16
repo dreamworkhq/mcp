@@ -21,6 +21,19 @@ export type ScorecardCountMetric = {
   prior7: number;
 };
 
+/** AI landings by complete Monday-to-Sunday UTC week, as on `/admin/traffic`. */
+export type ScorecardAiLandings = {
+  /** Monday of the last complete week. */
+  weekStart: string;
+  lastWeek: number;
+  previousWeek: number;
+  /**
+   * The weeks of the page's headline trend: up to 8 from the week of
+   * 2026-10-19, oldest first; empty while that read is pending or failed.
+   */
+  weeks: Array<{ weekStart: string; value: number }>;
+};
+
 /** A percentage per day. */
 export type ScorecardRateMetric = {
   days: ScorecardDay[];
@@ -164,7 +177,11 @@ export type AdminScorecard = {
   payingUsers: ScorecardStockMetric | null;
   /** Each day's value is the rate over the 7 days ending that day. */
   applicationSuccess: ScorecardRateMetric | null;
-  aeoVisits: ScorecardCountMetric | null;
+  /**
+   * The AI traffic page's headline: AI landings in the last complete
+   * Monday-to-Sunday UTC week. Null until that read lands, or when it failed.
+   */
+  aiLandings: ScorecardAiLandings | null;
   siteVisitors: ScorecardCountMetric | null;
   mcpUsers: ScorecardCountMetric | null;
   newUsers: {
