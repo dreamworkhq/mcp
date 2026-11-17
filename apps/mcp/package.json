@@ -47,7 +47,7 @@
     "@jobless/api-contracts": "workspace:*",
     "@jobless/assistant-contracts": "workspace:*",
     "@types/node": "^25.6.0",
-    "esbuild": "0.27.7",
+    "esbuild": "0.28.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   },
