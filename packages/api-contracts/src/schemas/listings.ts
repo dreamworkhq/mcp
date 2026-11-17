@@ -405,6 +405,11 @@ export const listListingsQuery = {
     .union([z.string(), z.array(z.string())])
     .describe("Exact canonical seniority for machine consumers. Repeatable."),
   dreamwork500: z.string().describe(`Dreamwork-500 companies only. ${truthy}`),
+  startup: z
+    .string()
+    .describe(
+      `Companies whose recorded funding stage is Pre-Seed, Seed, Series A, Series B, or Series C. A company with no recorded stage, a later stage, or an acquisition is excluded. ${truthy}`,
+    ),
   aiRole: z.string().describe(`AI roles only. ${truthy}`),
   newOnly: z.string().describe(`7-day freshness window. ${truthy}`),
   postedWithin: z

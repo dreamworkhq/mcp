@@ -1291,6 +1291,13 @@ export const operations: readonly OperationDescriptor[] = [
         schema: listListingsQuery.dreamwork500,
       },
       {
+        name: "startup",
+        in: "query",
+        required: false,
+        description: "Restrict to companies at Pre-Seed through Series C.",
+        schema: listListingsQuery.startup,
+      },
+      {
         name: "aiRole",
         in: "query",
         required: false,
