@@ -318,6 +318,14 @@ export const recommendedListingsResponseSchema = responseComponent(
      * newest-first page, so a client deadline belongs below that.
      */
     rankingBuildingMs: z.int(),
+    /**
+     * A new account's one-time fit check of its first matches. "pending": the
+     * check is running, and the relevance order of the checked listings
+     * changes when it lands, so a client showing that order asks again.
+     * "ready": the order already reflects it. "none": no check ran or is
+     * running. No score on a listing changes with it.
+     */
+    firstMatchRanking: z.enum(["none", "pending", "ready"]),
     hiddenByEligibility: z
       .int()
       .describe(
