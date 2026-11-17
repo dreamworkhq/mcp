@@ -62,9 +62,11 @@ export type AiTrafficConversionRow = {
   channel: string;
   group: AiTrafficChannelGroup;
   sessions: number;
-  resumeUploadPct: number;
-  resumeClickPct: number;
+  ctaClickPct: number;
+  signupOpenedPct: number;
   signInPct: number;
+  setupFinishedPct: number;
+  returnedPct: number;
 };
 
 export type AiTrafficFirstTouchRow = {
