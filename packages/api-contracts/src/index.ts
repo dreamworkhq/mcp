@@ -399,6 +399,37 @@ export type {
   RecruitVoteRequest,
 } from "./recruit.js";
 
+export type {
+  MatchAnswerRequest,
+  MatchAsk,
+  MatchAsksResponse,
+  MatchAskStatus,
+  MatchCandidate,
+  MatchCompany,
+  MatchCreateJobRequest,
+  MatchHirerSession,
+  MatchIdCheckResponse,
+  MatchJob,
+  MatchJobCounts,
+  MatchJobsResponse,
+  MatchJobStatus,
+  MatchJobSummary,
+  MatchMe,
+  MatchOutline,
+  MatchPeopleResponse,
+  MatchPerson,
+  MatchPersonDecisionRequest,
+  MatchQuestion,
+  MatchReadOut,
+  MatchSearchProgress,
+  MatchSendAsksRequest,
+  MatchTerms,
+  MatchUpdateJobRequest,
+  MatchUpdateTermsRequest,
+  MatchWorkKind,
+  MatchWorkSetting,
+} from "./match.js";
+
 export type { AdminSupportReplyRequest } from "./schemas/admin-support.js";
 
 export { communicationPreferencesResponseSchema, communicationPreferencesUpdateRequestSchema, productActivityRequestSchema, type CommunicationPreferencesResponse, type CommunicationPreferencesUpdateRequest } from "./schemas/users.js";

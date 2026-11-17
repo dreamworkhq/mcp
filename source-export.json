@@ -1,6 +1,6 @@
 {
   "version": "1.10.0",
-  "sourceCommit": "74ddceaf512b36f0c2f0c4a4715499cbc53366cd",
+  "sourceCommit": "d730fad5f649a49e7f418ed60484aa3847f22ee0",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -61,6 +61,7 @@
     "packages/api-contracts/src/generator/openapi.ts",
     "packages/api-contracts/src/generator/validate.ts",
     "packages/api-contracts/src/index.ts",
+    "packages/api-contracts/src/match.ts",
     "packages/api-contracts/src/operation.ts",
     "packages/api-contracts/src/operations.ts",
     "packages/api-contracts/src/recruit.ts",
