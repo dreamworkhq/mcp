@@ -46,6 +46,8 @@ import { z } from "zod";
 import {
   billingCancelAtPeriodEndRequestSchema,
   billingCancelAtPeriodEndResponseSchema,
+  billingCancelPriceOfferRequestSchema,
+  billingCancelPriceOfferResponseSchema,
   billingCancellationReasonRequestSchema,
   billingCancellationReasonResponseSchema,
   billingCheckoutRequestSchema,
@@ -484,6 +486,57 @@ export const operations: readonly OperationDescriptor[] = [
       },
       "502": {
         description: "Stripe refused or did not answer (`stripe_cancel_failed`). Nothing changed unless a retry shows `already_scheduled`.",
+        schema: errorResponseSchema,
+      },
+      "503": {
+        description: "Stripe is not configured on this server (`billing_not_configured`).",
+        schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "acceptBillingCancelPriceOffer",
+    method: "post",
+    path: "/billing/cancel-price-offer",
+    fastifyPath: "/billing/cancel-price-offer",
+    summary: "Take the discount offered to a price cancel",
+    description:
+      "The billing page offers a discount to a subscriber who answers \"Too expensive\" to the cancel question. This puts that coupon on the caller's own subscription, read live from Stripe, and marks the account so the offer is made once. It charges nothing now and changes nothing else. Eligibility is what `GET /billing/subscription` reports as `cancelPriceOffer` with `arm: \"offer\"`. Off while `BILLING_CANCEL_PRICE_OFFER_PERCENT` is 0.",
+    tags: ["billing"],
+    auth: "user-session",
+    contractMaturity: "consumer-adopted",
+    requestBody: {
+      description: "The confirmation and a per-offer idempotency key.",
+      contentType: "application/json",
+      required: true,
+      schema: billingCancelPriceOfferRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The subscription carries the discount.",
+        schema: billingCancelPriceOfferResponseSchema,
+      },
+      "400": {
+        description: "Missing confirmation or a malformed idempotency key.",
+        schema: errorResponseSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description:
+          "An API key (`session_required`), a subscription whose customer is not the caller's (`subscription_not_owned`), or an account the production-canary policy refuses.",
+        schema: errorResponseSchema,
+      },
+      "404": {
+        description: "The offer is switched off (`not_found`).",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description:
+          "No Stripe subscription (`stripe_subscription_missing`), or this account is not offered the discount (`cancel_price_offer_unavailable`): already taken, already discounted, not monthly, already ending, or in the holdout.",
+        schema: errorResponseSchema,
+      },
+      "502": {
+        description: "Stripe refused or did not answer (`stripe_discount_failed`). Nothing changed unless a retry shows `already_applied`.",
         schema: errorResponseSchema,
       },
       "503": {
