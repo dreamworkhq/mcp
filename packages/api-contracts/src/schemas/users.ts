@@ -55,10 +55,19 @@ export const meUserSchema = responseComponent(
     // free, for a plan that never went through Stripe, and for rows written
     // before the interval was recorded.
     subscriptionBillingInterval: billingIntervalSchema.nullable(),
-    billingRecovery: z.object({
-      kind: z.enum(["none", "update_payment", "resume_farcaster"]),
-      paidThrough: isoDateTime.nullable(),
-    }),
+    billingRecovery: z
+      .object({
+        kind: z.enum([
+          "none",
+          "update_payment",
+          "resume_farcaster",
+          "resubscribe",
+        ]),
+        paidThrough: isoDateTime.nullable(),
+      })
+      .describe(
+        "What would restore paid access. `update_payment`: a linked Stripe subscription whose payment failed, fixed in the billing portal. `resume_farcaster`: a Farcaster plan that will not renew. `resubscribe`: a paid plan that ended, renewed through checkout; `paidThrough` is when access ended, null when unknown.",
+      ),
     proHaloSeenVersion: z.int(),
     proHaloCurrentVersion: z.int(),
     role: accountRoleSchema.describe(
