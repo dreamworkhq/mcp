@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { defineAction } from "../action.js";
 import { ASSISTANT_EVENTS } from "../events.js";
+import {
+  JOB_FUNCTION_INPUT_HINT,
+  canonicalJobFunction,
+  jobFunctionInputSchema,
+} from "../jobFunctions.js";
 
 /**
  * Market-pulse actions: current hiring and layoff context from Dreamwork's
@@ -18,19 +23,6 @@ import { ASSISTANT_EVENTS } from "../events.js";
  * share one shape. The two surfaces drift when one restates the other's
  * payload by hand; sharing the builder makes drifting a reviewable diff.
  */
-
-/** The canonical function slugs the research browse surface filters on. */
-export const MARKET_FUNCTION_SLUGS = [
-  "engineering",
-  "product",
-  "design",
-  "data-science",
-  "sales",
-  "marketing",
-  "operations",
-  "customer-success",
-  "finance",
-] as const;
 
 export const marketPulseInputSchema = z.object({});
 
@@ -105,10 +97,9 @@ export const marketPulseOutputSchema = z.object({
 });
 
 export const topHiringCompaniesInputSchema = z.object({
-  function: z
-    .enum(MARKET_FUNCTION_SLUGS)
+  function: jobFunctionInputSchema
     .optional()
-    .describe("Limit to one job function, e.g. engineering."),
+    .describe(`Job function to keep. ${JOB_FUNCTION_INPUT_HINT}`),
   country: z
     .string()
     .length(2)
@@ -405,7 +396,9 @@ export function buildTopHiringCompaniesOutput(
     generatedAt: index.generatedAt,
     filters: {
       country: query.country ?? null,
-      function: query.function ?? null,
+      function: query.function
+        ? (canonicalJobFunction(query.function) ?? query.function)
+        : null,
       trend: query.trend ?? null,
       updatedWithinDays: 7,
     },

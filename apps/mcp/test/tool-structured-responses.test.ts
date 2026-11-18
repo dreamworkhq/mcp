@@ -380,6 +380,35 @@ test("a sorted browse pages by the clamped page size, not what came back", async
   );
 });
 
+test("browse_listings reads a function by its label or its slug", async () => {
+  const page = {
+    listings: [PUBLIC_LISTING],
+    nextCursor: null,
+    appliedLocation: null,
+    locationFilter: null,
+  };
+  const { results, paths } = await browseSequence([
+    { args: { function: ["Data Science", "Customer Success"] }, body: page },
+    { args: { function: ["data-science", "customer_success"] }, body: page },
+    { args: { function: ["growth"] } },
+  ]);
+  for (const [index, result] of results.slice(0, 2).entries()) {
+    assert.equal(result.isError, undefined, firstText(result));
+    assert.deepEqual(
+      (result.structuredContent as { appliedFilters: { functions: string[] } })
+        .appliedFilters.functions,
+      ["Customer Success", "Data Science"],
+    );
+    assert.equal(
+      new URLSearchParams(paths[index]).get("function"),
+      "Customer Success,Data Science",
+    );
+  }
+  assert.equal(results[2]!.isError, true);
+  assert.match(firstText(results[2]!), /Data Science/);
+  assert.equal(paths.length, 2);
+});
+
 test("browse_listings refuses a filter the route could not apply", async () => {
   const { results, paths } = await browseSequence([
     {

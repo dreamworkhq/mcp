@@ -157,3 +157,51 @@ test("fetchMarketPulse succeeds when the route stored a legitimate null", async 
   assert.equal(output.layoffs, null);
   assert.equal(output.hiring.activeRoles, 774_415);
 });
+
+test("get_top_hiring_companies reads a function by its label or its slug", async () => {
+  const requests: string[] = [];
+  const original = globalThis.fetch;
+  const server = createMcpServer(new ApiClient("https://api.example.test", ""));
+  const client = new Client({ name: "market-pulse-test", version: "0.0.0" });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  try {
+    globalThis.fetch = (async (url: string) => {
+      requests.push(new URL(url).search);
+      return {
+        status: 200,
+        ok: true,
+        json: async () => ({
+          ...indexRouteBody,
+          query: { function: "data-science" },
+        }),
+      } as Response;
+    }) as typeof fetch;
+    await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+    for (const spelling of ["Data Science", "data-science", "DATA_SCIENCE"]) {
+      const result = await client.callTool({
+        name: "get_top_hiring_companies",
+        arguments: { function: spelling },
+      });
+      assert.equal(result.isError, undefined, spelling);
+      assert.equal(
+        (result.structuredContent as { filters: { function: string } }).filters
+          .function,
+        "Data Science",
+      );
+    }
+    assert.deepEqual(
+      requests.map((search) => new URLSearchParams(search).get("function")),
+      ["Data Science", "Data Science", "Data Science"],
+    );
+    const refused = await client.callTool({
+      name: "get_top_hiring_companies",
+      arguments: { function: "growth" },
+    });
+    assert.equal(refused.isError, true);
+    assert.equal(requests.length, 3);
+  } finally {
+    await client.close();
+    await server.close();
+    globalThis.fetch = original;
+  }
+});

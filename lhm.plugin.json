@@ -251,7 +251,7 @@
             "maxLength": 120
           },
           "function": {
-            "description": "Job functions to keep, as a union.",
+            "description": "Job functions to keep, as a union. Case, spaces and hyphens are ignored: \"data-science\" is read as Data Science.",
             "minItems": 1,
             "maxItems": 15,
             "type": "array",
@@ -1440,18 +1440,24 @@
         "type": "object",
         "properties": {
           "function": {
-            "description": "Limit to one job function, e.g. engineering.",
+            "description": "Job function to keep. Case, spaces and hyphens are ignored: \"data-science\" is read as Data Science.",
             "type": "string",
             "enum": [
-              "engineering",
-              "product",
-              "design",
-              "data-science",
-              "sales",
-              "marketing",
-              "operations",
-              "customer-success",
-              "finance"
+              "Engineering",
+              "Product",
+              "Design",
+              "Marketing",
+              "Data Science",
+              "Sales",
+              "Operations",
+              "Finance",
+              "Legal",
+              "HR",
+              "Customer Success",
+              "DevRel",
+              "Security",
+              "Research",
+              "Executive"
             ]
           },
           "country": {

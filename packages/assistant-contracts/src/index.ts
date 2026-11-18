@@ -38,7 +38,6 @@ export { ASSISTANT_EVENTS, type AssistantEventName } from "./events.js";
 export { openAiMcpResource, mcpResourceAllowed, MCP_RESOURCE_HEADER } from "./mcp-resources.js";
 
 export {
-  MARKET_FUNCTION_SLUGS,
   RECOMMENDATION_FETCH_BUFFER,
   buildMarketPulseOutput,
   buildTopHiringCompaniesOutput,
@@ -79,7 +78,9 @@ export {
 } from "./handoff.js";
 export {
   JOB_FUNCTIONS,
+  JOB_FUNCTION_INPUT_HINT,
   canonicalJobFunction,
+  jobFunctionInputSchema,
   type JobFunction,
 } from "./jobFunctions.js";
 export {

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * The job-function labels the product speaks, in the exact casing it stores
  * and renders.
@@ -31,11 +33,33 @@ export const JOB_FUNCTIONS = [
 
 export type JobFunction = (typeof JOB_FUNCTIONS)[number];
 
+/** Case, spaces, hyphens and underscores do not distinguish two spellings. */
+function spellingKey(value: string): string {
+  return value.toLowerCase().replace(/[\s_-]+/g, "");
+}
+
 /**
- * The label a person's word names, ignoring case and surrounding space, or
- * `null` when it names none. "marketing" is Marketing; "growth" is nothing.
+ * The label a spelling names, or `null` when it names none. "marketing" is
+ * Marketing, and "data-science", "data_science" and "DATA SCIENCE" are all
+ * Data Science; "growth" is nothing.
  */
 export function canonicalJobFunction(value: string): JobFunction | null {
-  const wanted = value.trim().toLowerCase();
-  return JOB_FUNCTIONS.find((label) => label.toLowerCase() === wanted) ?? null;
+  const wanted = spellingKey(value);
+  return JOB_FUNCTIONS.find((label) => spellingKey(label) === wanted) ?? null;
 }
+
+/**
+ * One job function as a tool input. It advertises the labels as its enum and
+ * parses any spelling `canonicalJobFunction` resolves to the label, so a tool
+ * that takes a function cannot disagree with another about its format. A
+ * spelling that names no function fails with the labels listed.
+ */
+export const jobFunctionInputSchema = z.preprocess(
+  (value) =>
+    typeof value === "string" ? (canonicalJobFunction(value) ?? value) : value,
+  z.enum(JOB_FUNCTIONS),
+);
+
+/** How every tool that filters by function describes the spellings it reads. */
+export const JOB_FUNCTION_INPUT_HINT =
+  'Case, spaces and hyphens are ignored: "data-science" is read as Data Science.';

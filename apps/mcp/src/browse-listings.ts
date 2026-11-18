@@ -7,10 +7,12 @@ import {
 } from "@jobless/api-contracts";
 import {
   JOB_FUNCTIONS,
+  JOB_FUNCTION_INPUT_HINT,
   LISTING_INDUSTRIES,
   MATCH_SENIORITIES,
   WORK_SETTINGS,
   canonicalListingIndustry,
+  jobFunctionInputSchema,
   type JobFunction,
   type MatchSeniority,
   type McpDistribution,
@@ -102,11 +104,11 @@ export const browseListingsInputSchema = z.object({
     .describe("Words in the job title or company name."),
   company: z.string().max(120).optional().describe("Company name or domain."),
   function: z
-    .array(z.enum(JOB_FUNCTIONS))
+    .array(jobFunctionInputSchema)
     .min(1)
     .max(JOB_FUNCTIONS.length)
     .optional()
-    .describe("Job functions to keep, as a union."),
+    .describe(`Job functions to keep, as a union. ${JOB_FUNCTION_INPUT_HINT}`),
   seniority: z
     .array(z.enum(MATCH_SENIORITIES))
     .min(1)
