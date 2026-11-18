@@ -49,6 +49,7 @@ export type MatchCandidate = RecruitCandidate & {
   ask: MatchAskStatus | null;
 };
 
+/** `yes` counts the people waiting on the company's Meet or Pass; `meeting` those it chose to meet. */
 export type MatchJobCounts = { asked: number; yes: number; meeting: number; newFits: number };
 
 export type MatchJob = {
@@ -96,6 +97,11 @@ export type MatchUpdateJobRequest = {
   bookingUrl?: string | null;
   notifyNewFits?: boolean;
   answerByDays?: number;
+  /**
+   * `closed` stops new asks and new-fit runs; `live` reopens a job that was
+   * closed after its first asks went out. A draft goes live only by sending asks.
+   */
+  status?: Exclude<MatchJobStatus, "draft">;
 };
 
 export type MatchSendAsksRequest = { candidateIds: string[] };
