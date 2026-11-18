@@ -212,3 +212,72 @@ test("get_platform_context returns structuredContent matching its text result", 
   assert.deepEqual(JSON.parse(firstText(result)), result.structuredContent);
   await close();
 });
+
+test("submit_feedback sends a guest's report to the feedback route and relays a refusal", async () => {
+  const requests: Array<{
+    path: string;
+    method?: string;
+    body: unknown;
+    auth: string | null;
+  }> = [];
+  const responses: StubResponse[] = [
+    { status: 200, body: { received: true } },
+    {
+      status: 503,
+      body: {
+        error: "feedback_not_collected",
+        message:
+          "Dreamwork is not collecting tool feedback right now, so this report was not recorded.",
+      },
+    },
+  ];
+  const original = globalThis.fetch;
+  globalThis.fetch = (async (url: string, init?: RequestInit) => {
+    requests.push({
+      path: new URL(url).pathname,
+      method: init?.method,
+      body: JSON.parse(String(init?.body)),
+      auth: new Headers(init?.headers).get("authorization"),
+    });
+    const response = responses.shift()!;
+    return {
+      status: response.status,
+      ok: response.status < 300,
+      json: async () => response.body,
+    } as Response;
+  }) as typeof fetch;
+  try {
+    const { client, close } = await connectPair(
+      new ApiClient("https://api.example.test", ""),
+    );
+    const report = {
+      tool: "browse_listings",
+      summary: "function refused a slug",
+      details:
+        'Called browse_listings with function: ["data-science"] and got an enum error.',
+      proposedFix: "Accept the slug.",
+    };
+    const sent = await client.callTool({
+      name: "submit_feedback",
+      arguments: report,
+    });
+    assert.equal(sent.isError, undefined, firstText(sent));
+    assert.deepEqual(JSON.parse(firstText(sent)), { received: true });
+    assert.deepEqual(requests[0], {
+      path: "/public/mcp/feedback",
+      method: "POST",
+      body: report,
+      auth: null,
+    });
+
+    const refused = await client.callTool({
+      name: "submit_feedback",
+      arguments: report,
+    });
+    assert.equal(refused.isError, true);
+    assert.match(firstText(refused), /was not recorded/);
+    await close();
+  } finally {
+    globalThis.fetch = original;
+  }
+});

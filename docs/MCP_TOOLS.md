@@ -96,7 +96,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 
 ### Additional tools
 
-Tools that call a product route directly, with no registry action behind them. `get_platform_context`, `browse_listings`, `get_listing`, and `get_upgrade_link` need no key.
+Tools that call a product route directly, with no registry action behind them. These need no key: `browse_listings`, `get_listing`, `get_market_pulse`, `get_platform_context`, `get_top_hiring_companies`, `get_upgrade_link`, `submit_feedback`.
 
 | Tool | Calls | What it does |
 |------|-------|--------------|
@@ -117,6 +117,7 @@ Tools that call a product route directly, with no registry action behind them. `
 | `list_contacts` | `GET /contacts` | Returns the account's saved recruiter and referrer contacts, optionally filtered by company. |
 | `list_interviews` | `GET /interviews` | Returns all interviews detected for the account, including role, company, time and platform when known. |
 | `reopen_application_materials` | `POST /applications/:id/materials/reopen` | Opens a new editable material revision only after the API establishes that a failed application cannot still submit. |
+| `submit_feedback` | `POST /public/mcp/feedback` | Sends the Dreamwork team a report about a tool on this server that got in the way: an error, a refused input, a confusing or incomplete result, or a missing capability. |
 | `update_application_materials` | `PATCH /applications/:id/materials` | Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision. |
 | `update_profile` | `PUT /profile` | Updates profile text fields such as name, email, phone and tone. |
 | `upload_resume` | `POST /profile/resume` | Uploads original resume-file bytes encoded as base64 with PDF, DOCX, TXT, MD, PNG, JPG, JPEG or WEBP format and the current profileIdentityVersion. |

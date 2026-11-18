@@ -93,6 +93,7 @@ export {
   type MatchSeniority,
   type WorkSetting,
 } from "./listingFilters.js";
+export { mcpFeedbackInputSchema, type McpFeedbackInput } from "./mcpFeedback.js";
 export { receiptSchema, type Receipt } from "./receipt.js";
 export {
   TURN_ERROR_CODES,

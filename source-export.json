@@ -1,6 +1,6 @@
 {
   "version": "1.10.0",
-  "sourceCommit": "475384e88378ef728cc92485f9a4b76358767fdf",
+  "sourceCommit": "61bd9bc4dfadc1136956906c154199fe33d48296",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
@@ -116,6 +116,7 @@
     "packages/assistant-contracts/src/listingFilters.ts",
     "packages/assistant-contracts/src/matchFilterCost.ts",
     "packages/assistant-contracts/src/mcp-resources.ts",
+    "packages/assistant-contracts/src/mcpFeedback.ts",
     "packages/assistant-contracts/src/receipt.ts",
     "packages/assistant-contracts/src/registry.ts",
     "packages/assistant-contracts/src/turn.ts",

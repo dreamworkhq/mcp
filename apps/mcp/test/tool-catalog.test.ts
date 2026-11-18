@@ -41,6 +41,7 @@ const HAND_WRITTEN_TOOLS = [
   "list_contacts",
   "list_interviews",
   "reopen_application_materials",
+  "submit_feedback",
   "update_application_materials",
   "update_profile",
   "upload_resume",

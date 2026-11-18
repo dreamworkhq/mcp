@@ -37,7 +37,10 @@ const unreadNoticesOff = NOTICES_OFF.has(
 );
 const server = createMcpServer(
   api,
-  unreadNoticesOff ? {} : { unreadNotices: {} },
+  {
+    reportsToolProblemsUnasked: true,
+    ...(unreadNoticesOff ? {} : { unreadNotices: {} }),
+  },
 );
 // SDK 1.31's stdio transport stops reading at 10 MiB. upload_resume sends the
 // file as base64, and a file at PROFILE_DOCUMENT_MAX_BYTES (10 MiB) encodes

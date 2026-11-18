@@ -2847,6 +2847,50 @@
       }
     },
     {
+      "name": "submit_feedback",
+      "title": "Report a problem with a Dreamwork tool",
+      "description": "Sends the Dreamwork team a report about a tool on this server that got in the way: an error, a refused input, a confusing or incomplete result, or a missing capability. The report is about the tool. Leave out names, contact details, resume text, mail and anything else about the person. It changes nothing on the account and reaches no employer or recruiter. No login required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "description": "The tool the report is about, by name. Omit it when the report is about the server as a whole.",
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 200,
+            "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$",
+            "description": "One sentence naming the problem, on one line."
+          },
+          "details": {
+            "type": "string",
+            "maxLength": 3000,
+            "pattern": "\\S",
+            "description": "What you called and with which arguments, what you expected, and what came back, including any error text. Write placeholders such as <person> or <company> in place of anything about the person."
+          },
+          "proposedFix": {
+            "description": "The change to the tool, its input schema or its description that would have prevented the problem.",
+            "type": "string",
+            "maxLength": 3000,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "summary",
+          "details"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "annotations": {
+        "title": "Report a problem with a Dreamwork tool",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
       "name": "undo_last",
       "title": "Undo the last thing that can be undone",
       "description": "Reverses the latest action with an available undo, or the action identified by taskId. Sent applications, settled charges, expired undo windows and actions without a reversible outcome are refused with a reason.",

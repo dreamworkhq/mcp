@@ -775,6 +775,11 @@ export const MCP_TOOLS: McpTool[] = [
     calls: "POST /assistant/actions/strengthen_application",
   },
   {
+    name: "submit_feedback",
+    purpose: "Sends the Dreamwork team a report about a tool on this server that got in the way: an error, a refused input, a confusing or incomplete result, or a missing capability.",
+    calls: "POST /public/mcp/feedback",
+  },
+  {
     name: "undo_last",
     purpose: "Reverses the latest action with an available undo, or the action identified by taskId.",
     calls: "POST /assistant/actions/undo_last",
