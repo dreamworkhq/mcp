@@ -501,7 +501,7 @@ export const operations: readonly OperationDescriptor[] = [
     fastifyPath: "/billing/cancel-price-offer",
     summary: "Take the discount offered to a price cancel",
     description:
-      "The billing page offers a discount to a subscriber who answers \"Too expensive\" to the cancel question. This puts that coupon on the caller's own subscription, read live from Stripe, and marks the account so the offer is made once. It charges nothing now and changes nothing else. Eligibility is what `GET /billing/subscription` reports as `cancelPriceOffer` with `arm: \"offer\"`. Off while `BILLING_CANCEL_PRICE_OFFER_PERCENT` is 0.",
+      "The billing page offers a discount to a subscriber who answers \"Too expensive\" to the cancel question, or to one the win-back email reached after they scheduled a cancel. This puts that coupon on the caller's own subscription, read live from Stripe, and marks the account so the offer is made once. For the win-back the same Stripe update also removes the scheduled cancel. It charges nothing now and changes nothing else. Eligibility is what `GET /billing/subscription` reports as `cancelPriceOffer` with `arm: \"offer\"`. Off while `BILLING_CANCEL_PRICE_OFFER_PERCENT` is 0.",
     tags: ["billing"],
     auth: "user-session",
     contractMaturity: "consumer-adopted",
