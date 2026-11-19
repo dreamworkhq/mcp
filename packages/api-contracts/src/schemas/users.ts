@@ -223,6 +223,11 @@ export const meResponseSchema = responseComponent(
         "Non-null only for Pro and Dreamer; null for Free and for an admin without a tier preview.",
       ),
     applyPreferences: applyPreferencesSchema,
+    firstQueueSeedAvailable: z
+      .boolean()
+      .describe(
+        "True until a new account's empty Applications board has been seeded with its top matches; the web seeds only while it is.",
+      ),
     recruiterReplyReceived: z.boolean(),
     profile: meProfileSchema.nullable(),
     profileId: uuidString.nullable(),
