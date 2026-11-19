@@ -141,6 +141,19 @@ export const applyNowTrialOfferSchema = responseComponent(
 
 export type ApplyNowTrialOffer = z.infer<typeof applyNowTrialOfferSchema>;
 
+export const planPriceCurrencySchema = z
+  .enum(["usd", "eur"])
+  .describe("Lowercase ISO code of the currency Pro is priced in.");
+
+export const publicProPriceCurrencySchema = responseComponent(
+  z.strictObject({ currency: planPriceCurrencySchema }),
+  {
+    id: "PublicProPriceCurrency",
+    description:
+      "The currency a signed-out visitor's Pro card is priced in, from the connecting IP's country alone. A signed-in account reads proPriceCurrency on GET /users/me.",
+  },
+);
+
 export const billingPromoPreviewSchema = responseComponent(
   z.discriminatedUnion("status", [
     z.object({

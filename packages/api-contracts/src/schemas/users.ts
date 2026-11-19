@@ -8,7 +8,7 @@ import {
   subscriptionTierSchema,
   uuidString,
 } from "./common.js";
-import { applyNowTrialOfferSchema } from "./billing.js";
+import { applyNowTrialOfferSchema, planPriceCurrencySchema } from "./billing.js";
 import { meProfileSchema } from "./profile.js";
 
 export const onboardingGateSchema = responseComponent(
@@ -105,6 +105,9 @@ export const meUserSchema = responseComponent(
     // it for, and only the apply-now gate may show or send it; null everywhere
     // else so no other checkout entry can promise it.
     applyNowTrial: applyNowTrialOfferSchema.nullable(),
+    // The currency this account's Pro card and checkout are priced in: euros
+    // for a new subscriber in Europe, dollars for everyone else.
+    proPriceCurrency: planPriceCurrencySchema,
   }),
   {
     id: "MeUser",

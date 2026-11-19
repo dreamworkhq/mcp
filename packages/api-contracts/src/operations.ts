@@ -60,6 +60,7 @@ import {
   billingDreamerUpgradeResponseSchema,
   billingPromoPreviewQuery,
   billingPromoPreviewSchema,
+  publicProPriceCurrencySchema,
 } from "./schemas/billing.js";
 import type { OperationDescriptor, OperationResponse } from "./operation.js";
 import {
@@ -2064,6 +2065,24 @@ export const operations: readonly OperationDescriptor[] = [
       "409": {
         description: "Expected revision did not match.",
         schema: profileRevisionConflictResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "getPublicProPriceCurrency",
+    method: "get",
+    path: "/public/billing/pro-price-currency",
+    fastifyPath: "/public/billing/pro-price-currency",
+    summary: "The currency a signed-out visitor's Pro card is priced in",
+    description:
+      "Reads the connecting IP's country from the edge geo header and no account. Euros in Europe while the euro price is on, dollars otherwise. Checkout charges the signed-in answer on GET /users/me, not this one.",
+    tags: ["billing"],
+    auth: "public",
+    contractMaturity: "documented",
+    responses: {
+      "200": {
+        description: "The currency for this connection.",
+        schema: publicProPriceCurrencySchema,
       },
     },
   },
