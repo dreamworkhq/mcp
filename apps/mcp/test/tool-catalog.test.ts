@@ -272,3 +272,80 @@ test("every tool a workflow prompt names is a tool this server registers", async
     await server.close();
   }
 });
+
+/**
+ * The server instructions and the rules under every workflow prompt each tell
+ * an agent which tools answer `held`. The expected set is observed, not
+ * restated: the tools this distribution registers with a `confirmationToken`
+ * input. A held tool missing from either text, or a tool the OpenAI catalog
+ * withholds still named in it, fails here.
+ */
+for (const distribution of ["default", "openai"] as const) {
+  test(`the ${distribution} instructions and workflow prompts name exactly the tools that answer held`, async () => {
+    const server = createMcpServer(
+      new ApiClient("https://api.example.test", "sk_test"),
+      { distribution },
+    );
+    const [clientTransport, serverTransport] =
+      InMemoryTransport.createLinkedPair();
+    const client = new Client({ name: "held-rules-test", version: "0.0.0" });
+    await Promise.all([
+      server.connect(serverTransport),
+      client.connect(clientTransport),
+    ]);
+    try {
+      const held = (await client.listTools()).tools
+        .filter(
+          (tool) =>
+            (tool.inputSchema.properties as Record<string, unknown> | undefined)
+              ?.confirmationToken,
+        )
+        .map((tool) => tool.name)
+        .sort();
+      assert.ok(held.length > 0, "the catalog has tools that answer held");
+      assert.equal(
+        held.includes("start_checkout"),
+        distribution === "default",
+        "start_checkout is held on the default catalog and absent from the OpenAI one",
+      );
+
+      const inInstructions = /([a-z_, ]+) each answer held/.exec(
+        client.getInstructions() ?? "",
+      );
+      assert.deepEqual(
+        inInstructions?.[1]?.trim().split(/, | and /).sort(),
+        held,
+        "the server instructions name a different set of held tools",
+      );
+
+      const { prompts } = await client.listPrompts();
+      assert.ok(prompts.length > 0, "the server registers workflow prompts");
+      for (const prompt of prompts) {
+        const { messages } = await client.getPrompt({
+          name: prompt.name,
+          arguments: Object.fromEntries(
+            (prompt.arguments ?? [])
+              .filter((argument) => argument.required)
+              .map((argument) => [argument.name, "example"]),
+          ),
+        });
+        const text = messages
+          .map((message) =>
+            message.content.type === "text" ? message.content.text : "",
+          )
+          .join("\n");
+        const inRules = /((?:`[a-z_]+`[, and]*)+) answer held first/.exec(text);
+        assert.deepEqual(
+          [...(inRules?.[1] ?? "").matchAll(/`([a-z_]+)`/g)]
+            .map((match) => match[1]!)
+            .sort(),
+          held,
+          `${prompt.name}: its rules name a different set of held tools`,
+        );
+      }
+    } finally {
+      await client.close();
+      await server.close();
+    }
+  });
+}

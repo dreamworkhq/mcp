@@ -68,13 +68,15 @@ claude mcp add --transport http dreamwork https://mcp.dreamworkhq.com/mcp \
 ## Guest mode and API keys
 
 Guest mode is free and needs no account. With no key set, the server starts in
-guest mode and exposes the public, read-only tools: `browse_listings`,
-`get_listing`, `get_platform_context`, and `get_upgrade_link`. The server tells
-the agent it is in guest mode, so the agent can say what works now. Account
-tools answer with a short "No API key" message that lists the steps to get one.
+guest mode, where the public tools run: the ones under **Public (no key)** in
+[Tools](#tools). They search and read listings, read hiring-market figures,
+describe the platform, return an upgrade link, and report a tool problem. The
+server tells the agent it is in guest mode, so the agent can say what works
+now. `tools/list` still names every tool; an account tool answers with a short
+"No API key" message that lists the steps to get one.
 
 The hosted endpoint does the same for its handshake. `initialize` and
-`tools/list` succeed with no sign-in, and those four tools run. Every account
+`tools/list` succeed with no sign-in, and the public tools run. Every account
 tool, and any other method, answers `401` with `WWW-Authenticate` so a
 connector can sign in with OAuth. A bearer the API rejects is that same `401`.
 
@@ -152,9 +154,10 @@ confirmation), `interview_prep`, and `autopilot_setup`.
 Notes on a few tools:
 
 - No tool sends mail or submits an application on its first call. `apply`,
-  `reply_to_recruiter`, `set_autopilot`, `update_autopilot_settings` and
-  `start_checkout` return `held` with a summary and a `confirmationToken`, and
-  act only when you send that token back with identical arguments.
+  `answer_application_questions`, `reply_to_recruiter`, `set_autopilot`,
+  `update_autopilot_settings` and `start_checkout` return `held` with a
+  summary and a `confirmationToken`, and act only when you send that token
+  back with identical arguments.
 - 1.3.0 removed the 1.2.0 tools a registry action replaced: `search_jobs` and
   `list_applications` (use `get_pipeline`; `browse_listings` searches the
   index), `apply_to_job` (`apply`), `add_listing_to_pipeline` (`save_job`),
@@ -164,9 +167,10 @@ Notes on a few tools:
   `resolve_escalation`, and the hosted server no longer offers them. Dreamwork
   no longer hands an application back to you as an escalation, so there is
   nothing for them to list or resolve.
-- `update_application_materials` and `reopen_application_materials` are open to
-  the Applications rollout cohort the API admits; outside it they return the
-  API's own refusal.
+- `update_application_materials` edits an application that has not been sent
+  yet. `reopen_application_materials` opens a failed or skipped one for
+  editing, once Dreamwork has established that the earlier attempt cannot
+  still submit.
 - `get_stats` aggregates the signed-in candidate's own pipeline, so it needs a
   key like the rest.
 

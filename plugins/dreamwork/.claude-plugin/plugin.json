@@ -1,7 +1,7 @@
 {
   "name": "dreamwork",
   "displayName": "Dreamwork",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Job search, application materials, and application tracking for AI assistants.",
   "author": {
     "name": "Dreamwork",
@@ -12,7 +12,8 @@
   "license": "MIT",
   "keywords": ["dreamwork", "dreamworkhq", "jobs", "job-search"],
   "icon": "./icon-400.png",
-  "documentationUrl": "https://www.dreamworkhq.com/agents",
+  "documentationUrl": "https://www.dreamworkhq.com/agents/docs",
+  "supportUrl": "https://www.dreamworkhq.com/help",
   "privacyPolicyUrl": "https://www.dreamworkhq.com/privacy",
   "termsOfServiceUrl": "https://www.dreamworkhq.com/terms"
 }

@@ -28,7 +28,7 @@ Prefer the hosted server. It is Streamable HTTP at `https://mcp.dreamworkhq.com/
 
 `type` must be `streamableHttp`. Leaving it out selects the legacy SSE transport.
 
-With no sign-in, the server is in guest mode. These tools run: `browse_listings`, `get_listing`, `get_platform_context`, and `get_upgrade_link`. Account tools answer `401` with `WWW-Authenticate` so the client can sign in with OAuth.
+With no sign-in, the server is in guest mode. These tools run: `browse_listings`, `get_listing`, `get_market_pulse`, `get_top_hiring_companies`, `get_platform_context`, `get_upgrade_link`, and `submit_feedback`. Account tools answer `401` with `WWW-Authenticate` so the client can sign in with OAuth.
 
 A client that sets headers can send an API key instead of signing in with OAuth:
 
@@ -87,7 +87,7 @@ Account tools need a key in `env`:
 
 ## Guest mode and API keys
 
-Guest mode is free and needs no account. With no key, the server exposes only `browse_listings`, `get_listing`, `get_platform_context`, and `get_upgrade_link`. Account tools answer with a short "No API key" message.
+Guest mode is free and needs no account. With no key, only these tools run: `browse_listings`, `get_listing`, `get_market_pulse`, `get_top_hiring_companies`, `get_platform_context`, `get_upgrade_link`, and `submit_feedback`. `tools/list` still names the account tools; each one answers with a short "No API key" message.
 
 An API key unlocks the account tools: ranked matches, tailored resumes and cover letters, applying, and tracking replies. Any Dreamwork account can create one, including the free plan. Sign in at [dreamworkhq.com](https://www.dreamworkhq.com), open Profile, then MCP. The Agents page has a Get a key button that lands in the same place. The key looks like `sk_...`. Put it in `DREAMWORK_API_KEY` for the local server, or in the `Authorization` header for the remote server, then restart the MCP client.
 

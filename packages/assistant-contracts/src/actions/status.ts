@@ -357,7 +357,7 @@ export const statusActions = [
     mcp: {
       expose: true,
       description:
-        "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. Queued work can be followed through its recorded status.",
+        "Returns one entry from the account's record of assistant actions by taskId, including action, status, receipt, error code, and creation and update times. Queued work can be followed through its recorded status.",
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -402,7 +402,7 @@ export const statusActions = [
     mcp: {
       expose: true,
       description:
-        "Returns recent account-owned assistant actions, newest first, across the site and MCP. status filters ongoing, completed or failed work; limit bounds the result. The ledger records actions rather than conversation text.",
+        "Returns recent account-owned assistant actions, newest first, across the site and MCP. status filters ongoing, completed or failed work; limit bounds the result. The record holds actions rather than conversation text.",
       readOnlyHint: true,
       openWorldHint: false,
     },

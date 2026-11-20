@@ -546,9 +546,13 @@ function appliedFilters(
 type InventoryPage = z.output<typeof listingInventoryResponseSchema>;
 type OffsetPage = z.output<typeof listingsResponseSchema>;
 
-/** A keyless walk at the guest cap. The OpenAI endpoint connects through a sign-in, never an API key. */
+/**
+ * A walk with no account at the guest cap. The default catalog serves the
+ * stdio CLI, which takes an API key, and the hosted connector, which signs in.
+ * The OpenAI endpoint connects through a sign-in, never an API key.
+ */
 const GUEST_WALK_CAPPED_NOTE: Record<McpDistribution, string> = {
-  default: "This walk served its 1,000-listing guest limit and stopped early. Add a Dreamwork API key to walk every match.",
+  default: "This walk served its 1,000-listing guest limit and stopped early. Sign in to Dreamwork, or set a Dreamwork API key, to walk every match.",
   openai: "This walk stopped at the 1,000-listing limit for guests. Sign in to Dreamwork to walk every listing.",
 };
 

@@ -103,7 +103,7 @@ export const digestActions = [
     mcp: {
       expose: true,
       description:
-        "Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. asOf is the next watermark. Match discovery includes overlapHours, defaulting to 72, before since because listings may become servable after first discovery; repeated ids can appear. Truncation counts identify older changes excluded by caps. Reading marks no mail read and creates no schedule.",
+        "Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. asOf is the next watermark. Match discovery includes overlapHours, defaulting to 72, before since because a listing can become available some time after Dreamwork first sees it; repeated ids can appear. Truncation counts identify older changes excluded by caps. Reading marks no mail read and creates no schedule.",
       readOnlyHint: true,
       openWorldHint: false,
     },

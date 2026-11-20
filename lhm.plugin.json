@@ -3,7 +3,7 @@
   "name": "Dreamwork",
   "author": "Dreamwork",
   "authorUrl": "https://github.com/dreamworkhq",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "MCP server for job search. Browse listings with no account. With a free Dreamwork key: rank matches, tailor resumes and cover letters, apply, track replies.",
   "homepage": "https://www.dreamworkhq.com/agents?utm_source=lobehub&utm_medium=mcp_directory&utm_campaign=mcp_distribution",
   "category": "productivity",
@@ -80,18 +80,22 @@
             "description": "Company name"
           },
           "description": {
+            "description": "The job description text",
             "type": "string"
           },
           "url": {
+            "description": "Link to the employer's posting",
             "type": "string",
             "format": "uri"
           },
           "contactEmail": {
+            "description": "Address the posting says to send applications to",
             "type": "string",
             "format": "email",
             "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           },
           "applicationMethod": {
+            "description": "How the employer takes applications for this job",
             "type": "string",
             "enum": [
               "email",
@@ -110,7 +114,7 @@
       "annotations": {
         "title": "Add job manually",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -236,7 +240,7 @@
     {
       "name": "browse_listings",
       "title": "Browse job listings",
-      "description": "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported. A page holds 25 listings by default and limit accepts up to 100, which the API clamps to 25 without a key or when the account's plan caps it there; the next page is the previous nextCursor. An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.",
+      "description": "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported. A page holds 25 listings by default and limit accepts up to 100, which the API clamps to 25 without a key or when the account's plan caps it there; the next page is the previous nextCursor. An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because a listing can become available some time after Dreamwork first sees it. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -900,7 +904,7 @@
     {
       "name": "generate_resume",
       "title": "Generate tailored resume",
-      "description": "Generates a tailored resume for the specified account-owned application and returns its result. This does not submit an application.",
+      "description": "Generates a tailored resume for the specified account-owned application and returns it. An application that already has a tailored resume returns that one unchanged, with cached true. This does not submit an application.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -949,7 +953,7 @@
     {
       "name": "get_application_materials",
       "title": "Get application materials",
-      "description": "Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. Materials include default and tailored resume contents, selected variant, inclusion, lock state and optimistic revision for submission. Rendered resume PDFs are not included (pdfBase64 is null); get_application_documents returns download links for the files this application will send.",
+      "description": "Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. Materials include default and tailored resume contents, selected variant, inclusion, lock state and the revision apply expects. Rendered resume PDFs are not included (pdfBase64 is null); get_application_documents returns download links for the files this application will send.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1184,7 +1188,7 @@
     {
       "name": "get_job",
       "title": "Read one role",
-      "description": "Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no matcher explanation is stored.",
+      "description": "Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no match explanation is stored.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1412,7 +1416,7 @@
     {
       "name": "get_task",
       "title": "Read one entry in the record of what ran",
-      "description": "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. Queued work can be followed through its recorded status.",
+      "description": "Returns one entry from the account's record of assistant actions by taskId, including action, status, receipt, error code, and creation and update times. Queued work can be followed through its recorded status.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1511,7 +1515,7 @@
     {
       "name": "get_updates_since",
       "title": "Read what changed since a moment",
-      "description": "Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. asOf is the next watermark. Match discovery includes overlapHours, defaulting to 72, before since because listings may become servable after first discovery; repeated ids can appear. Truncation counts identify older changes excluded by caps. Reading marks no mail read and creates no schedule.",
+      "description": "Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. asOf is the next watermark. Match discovery includes overlapHours, defaulting to 72, before since because a listing can become available some time after Dreamwork first sees it; repeated ids can appear. Truncation counts identify older changes excluded by caps. Reading marks no mail read and creates no schedule.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1691,7 +1695,7 @@
     {
       "name": "list_matches",
       "title": "List matches",
-      "description": "Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. A page holds 10 jobs by default and limit accepts up to 50; the next page is the previous nextCursor, which keeps the page size it was issued with. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. notes describe applied filters and coverage.",
+      "description": "Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. A page holds 10 jobs by default and limit accepts up to 50; the next page is the previous nextCursor, which keeps the page size it was issued with. addedAfter supports overlapping discovery windows because a listing can become available some time after Dreamwork first sees it. notes describe applied filters and coverage.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1819,7 +1823,7 @@
     {
       "name": "list_tasks",
       "title": "List what the assistant has done recently",
-      "description": "Returns recent account-owned assistant actions, newest first, across the site and MCP. status filters ongoing, completed or failed work; limit bounds the result. The ledger records actions rather than conversation text.",
+      "description": "Returns recent account-owned assistant actions, newest first, across the site and MCP. status filters ongoing, completed or failed work; limit bounds the result. The record holds actions rather than conversation text.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1999,7 +2003,7 @@
       "annotations": {
         "title": "Set several preferences from one sentence",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -2075,7 +2079,7 @@
     {
       "name": "reopen_application_materials",
       "title": "Edit materials for a safe retry",
-      "description": "Opens a new editable material revision only after the API establishes that a failed application cannot still submit. Access is restricted to the Applications rollout cohort admitted by the API.",
+      "description": "Opens a new editable material revision for a failed or skipped application, and only once Dreamwork has established that the earlier attempt cannot still submit. Any other application is refused.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2083,7 +2087,7 @@
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-            "description": "Failed application ID"
+            "description": "Failed or skipped application ID"
           }
         },
         "required": [
@@ -2173,7 +2177,7 @@
     {
       "name": "reply_to_recruiter",
       "title": "Reply to a recruiter",
-      "description": "Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. Sending requires explicit consent and an unambiguous thread; otherwise the result is a confirmation hold containing the draft. Sent mail cannot be recalled. Threads whose ids begin with inbound: cannot receive replies through this endpoint.",
+      "description": "Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. Sending requires explicit consent and an unambiguous thread; otherwise the result is a confirmation hold containing the draft. Sent mail cannot be recalled. Threads whose ids begin with inbound: cannot receive replies through this tool.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2736,7 +2740,7 @@
     {
       "name": "set_autopilot",
       "title": "Turn Autopilot on or off",
-      "description": "Sets Autopilot on or off after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval. Off stops sending and keeps the minimum match, resume choice and queue; paused is accepted and means off. Daily and monthly limits remain determined by the plan.",
+      "description": "Sets Autopilot on or off after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval, unless Review first is on in Settings, which holds each pick for the person to send. Off stops sending and keeps the minimum match, resume choice and queue; paused is accepted and means off. Daily and monthly limits remain determined by the plan.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2914,7 +2918,7 @@
     {
       "name": "update_application_materials",
       "title": "Update application materials",
-      "description": "Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision. Access is restricted to the Applications rollout cohort admitted by the API. Locked or conflicting revisions are refused.",
+      "description": "Updates an application's resume selection, resume or cover-letter contents or inclusion. expectedRevision is the revision get_application_materials last returned; a locked application or a revision that has since changed is refused.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2927,9 +2931,11 @@
           "expectedRevision": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 9007199254740991
+            "maximum": 9007199254740991,
+            "description": "The revision get_application_materials last returned"
           },
           "resumeVariant": {
+            "description": "Which resume this application sends",
             "type": "string",
             "enum": [
               "default",
@@ -2937,14 +2943,17 @@
             ]
           },
           "resumeHtml": {
+            "description": "New resume HTML for the variant resumeVariant names, or for the selected variant when resumeVariant is omitted",
             "type": "string",
             "maxLength": 100000
           },
           "coverLetter": {
+            "description": "New cover-letter text",
             "type": "string",
             "maxLength": 50000
           },
           "coverLetterIncluded": {
+            "description": "Whether this application sends a cover letter",
             "type": "boolean"
           }
         },
@@ -3000,7 +3009,7 @@
       "annotations": {
         "title": "Change Autopilot settings",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": false
       }
     },
@@ -3330,22 +3339,26 @@
     {
       "name": "update_profile",
       "title": "Update profile",
-      "description": "Updates profile text fields such as name, email, phone and tone. Identity-bound changes require profileIdentityVersion matching the current profile snapshot. This endpoint does not upload a resume file.",
+      "description": "Updates profile text fields such as name, email, phone and tone. Identity-bound changes require profileIdentityVersion matching the current profile snapshot. It does not upload a resume file; upload_resume does.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "name": {
+            "description": "Full name used on applications",
             "type": "string"
           },
           "email": {
+            "description": "Contact email",
             "type": "string",
             "format": "email",
             "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           },
           "phone": {
+            "description": "Contact phone number",
             "type": "string"
           },
           "tonePreferences": {
+            "description": "How generated writing should sound, in the person's words",
             "type": "string"
           },
           "coverLettersEnabled": {

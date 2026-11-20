@@ -621,7 +621,7 @@ export const profileActions = [
         "Parses a sentence describing job preferences, applies supported fields and returns applied values and unparsed fragments. Compensation and seniority are not set by this parser and remain unparsed.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
 

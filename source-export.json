@@ -1,8 +1,7 @@
 {
-  "version": "1.10.0",
-  "sourceCommit": "f2cd3bc7d9b2199e3cabc81f60a413c14cbb5869",
+  "version": "1.11.0",
+  "sourceCommit": "976330ca14fa01eca100a65dae8919a813df5d28",
   "managedFiles": [
-    ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
     ".github/workflows/ci.yml",
     ".github/workflows/publish-registry.yml",
@@ -120,6 +119,11 @@
     "packages/assistant-contracts/src/receipt.ts",
     "packages/assistant-contracts/src/registry.ts",
     "packages/assistant-contracts/src/turn.ts",
+    "plugins/dreamwork/.claude-plugin/plugin.json",
+    "plugins/dreamwork/.mcp.json",
+    "plugins/dreamwork/LICENSE",
+    "plugins/dreamwork/README.md",
+    "plugins/dreamwork/icon-400.png",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
     "scripts/ci-test-shards.mjs",

@@ -521,7 +521,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "generate_resume",
-    purpose: "Generates a tailored resume for the specified account-owned application and returns its result.",
+    purpose: "Generates a tailored resume for the specified account-owned application and returns it.",
     calls: "POST /applications/:id/resume",
   },
   {
@@ -581,7 +581,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_job",
-    purpose: "Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict.",
+    purpose: "Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict.",
     calls: "POST /assistant/actions/get_job",
   },
   {
@@ -636,7 +636,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_task",
-    purpose: "Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times.",
+    purpose: "Returns one entry from the account's record of assistant actions by taskId, including action, status, receipt, error code, and creation and update times.",
     calls: "POST /assistant/actions/get_task",
   },
   {
@@ -726,7 +726,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "reopen_application_materials",
-    purpose: "Opens a new editable material revision only after the API establishes that a failed application cannot still submit.",
+    purpose: "Opens a new editable material revision for a failed or skipped application, and only once Dreamwork has established that the earlier attempt cannot still submit.",
     calls: "POST /applications/:id/materials/reopen",
   },
   {
@@ -786,7 +786,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "update_application_materials",
-    purpose: "Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision.",
+    purpose: "Updates an application's resume selection, resume or cover-letter contents or inclusion.",
     calls: "PATCH /applications/:id/materials",
   },
   {

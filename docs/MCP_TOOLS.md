@@ -14,7 +14,7 @@ Dreamwork exposes an MCP tool catalog that lets AI agents operate a person's job
 
 **Key scopes:** a key carries a subset of `read`, `write`, `apply`, and `send`, chosen when you generate it in Dreamwork.
 
-`apply` and `send` gate every path, not just the MCP tools. A key without `apply` cannot submit an application, cancel one that is still sending, or change Autopilot. Not through `apply` or `apply_to_job`, not through `POST /assistant/actions/apply`, and not by calling `POST /jobs/:id/apply`, the turbo-apply routes, or the escalation routes over plain HTTP. A key without `send` cannot mail a recruiter through `reply_to_recruiter`, `send_outreach`, `POST /outreach/send`, or `POST /conversations/:id/reply`. Direct HTTP calls to those routes answer 403 `{"error":"api_key_scope_required","scope":"apply"}` before the handler runs; assistant actions answer `action_not_authorized` with a next step naming the scope.
+`apply` and `send` gate every path, not just the MCP tools. A key without `apply` cannot submit an application, cancel one that is still sending, or change Autopilot. Not through `apply`, not through `POST /assistant/actions/apply`, and not by calling `POST /jobs/:id/apply`, the turbo-apply routes, or the escalation routes over plain HTTP. A key without `send` cannot mail a recruiter through `reply_to_recruiter`, `POST /outreach/send`, or `POST /conversations/:id/reply`. Direct HTTP calls to those routes answer 403 `{"error":"api_key_scope_required","scope":"apply"}` before the handler runs; assistant actions answer `action_not_authorized` with a next step naming the scope.
 
 `write` is the floor for changing anything at all. A key without it is refused on every request that is not a `GET`, `HEAD`, or `OPTIONS`, so a `read` key cannot rewrite a profile, generate a pack, or move the board by any path. The two exceptions are `POST /assistant/actions/:id` and `POST /assistant/turns`, which price each action individually and refuse the write ones on their own.
 
@@ -22,7 +22,7 @@ The profile page preselects all four scopes when a person creates a key, and the
 
 Key lifecycle is session-only: a key cannot read, create, or revoke keys, rotate the session token, or delete the account. Nor can it upgrade a subscription to Dreamer at list price (`POST /billing/upgrade-to-dreamer`), which charges the card on file immediately. Those answer 403 `{"error":"session_required"}`.
 
-**Confirming an irreversible act:** the five consequential actions (`apply`, `set_autopilot`, `update_autopilot_settings`, `reply_to_recruiter`, `start_checkout`) do not run on their first call. They answer `held` with a summary of exactly what would happen and a `confirmationToken`. Show the summary to the person; if they agree, call the same tool again with identical arguments plus that token. A changed argument is held again with a fresh token and a fresh summary, so a "yes" can only ever authorize the act that was described. The token lasts two minutes and is spent once.
+**Confirming an irreversible act:** the six consequential actions (`apply`, `answer_application_questions`, `set_autopilot`, `update_autopilot_settings`, `reply_to_recruiter`, `start_checkout`) do not run on their first call. They answer `held` with a summary of exactly what would happen and a `confirmationToken`. Show the summary to the person; if they agree, call the same tool again with identical arguments plus that token. A changed argument is held again with a fresh token and a fresh summary, so a "yes" can only ever authorize the act that was described. The token lasts two minutes and is spent once.
 
 ---
 
@@ -60,13 +60,13 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_career_record` | read | Returns resume-derived professional facts, document-vault metadata, person-stated preferences, writing preferences and unconfirmed hypotheses as separate fields. |
 | `get_communication_preferences` | read | Returns job-alert settings and cadence, Autopilot result-email mode, product-update consent and the all-optional-emails-off state. |
 | `get_inbox` | read | Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. |
-| `get_job` | read | Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. |
+| `get_job` | read | Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. |
 | `get_pack_status` | read | Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. |
 | `get_pipeline` | read | Returns saved and applied roles as board cards with column, application id and last-updated time. |
 | `get_preferences` | read | Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, seniority, AI-role interest and cover-letter settings. |
 | `get_resume_download_link` | read | Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. |
 | `get_resume_work_history` | read | Returns the account's main resume grouped by role: each employer with its title, location, dates and bullets as read from the file's page layout, plus achievements placed under no role and a count of bullets whose extracted-text position disagrees with the layout. |
-| `get_task` | read | Returns one account-owned assistant ledger entry by taskId, including action, status, receipt, error code, and creation and update times. |
+| `get_task` | read | Returns one entry from the account's record of assistant actions by taskId, including action, status, receipt, error code, and creation and update times. |
 | `get_unread_reminders` | read | Returns unread recruiter-message and thread counts, oldest unread time and recent message previews with thread, company, role and kind. |
 | `get_updates_since` | read | Returns new matches, board-status changes, employer-mail threads and Autopilot state since the supplied timestamp. |
 | `get_usage` | read | Returns packs and applications used today, the account's limit for each and the next reset time. |
@@ -104,7 +104,7 @@ Tools that call a product route directly, with no registry action behind them. T
 | `add_jobs` | `POST /jobs` | Adds a job to the account's private pipeline using title, company and optional description, URL, contact email and application method. |
 | `browse_listings` | `GET /listings` | Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. |
 | `generate_outreach` | `POST /outreach/generate` | Generates a personalized outreach-email draft for the specified contact and job. |
-| `generate_resume` | `POST /applications/:id/resume` | Generates a tailored resume for the specified account-owned application and returns its result. |
+| `generate_resume` | `POST /applications/:id/resume` | Generates a tailored resume for the specified account-owned application and returns it. |
 | `get_application_materials` | `GET /applications/:id/pack` | Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. |
 | `get_generated_resumes` | `GET /applications/:id/resumes` | Returns tailored resumes generated for the specified account-owned application. |
 | `get_listing` | `GET /listings/:id` | Returns full details of a platform job listing identified by id. |
@@ -116,9 +116,9 @@ Tools that call a product route directly, with no registry action behind them. T
 | `get_upgrade_link` | `GET /public/billing/upgrade-link` | Returns a browser link to checkout for the requested Pro or Dreamer plan and optional billing interval or promo code. |
 | `list_contacts` | `GET /contacts` | Returns the account's saved recruiter and referrer contacts, optionally filtered by company. |
 | `list_interviews` | `GET /interviews` | Returns all interviews detected for the account, including role, company, time and platform when known. |
-| `reopen_application_materials` | `POST /applications/:id/materials/reopen` | Opens a new editable material revision only after the API establishes that a failed application cannot still submit. |
+| `reopen_application_materials` | `POST /applications/:id/materials/reopen` | Opens a new editable material revision for a failed or skipped application, and only once Dreamwork has established that the earlier attempt cannot still submit. |
 | `submit_feedback` | `POST /public/mcp/feedback` | Sends the Dreamwork team a report about a tool on this server that got in the way: an error, a refused input, a confusing or incomplete result, or a missing capability. |
-| `update_application_materials` | `PATCH /applications/:id/materials` | Updates an application's resume selection, resume or cover-letter contents or inclusion at the expected optimistic revision. |
+| `update_application_materials` | `PATCH /applications/:id/materials` | Updates an application's resume selection, resume or cover-letter contents or inclusion. |
 | `update_profile` | `PUT /profile` | Updates profile text fields such as name, email, phone and tone. |
 | `upload_resume` | `POST /profile/resume` | Uploads original resume-file bytes encoded as base64 with PDF, DOCX, TXT, MD, PNG, JPG, JPEG or WEBP format and the current profileIdentityVersion. |
 
@@ -211,7 +211,7 @@ curl -X POST -H "Authorization: Bearer $DREAMWORK_API_KEY" \
 
 ### Expected Result
 
-`apply_to_job` returns updated application state. Depending on the candidate profile, job data, and application requirements, that state may be submitted, pack-ready, in progress, or waiting for candidate review.
+`apply` returns updated application state. Depending on the candidate profile, job data, and application requirements, that state may be submitted, pack-ready, in progress, or waiting for candidate review.
 
 ### Troubleshooting
 
@@ -219,4 +219,3 @@ curl -X POST -H "Authorization: Bearer $DREAMWORK_API_KEY" \
 - **"Profile not found"** - Complete your Dreamwork profile and add resume context before applying.
 - **Review state returned** - Dreamwork needs candidate input before it can proceed. Resolve the review item in Dreamwork, then retry.
 - **Timeout** - Some application workflows take longer or require human review. Check the saved job status before retrying.
-- **"AI decided not to apply"** - The role did not pass the current readiness or fit checks. Review the job details and candidate preferences.

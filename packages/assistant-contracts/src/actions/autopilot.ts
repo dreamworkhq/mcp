@@ -72,7 +72,7 @@ export const autopilotActions = [
         "Changes the minimum Matches score from 50 to 97, with null restoring 70, the default-versus-tailored resume choice, or whether roles whose posted pay tops out below the profile's minimum salary are skipped. Explicit consent is required. Changes apply to waiting applications and are rechecked before submission. This does not enable or resume Autopilot, recall sent applications or retry stopped applications.",
       readOnlyHint: false,
       openWorldHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
     },
   }),
   defineAction({
@@ -139,7 +139,7 @@ export const autopilotActions = [
     mcp: {
       expose: true,
       description:
-        "Sets Autopilot on or off after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval. Off stops sending and keeps the minimum match, resume choice and queue; paused is accepted and means off. Daily and monthly limits remain determined by the plan.",
+        "Sets Autopilot on or off after explicit consent. On authorizes recurring real employer submissions under the account holder's name without per-application approval, unless Review first is on in Settings, which holds each pick for the person to send. Off stops sending and keeps the minimum match, resume choice and queue; paused is accepted and means off. Daily and monthly limits remain determined by the plan.",
       readOnlyHint: false,
       openWorldHint: true,
       destructiveHint: true,

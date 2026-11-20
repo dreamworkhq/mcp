@@ -262,7 +262,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        `Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. A page holds ${MATCH_PAGE_SIZE_DEFAULT} jobs by default and limit accepts up to ${MATCH_PAGE_SIZE_MAX}; the next page is the previous nextCursor, which keeps the page size it was issued with. addedAfter supports overlapping discovery windows because listings can become servable after first discovery. notes describe applied filters and coverage.`,
+        `Returns the account's ranked live match pool with job id, its Dreamwork page url, title, company, location, remote terms, salary, dates, match percent and saved/applied state. Filters narrow that pool; nextCursor continues a page with identical filters, and null ends the walk. A page holds ${MATCH_PAGE_SIZE_DEFAULT} jobs by default and limit accepts up to ${MATCH_PAGE_SIZE_MAX}; the next page is the previous nextCursor, which keeps the page size it was issued with. addedAfter supports overlapping discovery windows because a listing can become available some time after Dreamwork first sees it. notes describe applied filters and coverage.`,
       readOnlyHint: true,
       openWorldHint: false,
     },
@@ -312,7 +312,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        "Returns one saved or corpus role by id with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no matcher explanation is stored.",
+        "Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no match explanation is stored.",
       readOnlyHint: true,
       openWorldHint: false,
     },

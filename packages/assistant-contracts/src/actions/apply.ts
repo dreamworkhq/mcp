@@ -70,7 +70,7 @@ export const applyActions = [
     mcp: {
       expose: true,
       description:
-        "Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. Sending requires explicit consent and an unambiguous thread; otherwise the result is a confirmation hold containing the draft. Sent mail cannot be recalled. Threads whose ids begin with inbound: cannot receive replies through this endpoint.",
+        "Sends the supplied reply text to one existing recruiter conversation under the account holder's identity. Sending requires explicit consent and an unambiguous thread; otherwise the result is a confirmation hold containing the draft. Sent mail cannot be recalled. Threads whose ids begin with inbound: cannot receive replies through this tool.",
       readOnlyHint: false,
       openWorldHint: true,
       destructiveHint: true,
