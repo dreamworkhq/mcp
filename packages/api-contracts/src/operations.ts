@@ -1162,6 +1162,11 @@ export const operations: readonly OperationDescriptor[] = [
         description: "The job, application, profile, or materials are not safe to prepare.",
         schema: errorResponseSchema,
       },
+      "429": {
+        description:
+          "The Free daily pack allowance is spent (`daily_pack_limit`, with `limit` and `used`); the saved job stays saved.",
+        schema: errorResponseSchema,
+      },
       "503": {
         description: "The durable pack enqueue could not be established.",
         schema: errorResponseSchema,
