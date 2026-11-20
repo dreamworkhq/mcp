@@ -8,7 +8,11 @@ import {
   subscriptionTierSchema,
   uuidString,
 } from "./common.js";
-import { applyNowTrialOfferSchema, planPriceCurrencySchema } from "./billing.js";
+import {
+  applyNowTrialOfferSchema,
+  gateLayoutArmSchema,
+  planPriceCurrencySchema,
+} from "./billing.js";
 import { meProfileSchema } from "./profile.js";
 
 export const onboardingGateSchema = responseComponent(
@@ -108,6 +112,9 @@ export const meUserSchema = responseComponent(
     // The currency this account's Pro card and checkout are priced in: euros
     // for a new subscriber in Europe, dollars for everyone else.
     proPriceCurrency: planPriceCurrencySchema,
+    // The account's arm of the gate layout test, or null while the test is
+    // off. The web lays the gate out by it and reports it on the gate's events.
+    gateLayoutArm: gateLayoutArmSchema.nullable(),
   }),
   {
     id: "MeUser",
