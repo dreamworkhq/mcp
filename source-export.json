@@ -1,6 +1,6 @@
 {
   "version": "1.10.0",
-  "sourceCommit": "f9ede932bb8c4cee2e9a8b42a542180b912d03d3",
+  "sourceCommit": "f2cd3bc7d9b2199e3cabc81f60a413c14cbb5869",
   "managedFiles": [
     ".claude-plugin/plugin.json",
     ".cursor-plugin/plugin.json",
