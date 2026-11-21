@@ -191,15 +191,91 @@ export type MatchOutline = {
   skills: string[];
 };
 
+/**
+ * What one line of a profile note says: what the person wants next, why they
+ * would move, what they will not do, or work their resume cannot list.
+ */
+export type MatchNoteKind = "want" | "reason" | "limit" | "work";
+
+/** One approved line, in the third person, at most 160 characters. */
+export type MatchNoteLine = { kind: MatchNoteKind; text: string };
+
+/** The lines a person saved (at most six), and when. */
+export type MatchProfileNote = { lines: MatchNoteLine[]; updatedAt: string };
+
+/** The note as the person sees it in Match. */
+export type MatchMeNote = MatchProfileNote & {
+  /** Exactly what a company's card shows under "In their words"; empty when nothing would show. */
+  onCard: string[];
+  /** The note is old enough that the person is asked whether it is still true. */
+  confirmDue: boolean;
+};
+
+/**
+ * The things a person can tap as "won't do" in setup. The API holds each
+ * one's chip label and note line (`engine/match/profile-note.ts`) and sends
+ * them with the suggestions, so this union is the one list.
+ */
+export type MatchWontDoKey =
+  | "relocation"
+  | "on_call"
+  | "agencies"
+  | "crypto"
+  | "travel"
+  | "contract"
+  | "early_stage"
+  | "big_company";
+
+/**
+ * A guess read from the resume, for the person to confirm with one tap.
+ * `role` becomes a `want` line; `setting` sets the work-setting term and a
+ * `want` line; `pay` sets only the private pay floor, never a line.
+ */
+export type MatchNoteGuess =
+  | { key: "role"; title: string }
+  | { key: "setting"; setting: MatchWorkSetting }
+  | { key: "pay"; payFloor: number };
+
+/** `GET /match/me/note/suggestions`: guesses for what is not answered yet, and the won't-do chips. */
+export type MatchNoteSuggestions = {
+  guesses: MatchNoteGuess[];
+  wontDo: Array<{ key: MatchWontDoKey; label: string; line: MatchNoteLine }>;
+  /** The resume identity version these guesses came from, passed back on `PUT /match/me/note`. */
+  profileIdentityVersion?: number;
+};
+
+/** `POST /match/me/note/distill`: the one free-text line, read into note lines. */
+export type MatchDistillNoteRequest = { text: string };
+
+/** Lines as they would be saved, and exactly what a company's card would show from them. */
+export type MatchNoteDraft = { lines: MatchNoteLine[]; onCard: string[] };
+
+/** `PUT /match/me/note` and `POST /match/me/note/preview`. */
+export type MatchSaveNoteRequest = {
+  lines: MatchNoteLine[];
+  /**
+   * Optional profile identity version from `MatchMe` or `MatchNoteSuggestions`.
+   * When set, `PUT /match/me/note` and `POST /match/me/note/preview` reject
+   * with 409 if the account has moved to a different resume identity.
+   */
+  expectedProfileIdentityVersion?: number;
+};
+
 export type MatchMe = {
   email: string;
   /** The resume is read and the person can be matched. */
   resumeReady: boolean;
+  /** Positive version of the current resume identity, or null when no profile exists or a reset is in progress. */
+  profileIdentityVersion: number | null;
   readOut: MatchReadOut | null;
   terms: MatchTerms;
   setupCompletedAt: string | null;
   idChecked: boolean;
   outline: MatchOutline | null;
+  /** The profile note is on (`MATCH_PROFILE_CHAT_ENABLED`). */
+  noteEnabled: boolean;
+  /** Null when the note is off or none is saved. */
+  note: MatchMeNote | null;
 };
 
 export type MatchUpdateTermsRequest = Partial<MatchTerms>;
