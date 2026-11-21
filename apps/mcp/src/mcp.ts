@@ -1279,7 +1279,7 @@ export function createMcpServer(
   registerDreamworkTool("browse_listings", {
     title: "Browse job listings",
     description:
-      `Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. Anonymous browsing is supported. ${BROWSE_PAGING_HINT} An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because a listing can become available some time after Dreamwork first sees it. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.`,
+      `Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, startup, internship and posting or discovery age. Anonymous browsing is supported. ${BROWSE_PAGING_HINT} An unsorted cursor walk is stable and uncapped; sorted walks stop at 1,000. nextCursor requires identical filters and sort; null ends the walk. addedAfter supports overlapping discovery windows because a listing can become available some time after Dreamwork first sees it. Each listing's url is its Dreamwork page; sourceUrl is the employer's direct posting. Pay filters use whole annual US dollars and match posted bands reaching the bound, rather than guaranteed pay.`,
     annotations: { readOnlyHint: true, openWorldHint: false },
     inputSchema: browseListingsInputSchema,
     outputSchema: browseListingsOutputSchema,

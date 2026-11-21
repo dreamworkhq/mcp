@@ -461,7 +461,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "browse_listings",
-    purpose: "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age.",
+    purpose: "Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, startup, internship and posting or discovery age.",
     calls: "GET /listings",
   },
   {

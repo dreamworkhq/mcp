@@ -409,6 +409,36 @@ test("browse_listings reads a function by its label or its slug", async () => {
   assert.equal(paths.length, 2);
 });
 
+test("browse_listings sends the startup filter and keys the cursor on it", async () => {
+  const inventoryPage = {
+    listings: [PUBLIC_LISTING],
+    nextCursor: "api-cursor-1",
+    appliedLocation: null,
+    locationFilter: null,
+  };
+  const { results, paths } = await browseSequence([
+    { args: { startup: true }, body: inventoryPage },
+    { args: {}, body: inventoryPage },
+  ]);
+  const startups = results[0]!.structuredContent as {
+    nextCursor: string;
+    appliedFilters: Record<string, unknown>;
+  };
+  assert.equal(results[0]!.isError, undefined, firstText(results[0]!));
+  assert.equal(startups.appliedFilters.startup, true);
+  assert.equal(new URLSearchParams(paths[0]).get("startup"), "true");
+  assert.equal(new URLSearchParams(paths[1]).has("startup"), false);
+
+  const everything = results[1]!.structuredContent as { nextCursor: string };
+  const crossed = await browseSequence([
+    { args: { startup: true, cursor: everything.nextCursor } },
+    { args: { cursor: startups.nextCursor } },
+  ]);
+  assert.equal(crossed.results[0]!.isError, true);
+  assert.equal(crossed.results[1]!.isError, true);
+  assert.equal(crossed.paths.length, 0);
+});
+
 test("browse_listings refuses a filter the route could not apply", async () => {
   const { results, paths } = await browseSequence([
     {

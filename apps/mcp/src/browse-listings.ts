@@ -139,6 +139,12 @@ export const browseListingsInputSchema = z.object({
     .optional()
     .describe("Internships, co-ops, and apprenticeships only."),
   aiRole: z.boolean().optional().describe("AI-focused roles only."),
+  startup: z
+    .boolean()
+    .optional()
+    .describe(
+      "Only jobs from the job boards of startups at Pre-Seed through Series C.",
+    ),
   postedWithinDays: z
     .int()
     .min(1)
@@ -234,6 +240,7 @@ const appliedBrowseFilters = z
     location: appliedLocationFilterSchema,
     internship: z.literal(true),
     aiRole: z.literal(true),
+    startup: z.literal(true),
     postedWithinDays: z.int(),
     minSalary: z.int(),
     maxSalary: z.int(),
@@ -288,6 +295,9 @@ interface BrowseSearch {
   location: string | null;
   internship: boolean;
   aiRole: boolean;
+  // Present only when set: the cursor digest covers this object, so a key
+  // added to every search would refuse cursors issued before it existed.
+  startup?: true;
   postedWithinDays: number | null;
   minSalaryK: number | null;
   maxSalaryK: number | null;
@@ -346,6 +356,7 @@ export function normalizeBrowseSearch(
       location: args.location?.trim() || null,
       internship: args.internship === true,
       aiRole: args.aiRole === true,
+      ...(args.startup === true ? { startup: true as const } : {}),
       postedWithinDays: args.postedWithinDays ?? null,
       minSalaryK,
       maxSalaryK,
@@ -457,6 +468,7 @@ export function browseRequest(
   if (search.location) params.set("location", search.location);
   if (search.internship) params.set("internship", "true");
   if (search.aiRole) params.set("aiRole", "true");
+  if (search.startup) params.set("startup", "true");
   if (search.postedWithinDays != null) {
     params.set("postedWithin", String(search.postedWithinDays));
   }
@@ -529,6 +541,7 @@ function appliedFilters(
   if (location) applied.location = location;
   if (search.internship) applied.internship = true;
   if (search.aiRole) applied.aiRole = true;
+  if (search.startup) applied.startup = true;
   if (search.postedWithinDays != null) {
     applied.postedWithinDays = search.postedWithinDays;
   }

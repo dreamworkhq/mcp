@@ -102,7 +102,7 @@ Tools that call a product route directly, with no registry action behind them. T
 |------|-------|--------------|
 | `add_contact` | `POST /contacts` | Adds a recruiter or referrer contact to the account using the supplied contact details. |
 | `add_jobs` | `POST /jobs` | Adds a job to the account's private pipeline using title, company and optional description, URL, contact email and application method. |
-| `browse_listings` | `GET /listings` | Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, internship and posting or discovery age. |
+| `browse_listings` | `GET /listings` | Returns indexed listings filtered by title or company keywords, function, seniority, work setting, location, pay, benefits, industry, AI role, startup, internship and posting or discovery age. |
 | `generate_outreach` | `POST /outreach/generate` | Generates a personalized outreach-email draft for the specified contact and job. |
 | `generate_resume` | `POST /applications/:id/resume` | Generates a tailored resume for the specified account-owned application and returns it. |
 | `get_application_materials` | `GET /applications/:id/pack` | Returns one account-owned application's resume and cover-letter materials plus draft employer-question answers with IDs, labels, current text and input type. |
