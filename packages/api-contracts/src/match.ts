@@ -212,6 +212,11 @@ export type MatchAsk = {
   payMin: number | null;
   payMax: number | null;
   workSetting: MatchWorkSetting | null;
+  /**
+   * Why the company asked, as one positive line to the person, written once
+   * when the ask was sent. Null when it could not be written.
+   */
+  reason: string | null;
   /** Every question the job asks with a yes. */
   questions: MatchQuestion[];
   /**
