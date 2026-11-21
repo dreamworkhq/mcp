@@ -17,6 +17,7 @@ import {
   jobLandingLinksResponseSchema,
   roleLocationLandingResponseSchema,
 } from "./schemas/job-landings.js";
+import { startupJobsResearchResponseSchema } from "./schemas/startup-research.js";
 import {
   applicationMaterialsResponseSchema,
   applicationMaterialsUpdateRequestSchema,
@@ -2216,6 +2217,22 @@ export const operations: readonly OperationDescriptor[] = [
       "200": { description: "The page data.", schema: roleLocationLandingResponseSchema },
       "404": { description: "Unknown slug, or no open roles in the snapshot.", schema: errorResponseSchema },
       "503": { description: "No landing snapshot has been computed yet.", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "getStartupJobsResearch",
+    method: "get",
+    path: "/research/startups",
+    fastifyPath: "/research/startups",
+    summary: "Read open jobs at startups",
+    tags: ["research"],
+    auth: "public",
+    contractMaturity: "handler-verified",
+    parameters: [
+      { name: "limit", in: "query", required: false, description: "Listings to return: 50 by default and at most. A value that is not a positive integer is read as the default.", schema: z.coerce.number().int().positive() },
+    ],
+    responses: {
+      "200": { description: "Counts over every startup listing, and its newest rows with at most three per job board.", schema: startupJobsResearchResponseSchema },
     },
   },
   {

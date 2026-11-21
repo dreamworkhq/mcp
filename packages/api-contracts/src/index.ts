@@ -56,6 +56,10 @@ export {
   roleLocationLandingResponseSchema,
 } from "./schemas/job-landings.js";
 export {
+  startupFundingStageSchema,
+  startupJobsResearchResponseSchema,
+} from "./schemas/startup-research.js";
+export {
   applicationMaterialsResponseSchema,
   applicationMaterialsSchema,
   applicationMaterialsUpdateRequestSchema,
@@ -233,6 +237,12 @@ export type JobLandingIndex = z.infer<typeof jobLandingIndexResponseSchema>;
 export type RoleLocationLanding = z.infer<typeof roleLocationLandingResponseSchema>;
 export type CompanyRoleLanding = z.infer<typeof companyRoleLandingResponseSchema>;
 export type JobLandingLinks = z.infer<typeof jobLandingLinksResponseSchema>;
+import type {
+  startupFundingStageSchema,
+  startupJobsResearchResponseSchema,
+} from "./schemas/startup-research.js";
+export type StartupFundingStage = z.infer<typeof startupFundingStageSchema>;
+export type StartupJobsResearch = z.infer<typeof startupJobsResearchResponseSchema>;
 import type {
   jobListResponseSchema,
   jobRecordSchema,
