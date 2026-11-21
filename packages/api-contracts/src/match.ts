@@ -47,6 +47,8 @@ export type MatchSearchProgress = {
 export type MatchCandidate = RecruitCandidate & {
   /** This job's ask to the person, if one was sent. */
   ask: MatchAskStatus | null;
+  /** The person used Dreamwork in the last 30 days, read when the page loads. Unknown reads as false. */
+  activeThisMonth: boolean;
 };
 
 /** `yes` counts the people waiting on the company's Meet or Pass; `meeting` those it chose to meet. */
