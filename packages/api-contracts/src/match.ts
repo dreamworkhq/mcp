@@ -72,6 +72,8 @@ export type MatchJob = {
   answerByDays: number;
   /** True once the first asks went out; in V1 nothing is charged (`docs/MATCH.md`, "Money"). */
   paid: boolean;
+  /** True once a hirer confirmed the role is approved and budgeted (`docs/MATCH.md`). */
+  budgetApproved: boolean;
   createdAt: string;
   search: MatchSearchProgress | null;
   candidates: MatchCandidate[];
@@ -106,7 +108,11 @@ export type MatchUpdateJobRequest = {
   status?: Exclude<MatchJobStatus, "draft">;
 };
 
-export type MatchSendAsksRequest = { candidateIds: string[] };
+/**
+ * `approvedBudget` confirms the role is approved and budgeted. A job with no
+ * confirmation on record refuses a send without it: 422 `budget_not_approved`.
+ */
+export type MatchSendAsksRequest = { candidateIds: string[]; approvedBudget?: true };
 
 /** A person who said yes, named to this company only. */
 export type MatchPerson = {
