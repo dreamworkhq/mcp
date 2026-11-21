@@ -56,6 +56,12 @@ export type MatchCandidate = RecruitCandidate & {
   ask: MatchAskStatus | null;
   /** The person used Dreamwork in the last 30 days, read when the page loads. Unknown reads as false. */
   activeThisMonth: boolean;
+  /**
+   * One or two lines from the person's own profile note (what they want,
+   * work their resume does not list), scrubbed like the rest of the card.
+   * Absent when they have none to show.
+   */
+  inTheirWords?: string[];
 };
 
 /**
