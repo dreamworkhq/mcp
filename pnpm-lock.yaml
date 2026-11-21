@@ -12,10 +12,10 @@ importers:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: 1.32.0
-        version: 1.32.0(zod@4.4.2)
+        version: 1.32.0(zod@4.6.6)
       zod:
-        specifier: 4.4.2
-        version: 4.4.2
+        specifier: 4.6.6
+        version: 4.6.6
     devDependencies:
       '@jobless/api-contracts':
         specifier: workspace:*
@@ -39,14 +39,14 @@ importers:
   packages/api-contracts:
     dependencies:
       zod:
-        specifier: 4.4.2
-        version: 4.4.2
+        specifier: 4.6.6
+        version: 4.6.6
 
   packages/assistant-contracts:
     dependencies:
       zod:
-        specifier: 4.4.2
-        version: 4.4.2
+        specifier: 4.6.6
+        version: 4.6.6
 
 packages:
 
@@ -599,8 +599,8 @@ packages:
     peerDependencies:
       zod: ^3.25.28 || ^4
 
-  zod@4.4.2:
-    resolution: {integrity: sha512-IynmDyxsEsb9RKzO3J9+4SxXnl2FTFSzNBaKKaMV6tsSk0rw9gYw9gs+JFCq/qk2LCZ78KDwyj+Z289TijSkUw==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
 snapshots:
 
@@ -686,7 +686,7 @@ snapshots:
     dependencies:
       hono: 4.13.19
 
-  '@modelcontextprotocol/sdk@1.32.0(zod@4.4.2)':
+  '@modelcontextprotocol/sdk@1.32.0(zod@4.6.6)':
     dependencies:
       '@hono/node-server': 2.1.9(hono@4.13.19)
       ajv: 8.20.0
@@ -703,8 +703,8 @@ snapshots:
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.4.2
-      zod-to-json-schema: 3.25.2(zod@4.4.2)
+      zod: 4.6.6
+      zod-to-json-schema: 3.25.2(zod@4.6.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -1121,8 +1121,8 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  zod-to-json-schema@3.25.2(zod@4.4.2):
+  zod-to-json-schema@3.25.2(zod@4.6.6):
     dependencies:
-      zod: 4.4.2
+      zod: 4.6.6
 
-  zod@4.4.2: {}
+  zod@4.6.6: {}
