@@ -425,6 +425,8 @@ export type {
   MatchJobStatus,
   MatchJobSummary,
   MatchMe,
+  MatchMoveStageRequest,
+  MatchOutcomeStage,
   MatchOutline,
   MatchPeopleResponse,
   MatchPerson,

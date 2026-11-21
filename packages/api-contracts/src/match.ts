@@ -15,11 +15,18 @@ export type MatchWorkSetting = "remote" | "hybrid" | "onsite";
 export type MatchJobStatus = "draft" | "live" | "closed";
 
 /**
+ * Where a person stands with the company after it chose to meet them. The
+ * company moves an ask among these (`docs/MATCH.md`, "Outcome stages").
+ */
+export type MatchOutcomeStage = "meeting" | "interviewing" | "offer" | "hired" | "declined";
+
+/**
  * Where one ask stands. `asked` waits on the person; `yes` and `no` are their
  * answer; `expired` is no answer by the deadline. After a yes the company
- * moves it to `meeting` or `passed`.
+ * moves it to `meeting` or `passed`, and from `meeting` through the outcome
+ * stages.
  */
-export type MatchAskStatus = "asked" | "yes" | "no" | "expired" | "meeting" | "passed";
+export type MatchAskStatus = "asked" | "yes" | "no" | "expired" | "passed" | MatchOutcomeStage;
 
 /** A company's question, asked only after a yes. At most three per job. */
 export type MatchQuestion = { key: string; text: string };
@@ -51,7 +58,10 @@ export type MatchCandidate = RecruitCandidate & {
   activeThisMonth: boolean;
 };
 
-/** `yes` counts the people waiting on the company's Meet or Pass; `meeting` those it chose to meet. */
+/**
+ * `yes` counts the people waiting on the company's Meet or Pass; `meeting`
+ * those it chose to meet, at any outcome stage since.
+ */
 export type MatchJobCounts = { asked: number; yes: number; meeting: number; newFits: number };
 
 export type MatchJob = {
@@ -132,11 +142,27 @@ export type MatchPerson = {
   cameToYou: boolean;
   answers: Array<{ question: string; answer: string }>;
   answeredAt: string;
+  /** Yearly base pay in USD the company offered; set at `offer` and kept through `hired` or `declined`. */
+  offerBase: number | null;
+  /** The outcome stages the company may move this person to now; empty before Meet. */
+  moves: MatchOutcomeStage[];
 };
 
 export type MatchPeopleResponse = { people: MatchPerson[] };
 
 export type MatchPersonDecisionRequest = { decision: "meet" | "pass" };
+
+/**
+ * Moves a person the company met to another outcome stage. `from` is the
+ * stage the page showed; the move lands only if the ask is still there.
+ * `offer` carries the yearly base pay in USD; correcting an existing offer
+ * (`from: "offer"`) also carries `expectedOfferBase`, the amount the page
+ * showed, so a stale tab cannot overwrite a newer amount.
+ */
+export type MatchMoveStageRequest =
+  | { from: MatchOutcomeStage; to: Exclude<MatchOutcomeStage, "offer"> }
+  | { from: Exclude<MatchOutcomeStage, "offer">; to: "offer"; offerBase: number }
+  | { from: "offer"; to: "offer"; offerBase: number; expectedOfferBase: number | null };
 
 /** The terms a person sets once. The pay floor is never shown to a company. */
 export type MatchTerms = {
@@ -201,6 +227,8 @@ export type MatchAsk = {
   companyReplyBy: string | null;
   /** Set once the company chose to meet. */
   bookingUrl: string | null;
+  /** Yearly base pay in USD the company offered, once it recorded an offer. */
+  offerBase: number | null;
 };
 
 export type MatchAsksResponse = { asks: MatchAsk[] };
