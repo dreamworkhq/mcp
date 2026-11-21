@@ -140,6 +140,8 @@ export const applicationSubmittedAnswerCaptureSchema = responseComponent(
         value: z.string().nullable(),
         values: z.array(z.string()).nullable(),
         omitted: z.enum(["restricted"]).nullable(),
+        basis: z.enum(["stated", "resume", "derived", "estimate", "decline", "pack"]).nullable(),
+        source: z.string().nullable(),
       }),
     ),
   }),

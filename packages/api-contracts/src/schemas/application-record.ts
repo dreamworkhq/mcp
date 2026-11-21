@@ -27,6 +27,15 @@ export const applicationSubmittedAnswerSchema = responseComponent(
      * restricted-data policy. The question is still listed.
      */
     omitted: z.enum(["restricted"]).nullable(),
+    /**
+     * The rung our agent's Answerer took: stated, resume, derived, estimate,
+     * decline, or pack when its model gave no answer and the generated pack
+     * answer was typed. Null when the Answerer did not decide this answer: a saved answer,
+     * a typed fact, or anything the planner typed.
+     */
+    basis: z.enum(["stated", "resume", "derived", "estimate", "decline", "pack"]).nullable(),
+    /** What the Answerer said the answer rests on, in under 12 words. */
+    source: z.string().nullable(),
   }),
   {
     id: "ApplicationSubmittedAnswer",

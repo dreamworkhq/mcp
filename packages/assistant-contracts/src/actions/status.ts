@@ -122,6 +122,16 @@ export const statusActions = [
               values: z.array(z.string()).nullable(),
               /** `restricted` when the value is withheld by policy. */
               omitted: z.string().nullable(),
+              /**
+               * How the agent decided this answer: stated, resume, derived,
+               * estimate, decline or pack. `estimate` means no source said it: a
+               * plausible answer for this career. `pack` means the generated
+               * application-pack answer was typed. Null when a saved answer or a
+               * typed fact was used. Older APIs omit it.
+               */
+              basis: z.string().nullable().default(null),
+              /** What the answer rests on, in under 12 words. */
+              source: z.string().nullable().default(null),
             }),
           ),
         })
