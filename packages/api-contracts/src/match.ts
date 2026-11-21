@@ -215,3 +215,15 @@ export type MatchIdCheckResponse =
   | { status: "verified" }
   | { status: "not_required" }
   | { status: "started"; url: string };
+
+/** A question the company asks of every card on a job's page, answered from each resume. */
+export type MatchPoolQuestionRequest = { question: string };
+
+/**
+ * One card's answer. `line` restates only what the resume says, scrubbed like
+ * the card, or is exactly "Not in their profile" with relevance 0.
+ */
+export type MatchPoolAnswer = { candidateId: string; relevance: number; line: string };
+
+/** The page's cards in the order the question ranks them, most relevant first. */
+export type MatchPoolQuestionResponse = { question: string; answers: MatchPoolAnswer[] };
