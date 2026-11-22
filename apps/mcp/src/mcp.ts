@@ -39,7 +39,11 @@ import {
 import { registerWorkflowPrompts, sentenceList } from "./prompts.js";
 import { MCP_SERVER_VERSION } from "./version.js";
 import { OPENAI_WITHHELD_TOOLS, openAiToolOutputSchema, openAiToolResult } from "./openai.js";
-export { openAiMcpResource, MCP_RESOURCE_HEADER } from "@jobless/assistant-contracts";
+export {
+  HOSTED_GUEST_ID_PREFIX,
+  MCP_RESOURCE_HEADER,
+  openAiMcpResource,
+} from "@jobless/assistant-contracts";
 
 const applicationMaterialsReadResponseSchema = applicationMaterialsResponseSchema.extend({
   answers: z.array(packDraftAnswerSchema).optional(),

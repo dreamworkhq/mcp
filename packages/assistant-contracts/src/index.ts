@@ -35,7 +35,12 @@ export {
 } from "./action.js";
 
 export { ASSISTANT_EVENTS, type AssistantEventName } from "./events.js";
-export { openAiMcpResource, mcpResourceAllowed, MCP_RESOURCE_HEADER } from "./mcp-resources.js";
+export {
+  HOSTED_GUEST_ID_PREFIX,
+  MCP_RESOURCE_HEADER,
+  mcpResourceAllowed,
+  openAiMcpResource,
+} from "./mcp-resources.js";
 
 export {
   RECOMMENDATION_FETCH_BUFFER,
