@@ -220,7 +220,7 @@ A scope gates every path to the act, direct routes included.
 request that is not a `GET`, `HEAD`, or `OPTIONS`, so a read key cannot rewrite
 a profile or move the board by calling the route directly. A key without
 `apply` is refused at `apply`, and also at
-`POST /jobs/:id/apply`, the turbo-apply routes and the escalation routes. A key
+`POST /jobs/:id/apply` and the turbo-apply routes. A key
 without `send` is refused at `reply_to_recruiter`, at
 `POST /outreach/send` and at `POST /conversations/:id/reply`. A direct call
 answers 403 with
