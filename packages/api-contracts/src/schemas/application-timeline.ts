@@ -21,7 +21,6 @@ export const applicationTimelineEventKindSchema = sharedComponent(
     "rejection",
     "interview_detected",
     "interview_marked",
-    "escalation",
     "failed",
     "cancelled",
   ]),
@@ -38,13 +37,12 @@ export const applicationTimelineEventSourceSchema = sharedComponent(
     "application",
     "inbound_email",
     "interview",
-    "escalation",
     "pipeline",
   ]),
   {
     id: "ApplicationTimelineEventSource",
     description:
-      "The record that produced the event: the applications row, a user-facing inbound email, the interview row, an escalation, or the pipeline projection.",
+      "The record that produced the event: the applications row, a user-facing inbound email, the interview row, or the pipeline projection.",
   },
 );
 

@@ -420,7 +420,7 @@ export const operations: readonly OperationDescriptor[] = [
     fastifyPath: "/applications/:id/timeline",
     summary: "Read one application's truthful status timeline",
     description:
-      "Ordered facts for a single owned application, each backed by a stored row: apply/submission columns, user-facing inbound mail, the interview row, and escalations. `submitted` reads the status vocabulary and `received` reads employer_confirmed_at; neither is inferred from the other. The coverage block states how far the read could see.",
+      "Ordered facts for a single owned application, each backed by a stored row: apply/submission columns, user-facing inbound mail, and the interview row. `submitted` reads the status vocabulary and `received` reads employer_confirmed_at; neither is inferred from the other. The coverage block states how far the read could see.",
     tags: ["applications"],
     auth: "user-session",
     contractMaturity: "consumer-adopted",
@@ -2242,7 +2242,7 @@ export const operations: readonly OperationDescriptor[] = [
     fastifyPath: "/stats",
     summary: "Get aggregate pipeline stats",
     description:
-      "Dashboard aggregates across jobs, applications, escalations, and outreach for the current user.",
+      "Dashboard aggregates across jobs, applications, and outreach for the current user. The escalations block is always zero.",
     tags: ["stats"],
     auth: "user-session",
     contractMaturity: "handler-verified",

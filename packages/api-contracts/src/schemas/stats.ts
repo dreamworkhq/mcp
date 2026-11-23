@@ -2,8 +2,9 @@ import { z } from "zod";
 import { responseComponent } from "../registry.js";
 
 /**
- * `GET /stats` aggregates. Every block is a single-row SQL aggregate, so the
- * blocks are always present.
+ * `GET /stats` aggregates. `jobs`, `applications` and `outreach` are each a
+ * single-row SQL aggregate and `escalations` is a constant, so the blocks are
+ * always present.
  */
 
 export const statsJobsSchema = responseComponent(
@@ -54,7 +55,8 @@ export const statsEscalationsSchema = responseComponent(
   }),
   {
     id: "StatsEscalations",
-    description: "Escalation counts for the user's applications.",
+    description:
+      "Always zero. The key stays because released MCP clients require it.",
   },
 );
 
@@ -81,6 +83,7 @@ export const statsResponseSchema = responseComponent(
   }),
   {
     id: "StatsResponse",
-    description: "Aggregate pipeline stats across jobs, applications, escalations, and outreach.",
+    description:
+      "Aggregate pipeline stats across jobs, applications, and outreach. The escalations block is always zero.",
   },
 );

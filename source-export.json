@@ -1,6 +1,6 @@
 {
   "version": "1.11.0",
-  "sourceCommit": "0c40d0999f623585fcb86563ab234cef1b86a7c6",
+  "sourceCommit": "a9b4ad2f44abcb414a4ef2dc8a607c43f6975f20",
   "managedFiles": [
     ".cursor-plugin/plugin.json",
     ".github/workflows/ci.yml",
