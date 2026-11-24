@@ -145,12 +145,6 @@ export const planPriceCurrencySchema = z
   .enum(["usd", "eur"])
   .describe("Lowercase ISO code of the currency Pro is priced in.");
 
-export const gateLayoutArmSchema = z
-  .enum(["side_by_side", "stacked"])
-  .describe(
-    "The account's arm of the gate layout test: two plan cards side by side, or the phone layout at every width.",
-  );
-
 export const publicProPriceCurrencySchema = responseComponent(
   z.strictObject({ currency: planPriceCurrencySchema }),
   {
