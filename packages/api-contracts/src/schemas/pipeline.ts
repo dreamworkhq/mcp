@@ -179,6 +179,11 @@ export const pipelineItemSchema = responseComponent(
     pipelineUpdatedAt: isoDateTime,
     employerConfirmedAt: isoDateTime.nullable(),
     /**
+     * True when the card is Not selected because an employer's rejection
+     * email moved it there, not the person. Any later board move clears it.
+     */
+    closedByRejectionEmail: z.boolean(),
+    /**
      * Engine that actually submitted, and only once the row is applied: an
      * in-flight fallback stays null so no client can render a premature
      * "submitted by" claim. Other strategies and legacy rows are null rather
