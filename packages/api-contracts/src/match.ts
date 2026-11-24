@@ -302,6 +302,12 @@ export type MatchAsk = {
   payMax: number | null;
   workSetting: MatchWorkSetting | null;
   /**
+   * After a yes, the company holds this pay until this time, 60 days from
+   * the yes. Null before a yes, after a pass, once the time has passed, or
+   * when the ask holds no pay.
+   */
+  payLockedUntil: string | null;
+  /**
    * Why the company asked, as one positive line to the person, written once
    * when the ask was sent. Null when it could not be written.
    */
