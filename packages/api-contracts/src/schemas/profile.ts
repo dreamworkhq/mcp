@@ -765,6 +765,18 @@ export const profilePreferencesSchema = responseComponent(
     excludedCompanies: z.array(z.string()).optional(),
     address: z.string().optional(),
     mailingAddress: mailingAddressSchema.optional(),
+    /**
+     * The person's own split of `name` into the first and last name forms
+     * ask for. Counts only while `first + " " + last` is the current name
+     * (`applicantNameParts` in @jobless/shared); null when cleared.
+     */
+    nameParts: z
+      .object({
+        first: z.string().min(1).max(100),
+        last: z.string().max(100),
+      })
+      .nullable()
+      .optional(),
     applicationProfile: applicationProfileSchema.optional(),
     // Absent means enabled. Only an explicit false turns cover-letter
     // generation and every automated cover-letter use off — see
