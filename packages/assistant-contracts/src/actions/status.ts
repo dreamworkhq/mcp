@@ -112,6 +112,8 @@ export const statusActions = [
           attemptId: z.string(),
           capturedAt: z.string(),
           coverLetterDelivered: z.boolean().nullable(),
+          /** False when the employer's form lacked any cover-letter field. Older APIs omit it. */
+          coverLetterFieldSeen: z.boolean().nullable().default(null),
           items: z.array(
             z.object({
               id: z.string(),

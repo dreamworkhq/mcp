@@ -64,12 +64,17 @@ export const applicationSubmittedRecordSchema = responseComponent(
       /**
        * submitted: the engine confirmed it entered or uploaded the letter.
        * included: the frozen letter was part of what the proven attempt sent,
-       * without engine confirmation the form accepted it. omitted: the user
-       * turned it off. prepared: a letter exists without proof of sending.
+       * without engine confirmation the form accepted it. no_field: the
+       * proven attempt's form lacked any cover-letter control, so the letter was
+       * not sent. not_attached: the form had one and it was left empty.
+       * omitted: the user turned it off. prepared: a letter exists without
+       * proof of sending.
        */
       provenance: z.enum([
         "submitted",
         "included",
+        "no_field",
+        "not_attached",
         "omitted",
         "prepared",
         "unavailable",

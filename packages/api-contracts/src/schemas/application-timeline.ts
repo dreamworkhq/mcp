@@ -127,6 +127,8 @@ export const applicationSubmittedAnswerCaptureSchema = responseComponent(
     attemptId: z.string(),
     capturedAt: isoDateTime,
     coverLetterDelivered: z.boolean().nullable(),
+    /** False when the form lacked any cover-letter control; null on captures that predate the key. */
+    coverLetterFieldSeen: z.boolean().nullable(),
     items: z.array(
       z.object({
         // Stable field identity within the form — the same `id` the
