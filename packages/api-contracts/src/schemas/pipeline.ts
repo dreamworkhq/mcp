@@ -141,6 +141,27 @@ export const applicationSubmissionSummarySchema = responseComponent(
 );
 
 /**
+ * A listing's pay after the public salary verifier
+ * (`apps/api/src/engine/public-salary-policy.ts`): the posting's own pay or an
+ * accepted Dreamwork estimate, in the unit `currency` and `period` name.
+ */
+export const publicSalarySchema = responseComponent(
+  z.object({
+    min: z.number(),
+    max: z.number(),
+    currency: z.string(),
+    period: z.string(),
+    isOte: z.boolean(),
+    disclosure: z.enum(["source_provided", "estimate"]),
+  }),
+  {
+    id: "PublicSalary",
+    description:
+      "Verified listing pay in its own currency and period; `disclosure` says whether the posting stated it or Dreamwork estimated it.",
+  },
+);
+
+/**
  * One deduplicated pipeline card from `GET /pipeline`. `listingId` and
  * `sourceUrl` are omitted (not null) when unknown — the handler assigns
  * `undefined`, which JSON serialization drops.
@@ -171,6 +192,14 @@ export const pipelineItemSchema = responseComponent(
     salaryPeriod: z.string().nullable(),
     salaryLocalMin: z.number().nullable(),
     salaryLocalMax: z.number().nullable(),
+    /** The backing listing's verified pay; null for a private import or unverified pay. */
+    publicSalary: publicSalarySchema.nullable(),
+    /**
+     * Only with `include=matchPercent`: the match percent the person sees,
+     * 1–100, from the feed's score for the listing or the role's stored
+     * scores. Null when nothing scored it.
+     */
+    matchPercent: z.int().min(1).max(100).nullable().optional(),
     location: z.string().nullable(),
     locationType: z.string().nullable(),
     benefits: pipelineBenefitsSchema,
@@ -323,4 +352,8 @@ export const pipelineQuery = {
     .max(500)
     .default(200)
     .describe("Maximum cards returned (coerced from the query string)."),
+  include: z
+    .literal("matchPercent")
+    .optional()
+    .describe("`matchPercent` adds each card's match percent, scored against the feed."),
 };

@@ -22,6 +22,17 @@ const pipelineCard = z.object({
   listingId: z.string().nullable(),
   title: z.string(),
   company: z.string(),
+  /**
+   * The match percent the person sees for the role, 1–100, the same number
+   * `get_job` reports. Null when nothing scored it; never 0.
+   */
+  matchPercent: z.int().min(1).max(100).nullable(),
+  /**
+   * The pay as one line, e.g. "USD 150,000 – 180,000 per year", marked
+   * "(estimated)" when it is Dreamwork's estimate. Null when no pay could be
+   * checked.
+   */
+  salary: z.string().nullable(),
   status: pipelineStatusSchema,
   appliedAt: z.string().nullable(),
   updatedAt: z.string(),
@@ -42,7 +53,7 @@ export const pipelineActions = [
     risk: "read",
     title: "Read the pipeline",
     description:
-      "Read every role the person has saved, applied to, or heard back about, as board cards with their column, the application id when one exists, and when each was last updated. Use it for \"what have I applied to\", \"what is still sending\", and to find the application id another action needs. Report `total` as the number and list `cards`, which `complete` says may be only the first `limit`; `counts` covers every column whatever the filter. The column is display state — `get_application_status` is the only action that checks whether an employer received, read or replied to anything.",
+      "Read every role the person has saved, applied to, or heard back about, as board cards with their column, match percent, pay, the application id when one exists, and when each was last updated. Use it for \"what have I applied to\", \"what is still sending\", and to find the application id another action needs. Report `total` as the number and list `cards`, which `complete` says may be only the first `limit`; `counts` covers every column whatever the filter. The column is display state — `get_application_status` is the only action that checks whether an employer received, read or replied to anything.",
     input: z.object({
       status: pipelineStatusSchema.optional(),
       limit: z
@@ -79,7 +90,7 @@ export const pipelineActions = [
     mcp: {
       expose: true,
       description:
-        `Returns saved and applied roles as board cards with column, application id and last-updated time. total and counts cover all matching records; complete identifies whether cards are truncated by limit. limit defaults to ${PIPELINE_LIMIT_DEFAULT} cards and accepts up to ${PIPELINE_LIMIT_MAX}; there is no next page, so when complete is false narrow the read with status. Column values describe board state and do not establish employer receipt or response.`,
+        `Returns saved and applied roles as board cards with column, match percent, salary, application id and last-updated time. total and counts cover all matching records; complete identifies whether cards are truncated by limit. limit defaults to ${PIPELINE_LIMIT_DEFAULT} cards and accepts up to ${PIPELINE_LIMIT_MAX}; there is no next page, so when complete is false narrow the read with status. Column values describe board state and do not establish employer receipt or response.`,
       readOnlyHint: true,
       openWorldHint: false,
     },

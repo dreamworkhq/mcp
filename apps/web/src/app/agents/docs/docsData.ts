@@ -601,7 +601,7 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "get_pipeline",
-    purpose: "Returns saved and applied roles as board cards with column, application id and last-updated time.",
+    purpose: "Returns saved and applied roles as board cards with column, match percent, salary, application id and last-updated time.",
     calls: "POST /assistant/actions/get_pipeline",
   },
   {

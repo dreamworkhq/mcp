@@ -62,7 +62,7 @@ A `consequential` action does not run on the first call. It answers `held` with 
 | `get_inbox` | read | Returns recruiter conversations ordered by newest activity, including role, message kind, unread state and whether the employer wrote last. |
 | `get_job` | read | Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. |
 | `get_pack_status` | read | Returns material preparation state for the specified application, board-card or listing ids: queued, generating, ready, partial, failed, stale, not_started or not_found. |
-| `get_pipeline` | read | Returns saved and applied roles as board cards with column, application id and last-updated time. |
+| `get_pipeline` | read | Returns saved and applied roles as board cards with column, match percent, salary, application id and last-updated time. |
 | `get_preferences` | read | Returns stated target functions, work locations and modes, relocation, pay floor, availability, deal-breakers, excluded companies, places and levels, seniority, AI-role interest and cover-letter settings. |
 | `get_resume_download_link` | read | Returns a download link for the account's main profile resume as a PDF, with its expiry, filename and MIME type. |
 | `get_resume_work_history` | read | Returns the account's main resume grouped by role: each employer with its title, location, dates and bullets as read from the file's page layout, plus achievements placed under no role and a count of bullets whose extracted-text position disagrees with the layout. |

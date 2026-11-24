@@ -283,7 +283,7 @@ export const matchesActions = [
     output: z.object({
       job: jobSummary.extend({
         /**
-         * The match percent the person sees, 0–100, null when nothing scored
+         * The match percent the person sees, 1–100, null when nothing scored
          * the role. The feed's score through the feed's display curve; for a
          * saved role the feed no longer scores, the percent its card shows,
          * then the tailored resume's estimate. `score` stays the raw feed
@@ -320,7 +320,7 @@ export const matchesActions = [
     mcp: {
       expose: true,
       description:
-        "Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. matchPercent is the 0–100 match the person sees; score is the raw feed score, null for a role the feed no longer scores. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no match explanation is stored.",
+        "Returns one role by id, whether saved or only listed, with full description, company, location and remote terms, salary, posted date, match score, saved state, board column, application id, material readiness and work-eligibility verdict. url is the Dreamwork listing page; sourceUrl is the employer's direct posting. matchPercent is the 1–100 match the person sees; score is the raw feed score, null for a role the feed no longer scores. eligible is true for an unrestricted role or a confirmed allowed country, false for a high-confidence restriction excluding confirmed countries, and null when eligibility is unknown. Only false blocks applying or Autopilot: null means eligibility is not yet known, so proceed with applying — the application itself surfaces any real restriction. whyItMatches may be empty when no match explanation is stored.",
       readOnlyHint: true,
       openWorldHint: false,
     },

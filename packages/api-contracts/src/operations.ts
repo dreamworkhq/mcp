@@ -1690,6 +1690,14 @@ export const operations: readonly OperationDescriptor[] = [
         description: "Maximum cards returned, 1-500. Defaults to 200.",
         schema: pipelineQuery.limit,
       },
+      {
+        name: "include",
+        in: "query",
+        required: false,
+        description:
+          "Set to `matchPercent` to include each card's match percent, scored against the feed.",
+        schema: pipelineQuery.include,
+      },
     ],
     responses: {
       "200": {
