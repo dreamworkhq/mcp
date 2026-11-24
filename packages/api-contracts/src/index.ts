@@ -417,6 +417,7 @@ export type {
   MatchCandidate,
   MatchCompany,
   MatchCreateJobRequest,
+  MatchDemoRequest,
   MatchDistillNoteRequest,
   MatchHirerSession,
   MatchIdCheckResponse,

@@ -41,7 +41,14 @@ export type MatchCompany = {
 export type MatchHirerSession = {
   email: string;
   company: MatchCompany | null;
+  /** The caller is acting as `company` for a demo: its new jobs never reach anyone. */
+  demo: boolean;
+  /** Staff and admins may demo as any company. */
+  canDemo: boolean;
 };
+
+/** A company's domain, such as `acme.com`, for a staff demo. */
+export type MatchDemoRequest = { domain: string };
 
 export type MatchSearchProgress = {
   status: RecruitSearchStatus;
