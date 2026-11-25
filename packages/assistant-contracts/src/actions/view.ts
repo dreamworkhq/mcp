@@ -154,6 +154,14 @@ export const setFiltersInput = z.object({
 });
 
 /**
+ * Mirrors `RESUME_LINE_INSTRUCTION_MAX_CHARS` in `@jobless/shared`, which the
+ * reword route enforces on `request`. This package stays zod-only, so the
+ * value is copied rather than imported, and must equal that constant: a cap
+ * above the route's would let a request validate here and 400 there.
+ */
+const RESUME_LINE_REQUEST_MAX_CHARS = 400;
+
+/**
  * Actions that change what the person sees rather than what the records say.
  * They execute in the attached browser session and nowhere else, which is why
  * every one of them is withheld from MCP as `needs_attached_browser`: an MCP
@@ -167,13 +175,13 @@ export const viewActions = [
     risk: "cheap",
     title: "Open a page",
     description:
-      "Move the person's browser to one of the product's named pages, from the fixed set in `destination` — you do not type a URL. Use it when the answer is on a page they are not on: \"take me to my matches\", \"show me my applications\", \"open that role\". `job` and `pack` each open one listing or its materials and need `params.listingId`.",
+      "Move the person's browser to one of the product's named pages, from the fixed set in `destination` — you do not type a URL. Use it when the answer is on a page they are not on: \"take me to my matches\", \"show me my applications\", \"open that role\". `job` and `pack` each open one listing or its materials and need `params.listingId`. `resume_rewriter` is the page that rewrites their main resume line by line and shows every change: open it for \"improve my resume\", \"fix my resume\", \"clean up my resume\".",
     input: z.object({
       destination: openDestinationSchema.describe("Which named page to open."),
       params: openParamsSchema
         .optional()
         .describe(
-          "`job` and `pack` take `listingId`. `profile` takes `section` — `about` (About you), `preferences` (Job preferences), `resume` (Resume), `vault` (Work vault), `ai` (AI writing), `communications` (Notifications, the email settings), `agent` (MCP), `billing` (Subscription), `help` (Help & Feedback) — and, on `about` only, `field`, which opens one row in its editor: `fullName`, `phone`, `currentCompany`, `address`, `linkedin`, `github`, `portfolio`, `website`, `twitter`. The visible label works as a section too (\"notifications\" opens `communications`); a section that is neither is refused, not landed on About. Email is not editable there.",
+          "`job` and `pack` take `listingId`. `profile` takes `section` — `about` (About you), `preferences` (Job preferences), `resume` (Resume), `vault` (Work vault), `ai` (AI writing), `communications` (Notifications, the email settings), `agent` (MCP), `billing` (Subscription), `help` (Help & Feedback) — and, on `about` only, `field`, which opens one row in its editor: `fullName`, `phone`, `currentCompany`, `address`, `linkedin`, `github`, `portfolio`, `website`, `twitter`. The visible label works as a section too (\"notifications\" opens `communications`); a section that is neither is refused, not landed on About. Email is not editable there. `resume_rewriter` takes `start: \"1\"`, which begins a rewrite as the page opens; send it when they asked for the rewrite itself, and leave it out when they only want to look at one already there.",
         ),
     }),
     output: z.object({ route: z.string() }),
@@ -401,5 +409,39 @@ export const viewActions = [
     invalidates: [],
     event: ASSISTANT_EVENTS.ACTION_COMPLETED,
     mcp: { expose: false, reason: "needs_attached_browser" },
+  }),
+
+  defineAction({
+    id: "reword_resume_line",
+    kind: "view",
+    risk: "cheap",
+    title: "Reword one line of the resume",
+    description:
+      "Change one line of the resume on the resume rewriter page, the way the person just described: \"make that one shorter\", \"say I led the team of four\", \"start it with the result\". Pass what they said as `request`, in their words, including any fact they stated; a fact they said aloud may go on the line, and nothing else new will. The new wording lands on their screen with the change marked and is theirs to undo there. Nothing is saved to their profile; only their own Save does that. `line` is a line number from `get_resume_rewrite`, or the selection's `paragraphIndex` when they have a line open and say \"this one\". It works only while the rewriter page is open with a rewrite on it: `open` it first, and wait for the rewrite to be there. A refusal is an answer, not an error: `adds_fact` means the new wording needed a number or name the resume and the request do not contain, so ask them for it and try again with it in `request`; `no_change` means the line already reads that way; `saved` means the rewrite was already saved and nothing on it can change.",
+    input: z.object({
+      line: z
+        .int()
+        .min(0)
+        .describe(
+          "The line's number, from `get_resume_rewrite` or the selection's `paragraphIndex`.",
+        ),
+      request: z
+        .string()
+        .min(1)
+        .max(RESUME_LINE_REQUEST_MAX_CHARS)
+        .describe(
+          "What to change about the line, in the person's own words, with any fact they stated.",
+        ),
+    }),
+    output: z.object({ line: z.int(), reworded: z.boolean() }),
+    authorization: { mode: "none" },
+    anchor: { route: "/resume-editor", target: "resume.line:<id>" },
+    invalidates: [],
+    event: ASSISTANT_EVENTS.ACTION_COMPLETED,
+    mcp: {
+      expose: false,
+      reason: "needs_attached_browser",
+      note: "The rewording lands in the review the person has open and is saved only by their own Save.",
+    },
   }),
 ] as const;

@@ -37,6 +37,14 @@ import {
 } from "./schemas/application-needs-info.js";
 import { applicationTimelineResponseSchema } from "./schemas/application-timeline.js";
 import {
+  resumeImprovementApplyRequestSchema,
+  resumeImprovementRefusalSchema,
+  resumeImprovementResponseSchema,
+  resumeImprovementUndoRequestSchema,
+  resumeLineRewordRequestSchema,
+  resumeLineRewordResponseSchema,
+} from "./schemas/resume-improvement.js";
+import {
   assistantHypothesisConfirmResponseSchema,
   assistantHypothesisCreateRequestSchema,
   assistantHypothesisCreateResponseSchema,
@@ -1994,6 +2002,241 @@ export const operations: readonly OperationDescriptor[] = [
         description:
           "The work vault is full, a profile identity reset is in progress, or the write conflicted.",
         schema: errorResponseSchema,
+      },
+    },
+  },
+  {
+    operationId: "getResumeImprovement",
+    method: "get",
+    path: "/profile/resume/improvement",
+    fastifyPath: "/profile/resume/improvement",
+    summary: "Read the improvement held for the default resume",
+    description:
+      "What the resume improver holds for the profile's resume as it is now: nothing, a proposal that has not been saved, or the improvement in use. Runs no model.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    responses: {
+      "200": {
+        description: "The current state, with the improvement when there is one.",
+        schema: resumeImprovementResponseSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No profile configured for this user.",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description: "A profile identity reset is in progress.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "proposeResumeImprovement",
+    method: "post",
+    path: "/profile/resume/improvement",
+    fastifyPath: "/profile/resume/improvement",
+    summary: "Improve the default resume",
+    description:
+      "Lay the default resume out for the PDF renderer and reword the lines that need it, returning the result for review. Nothing is saved to the resume. A resume that has already been through the improver returns its stored proposal without running a model. Every rewrite is checked in code and dropped if it adds or removes a number, a named term, a claim or emphasis.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    responses: {
+      "200": {
+        description: "The proposal for the resume as it is now.",
+        schema: resumeImprovementResponseSchema,
+      },
+      "400": {
+        description: "The profile has no resume.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No profile configured for this user.",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description: "The resume or the profile identity changed while the run was in progress.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "422": {
+        description: "The resume is too short to be a resume, or too long to improve in one pass.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "429": {
+        description: "The daily limit of new improvements is used up.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "502": {
+        description: "The run could not be verified against the resume and was thrown away. The resume is unchanged.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "applyResumeImprovement",
+    method: "post",
+    path: "/profile/resume/improvement/{id}/apply",
+    fastifyPath: "/profile/resume/improvement/:id/apply",
+    summary: "Save an improvement as the default resume",
+    description:
+      "Replace the default resume with the improved text, keeping the person's own wording on every rejected line, and re-render its PDF. The resume it replaces is kept so the change can be undone.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned improvement id.",
+        schema: uuidString,
+      },
+    ],
+    requestBody: {
+      description: "The lines to leave as written, and the identity fence.",
+      contentType: "application/json",
+      required: true,
+      schema: resumeImprovementApplyRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The improvement, now the resume in use.",
+        schema: resumeImprovementResponseSchema,
+      },
+      "400": {
+        description: "Body validation failed, or every change was rejected.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No improvement with that id belongs to the caller.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "409": {
+        description: "The resume is no longer the one this improvement was made from, or the profile identity changed.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "rewordResumeImprovementLine",
+    method: "post",
+    path: "/profile/resume/improvement/{id}/lines/{line}/reword",
+    fastifyPath: "/profile/resume/improvement/:id/lines/:line/reword",
+    summary: "Reword one line the way the person asks",
+    description:
+      "Reword a single line of an improvement following a typed or spoken request. A fact the person states in the request may be added; anything the model adds on its own is refused in code. Nothing is stored.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned improvement id.",
+        schema: uuidString,
+      },
+      {
+        name: "line",
+        in: "path",
+        required: true,
+        description: "The line's ordinal among the resume's non-blank lines.",
+        schema: z.number().int().nonnegative(),
+      },
+    ],
+    requestBody: {
+      description: "The request and the line as it reads now.",
+      contentType: "application/json",
+      required: true,
+      schema: resumeLineRewordRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The rewording, or why none was used.",
+        schema: resumeLineRewordResponseSchema,
+      },
+      "400": {
+        description: "Body validation failed, or the resume has no such line.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No improvement with that id belongs to the caller.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "502": {
+        description: "The model call failed. Nothing was changed.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "undoResumeImprovement",
+    method: "post",
+    path: "/profile/resume/improvement/{id}/undo",
+    fastifyPath: "/profile/resume/improvement/:id/undo",
+    summary: "Put back the resume an improvement replaced",
+    description:
+      "Restore the resume text and file that were in place before the improvement was applied. Refused once the resume has changed again.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned improvement id.",
+        schema: uuidString,
+      },
+    ],
+    requestBody: {
+      description: "The identity fence.",
+      contentType: "application/json",
+      required: true,
+      schema: resumeImprovementUndoRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The earlier resume is back, and the improvement is a proposal again.",
+        schema: resumeImprovementResponseSchema,
+      },
+      "400": {
+        description: "Body validation failed.",
+        schema: validationErrorResponseSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No improvement with that id belongs to the caller.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "409": {
+        description: "The improvement is not the resume in use, or the profile identity changed.",
+        schema: resumeImprovementRefusalSchema,
       },
     },
   },

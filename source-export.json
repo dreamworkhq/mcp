@@ -1,6 +1,6 @@
 {
   "version": "1.11.0",
-  "sourceCommit": "cc4a1f6108dc3ae53c22770035e5c67aa18b3e3f",
+  "sourceCommit": "d0eb68c17eae68d5915214795308653e8822e895",
   "managedFiles": [
     ".cursor-plugin/plugin.json",
     ".github/workflows/ci.yml",
@@ -83,6 +83,7 @@
     "packages/api-contracts/src/schemas/pack.ts",
     "packages/api-contracts/src/schemas/pipeline.ts",
     "packages/api-contracts/src/schemas/profile.ts",
+    "packages/api-contracts/src/schemas/resume-improvement.ts",
     "packages/api-contracts/src/schemas/startup-research.ts",
     "packages/api-contracts/src/schemas/stats.ts",
     "packages/api-contracts/src/schemas/users.ts",

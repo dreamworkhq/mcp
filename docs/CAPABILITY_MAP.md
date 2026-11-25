@@ -108,7 +108,7 @@ check only keep the map honest about the actions that do exist.
 
 ## In our app only
 
-16 capabilities the MCP catalog does not offer. Each declares why in the registry, and the compiler refuses a withheld capability that does not.
+18 capabilities the MCP catalog does not offer. Each declares why in the registry, and the compiler refuses a withheld capability that does not.
 
 | Capability | What it does | Why it is not on MCP |
 |------------|--------------|----------------------|
@@ -116,6 +116,7 @@ check only keep the map honest about the actions that do exist.
 | `draft_reply` | Write a reply into the Messages composer so the person reads it on their own screen before anything leaves. | `needs_attached_browser` |
 | `get_application_materials` | Read what one application will actually send to this employer: which resume version is selected, whether the cover letter is included, whether a send in flight has locked it, and the `revision` every write against it quotes. | `duplicate_of_mcp_tool`: the hand-written tool of this name returns the document bodies, which an agent reading them for a person needs and this twin withholds. |
 | `get_market_pulse` | Read CURRENT worldwide hiring-market context from Dreamwork's research corpus (a snapshot computed at most twice a day ago; generatedAt names it): companies tracked, open roles, roles added in the last 7 days, growing vs contracting companies, week-over-week movement, median salary, AI-role volume, plus global layoff pressure by industry and company. | `duplicate_of_mcp_tool`: apps/mcp serves the same payload as a PUBLIC (guest-capable) hand-written tool; a registry twin would add an auth wall for the same data. |
+| `get_resume_rewrite` | The rewrite Dreamwork holds for the person's main resume, as numbered lines: each line as they wrote it, what it is (`heading`, `entry` for an employer or school, `title`, `bullet`, `paragraph`), and `rewrite`, the new wording proposed for it or null when it was left alone. | `needs_attached_browser`: Reads the rewrite a person reviews on the rewriter page. The MCP path to a rewritten resume is a separate decision; see docs/RESUME_IMPROVER.md. |
 | `get_top_hiring_companies` | List the companies hiring the most right now, ranked by open roles among companies active in the last 7 days, each with hiring trend, week-over-week velocity, median pay and its page on Dreamwork. | `duplicate_of_mcp_tool`: apps/mcp serves the same payload as a PUBLIC (guest-capable) hand-written tool; a registry twin would add an auth wall for the same data. |
 | `highlight` | Mark one element on screen — a card, a row, a control, a block of a document — by its anchor, with an optional `note` beside it. | `needs_attached_browser` |
 | `open` | Move the person's browser to one of the product's named pages, from the fixed set in `destination` — you do not type a URL. | `needs_attached_browser` |
@@ -125,6 +126,7 @@ check only keep the map honest about the actions that do exist.
 | `open_thread` | Open one recruiter thread on the Messages page so its transcript is on screen. | `needs_attached_browser` |
 | `reopen_application_materials` | Start a new editable revision of an application whose send FAILED, so its materials can be changed before a retry. | `duplicate_of_mcp_tool`: the hand-written tool of this name answers with the reopened materials block rather than a receipt. |
 | `reveal_section` | Scroll one group of the Applications board into view, and with `expand: true` open what it has folded away — Applied's "Show N more", the ones that did not go through, the closed roles, Autopilot's recommendations. | `needs_attached_browser` |
+| `reword_resume_line` | Change one line of the resume on the resume rewriter page, the way the person just described: "make that one shorter", "say I led the team of four", "start it with the result". | `needs_attached_browser`: The rewording lands in the review the person has open and is saved only by their own Save. |
 | `scroll_to` | Bring an anchor into view without marking it. | `needs_attached_browser` |
 | `set_filters` | Change the Matches feed's filter tray, and show or hide the tray itself with `tray`: match quality, posted-within, work setting, location, function, seniority, internships, AI roles, pay, benefits, industry, plus the search box, the sort order, and the Matches/All jobs switch. | `needs_attached_browser` |
 | `update_application_materials` | Change what this one application will send: `resumeVariant` picks the person's own uploaded resume or the tailored one, `coverLetterIncluded` decides whether the letter goes with it. | `duplicate_of_mcp_tool`: the hand-written tool of this name also writes `resumeHtml` and `coverLetter` as free text, which nothing in this registry does. |

@@ -109,6 +109,31 @@ export {
   assistantWritingPreferencesSchema,
 } from "./schemas/assistant-memory.js";
 export {
+  resumeAdviceCodeSchema,
+  resumeAuditSchema,
+  resumeChangeCategorySchema,
+  resumeImprovementApplyRequestSchema,
+  resumeImprovementRefusalSchema,
+  resumeImprovementResponseSchema,
+  resumeImprovementSchema,
+  resumeImprovementUndoRequestSchema,
+  resumeLineKindSchema,
+  resumeLineRewordRequestSchema,
+  resumeLineRewordResponseSchema,
+} from "./schemas/resume-improvement.js";
+import type {
+  resumeImprovementApplyRequestSchema as ResumeImprovementApplyRequestSchema,
+  resumeImprovementRefusalSchema as ResumeImprovementRefusalSchema,
+  resumeImprovementResponseSchema as ResumeImprovementResponseSchema,
+  resumeImprovementSchema as ResumeImprovementSchema,
+  resumeLineRewordResponseSchema as ResumeLineRewordResponseSchema,
+} from "./schemas/resume-improvement.js";
+export type ResumeLineRewordResponse = z.infer<typeof ResumeLineRewordResponseSchema>;
+export type ResumeImprovement = z.infer<typeof ResumeImprovementSchema>;
+export type ResumeImprovementResponse = z.infer<typeof ResumeImprovementResponseSchema>;
+export type ResumeImprovementApplyRequest = z.infer<typeof ResumeImprovementApplyRequestSchema>;
+export type ResumeImprovementRefusal = z.infer<typeof ResumeImprovementRefusalSchema>;
+export {
   applicationSubmittedAnswerSchema,
   applicationSubmittedRecordSchema,
 } from "./schemas/application-record.js";

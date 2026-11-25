@@ -848,6 +848,44 @@ export const profileActions = [
     },
   }),
   defineAction({
+    id: "get_resume_rewrite",
+    kind: "data",
+    risk: "read",
+    title: "Read the resume rewrite",
+    description:
+      "The rewrite Dreamwork holds for the person's main resume, as numbered lines: each line as they wrote it, what it is (`heading`, `entry` for an employer or school, `title`, `bullet`, `paragraph`), and `rewrite`, the new wording proposed for it or null when it was left alone. Read it before `reword_resume_line`, to turn \"the second bullet under Acme\" into a `line` number, and to answer what was changed and why a line was left alone. `status` is `none` when there is no rewrite for the resume as it stands (the rewriter page starts one: `open` with destination `resume_rewriter` and `start`), `proposed` while they are reviewing one that is not saved, and `saved` once it is their resume. It reads the rewrite as proposed; choices they have made on screen and not saved are not in it.",
+    input: z.object({}),
+    output: z.object({
+      status: z
+        .enum(["none", "proposed", "saved"])
+        .describe("`none` carries no lines."),
+      lines: z.array(
+        z.object({
+          line: z.int().describe("The number `reword_resume_line` takes."),
+          kind: z.string(),
+          text: z.string().describe("The line as the person wrote it."),
+          rewrite: z
+            .string()
+            .nullable()
+            .describe("The proposed wording, or null when the line was left alone."),
+          reason: z
+            .string()
+            .nullable()
+            .describe("Why the line was reworded, when it was."),
+        }),
+      ),
+    }),
+    authorization: { mode: "none" },
+    anchor: { route: "/resume-editor", target: "resume.sheet" },
+    invalidates: [],
+    event: ASSISTANT_EVENTS.ACTION_COMPLETED,
+    mcp: {
+      expose: false,
+      reason: "needs_attached_browser",
+      note: "Reads the rewrite a person reviews on the rewriter page. The MCP path to a rewritten resume is a separate decision; see docs/RESUME_IMPROVER.md.",
+    },
+  }),
+  defineAction({
     id: "get_communication_preferences",
     kind: "data",
     risk: "read",
