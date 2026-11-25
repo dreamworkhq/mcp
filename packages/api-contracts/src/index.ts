@@ -412,8 +412,13 @@ export type {
 export type {
   MatchAnswerRequest,
   MatchAsk,
+  MatchAskSender,
   MatchAsksResponse,
   MatchAskStatus,
+  MatchAutopilot,
+  MatchAutopilotPause,
+  MatchAutopilotRules,
+  MatchAutopilotSend,
   MatchCandidate,
   MatchCompany,
   MatchCreateJobRequest,

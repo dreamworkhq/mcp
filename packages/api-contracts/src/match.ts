@@ -77,6 +77,43 @@ export type MatchCandidate = RecruitCandidate & {
  */
 export type MatchJobCounts = { asked: number; yes: number; meeting: number; newFits: number };
 
+/**
+ * A job's autopilot rules: ask anyone new on the daily run scoring at least
+ * `minScore` (70 to 95, a card's score times ten) who meets the job's terms,
+ * at most `weeklyLimit` (1 to 10) people in any seven days.
+ */
+export type MatchAutopilotRules = { enabled: boolean; minScore: number; weeklyLimit: number };
+
+/**
+ * Why an enabled autopilot sends nothing today. `switched_off` is our kill
+ * switch; `job_closed` a closed job; `needs_hand_asks` fewer than three asks
+ * sent by hand, or a yes to one of them still waiting on Meet or Pass;
+ * `yes_overdue` a yes past the company's answer-by date.
+ */
+export type MatchAutopilotPause = "switched_off" | "job_closed" | "needs_hand_asks" | "yes_overdue";
+
+/** Who sent an ask: the company by hand, or its autopilot rules. */
+export type MatchAskSender = "company" | "autopilot";
+
+/** One ask the autopilot sent, with the score and reason the card showed. */
+export type MatchAutopilotSend = {
+  askId: string;
+  candidateId: string;
+  title: string;
+  /** The card's score, out of 10. */
+  score: number;
+  reason: string;
+  status: MatchAskStatus;
+  askedAt: string;
+};
+
+export type MatchAutopilot = {
+  rules: MatchAutopilotRules | null;
+  /** Set only while the rules are enabled and nothing can be sent. */
+  paused: MatchAutopilotPause | null;
+  sent: MatchAutopilotSend[];
+};
+
 export type MatchJob = {
   id: string;
   kind: MatchWorkKind;
@@ -101,6 +138,7 @@ export type MatchJob = {
   search: MatchSearchProgress | null;
   candidates: MatchCandidate[];
   counts: MatchJobCounts;
+  autopilot: MatchAutopilot;
 };
 
 export type MatchJobSummary = {
@@ -129,6 +167,8 @@ export type MatchUpdateJobRequest = {
    * closed after its first asks went out. A draft goes live only by sending asks.
    */
   status?: Exclude<MatchJobStatus, "draft">;
+  /** Null clears the rules. */
+  autopilot?: MatchAutopilotRules | null;
 };
 
 /**
