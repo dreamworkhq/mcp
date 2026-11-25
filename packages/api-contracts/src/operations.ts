@@ -108,6 +108,9 @@ import {
   applyPreferencesUpdateRequestSchema,
   communicationPreferencesResponseSchema,
   communicationPreferencesUpdateRequestSchema,
+  phoneOptInStartRequestSchema,
+  phoneOptInVerifyRequestSchema,
+  phoneOptInResponseSchema,
   productActivityRequestSchema,
   applicationUsageResponseSchema,
   meResponseSchema,
@@ -2389,6 +2392,53 @@ export const operations: readonly OperationDescriptor[] = [
         description: "Session user no longer exists.",
         schema: errorResponseSchema,
       },
+    },
+  },
+  {
+    operationId: "clearPhoneOptIn", method: "delete",
+    path: "/users/me/phone-opt-in", fastifyPath: "/users/me/phone-opt-in",
+    summary: "Opt out of text notifications",
+    description:
+      "Clears the verified phone and the smsHighSignal preference together. The STOP reply word runs the same path.",
+    tags: ["users"], auth: "user-session", contractMaturity: "consumer-adopted",
+    responses: {
+      "200": { description: "Opted out", schema: phoneOptInResponseSchema },
+      "401": unauthorized,
+      "404": { description: "User not found", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "startPhoneOptIn", method: "post",
+    path: "/users/me/phone-opt-in/start", fastifyPath: "/users/me/phone-opt-in/start",
+    summary: "Start text-notification opt-in",
+    description:
+      "Sends a 6-digit verification code to a US/CA phone. Paid plans only; one code per user, 10-minute expiry, 1-minute resend cooldown.",
+    tags: ["users"], auth: "user-session", contractMaturity: "consumer-adopted",
+    requestBody: { description: "Phone as entered plus an optional region hint", contentType: "application/json", required: true, schema: phoneOptInStartRequestSchema },
+    responses: {
+      "200": { description: "Code sent (devCode only outside production)", schema: phoneOptInResponseSchema },
+      "400": { description: "Not a valid US/CA number", schema: errorResponseSchema },
+      "401": unauthorized,
+      "403": { description: "Text notifications require a paid plan", schema: errorResponseSchema },
+      "429": { description: "Resend cooldown", schema: errorResponseSchema },
+      "503": { description: "Text channel unavailable", schema: errorResponseSchema },
+    },
+  },
+  {
+    operationId: "verifyPhoneOptIn", method: "post",
+    path: "/users/me/phone-opt-in/verify", fastifyPath: "/users/me/phone-opt-in/verify",
+    summary: "Complete text-notification opt-in",
+    description:
+      "Consumes the code and permanently stores the verified phone plus the smsHighSignal preference. Wrong codes are rate-limited to 5 attempts per code.",
+    tags: ["users"], auth: "user-session", contractMaturity: "consumer-adopted",
+    requestBody: { description: "Phone plus the code it received", contentType: "application/json", required: true, schema: phoneOptInVerifyRequestSchema },
+    responses: {
+      "200": { description: "Opt-in complete", schema: phoneOptInResponseSchema },
+      "400": { description: "Wrong code", schema: errorResponseSchema },
+      "401": unauthorized,
+      "403": { description: "Text notifications require a paid plan", schema: errorResponseSchema },
+      "410": { description: "Code expired", schema: errorResponseSchema },
+      "503": { description: "Text channel unavailable", schema: errorResponseSchema },
     },
   },
 ];

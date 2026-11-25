@@ -479,6 +479,7 @@ export type {
 export type { AdminSupportReplyRequest } from "./schemas/admin-support.js";
 
 export { communicationPreferencesResponseSchema, communicationPreferencesUpdateRequestSchema, productActivityRequestSchema, type CommunicationPreferencesResponse, type CommunicationPreferencesUpdateRequest } from "./schemas/users.js";
+export { phoneOptInStartRequestSchema, phoneOptInVerifyRequestSchema, phoneOptInResponseSchema, type PhoneOptInStartRequest, type PhoneOptInVerifyRequest, type PhoneOptInResponse } from "./schemas/users.js";
 export { applyPreferencesSchema, applyPreferencesUpdateRequestSchema, meFreeApplicationsSchema, type ApplyPreferences, type ApplyPreferencesUpdateRequest } from "./schemas/users.js";
 export type {
   FriendInvite,

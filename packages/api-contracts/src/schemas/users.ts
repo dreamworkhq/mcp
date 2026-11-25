@@ -323,6 +323,16 @@ export const communicationPreferencesResponseSchema = responseComponent(z.object
     reason: z.enum(["eligible", "off", "inactive", "unsubscribed", "address_suppressed", "banned", "retired"]),
     resumesOnActivity: z.boolean(),
   }),
+  // Text channel (docs/SMS_IMESSAGE_CHANNEL.md). `smsOptedIn` is the resolved
+  // opt-in: true only with a verified phone AND the stored preference. Paid
+  // tiers only; free users read false and the Profile row offers the upgrade.
+  smsHighSignal: z.boolean(),
+  smsPhone: z.object({
+    e164: z.string(),
+    verifiedAt: isoDateTime,
+  }).nullable(),
+  smsEligible: z.boolean(),
+  smsChannelEnabled: z.boolean().describe("Whether the text-notification channel is enabled for opt-in on this deployment."),
 }), { id: "CommunicationPreferences", description: "Saved communication choices and effective job-alert delivery eligibility." });
 
 export const communicationPreferencesUpdateRequestSchema = requestComponent(z.strictObject({
@@ -334,5 +344,35 @@ export const communicationPreferencesUpdateRequestSchema = requestComponent(z.st
 }).refine((value) => Object.keys(value).length > 0 && (!value.allOptionalEmailsOff || Object.keys(value).length === 1), "Choose a category or turn off all optional emails"), { id: "CommunicationPreferencesUpdateRequest", description: "Updates only the supplied category, or disables every optional email. Recruiter introductions are a separate consent that the all-optional-emails switch does not change." });
 export type CommunicationPreferencesResponse = z.infer<typeof communicationPreferencesResponseSchema>;
 export type CommunicationPreferencesUpdateRequest = z.infer<typeof communicationPreferencesUpdateRequestSchema>;
+
+// The trio is its own surface, NOT a key on the generic PATCH: the text
+// channel is paid-only and consent is proven by an OTP delivery, so opting
+// in is a flow (start → code → verify), not a boolean a client can flip.
+
+export const phoneOptInStartRequestSchema = requestComponent(z.strictObject({
+  phone: z.string().min(5).max(32),
+  // Optional region hint for a national (non "+") number: the ISO country or
+  // E.164 dial code the picker selected. Never guessed server-side.
+  country: z.string().length(2).optional(),
+  dialCode: z.string().regex(/^\+\d{1,4}$/).optional(),
+}), { id: "PhoneOptInStartRequest", description: "Sends a verification code to a US/CA phone to begin text-notification opt-in." });
+
+export const phoneOptInVerifyRequestSchema = requestComponent(z.strictObject({
+  phone: z.string().min(5).max(32),
+  code: z.string().regex(/^\d{6}$/),
+}), { id: "PhoneOptInVerifyRequest", description: "Completes text-notification opt-in by proving the code the phone received." });
+
+export const phoneOptInResponseSchema = responseComponent(z.object({
+  status: z.enum(["code_sent", "verified", "removed"]),
+  // Present on verified responses: the E.164 phone saved on the account.
+  phoneE164: z.string().optional(),
+  // Present only in non-production dry-run mode (and in tests): the code the
+  // sender WOULD have delivered. Never expose in production responses.
+  devCode: z.string().nullable().optional(),
+}), { id: "PhoneOptInResponse", description: "Outcome of one text-channel opt-in step." });
+
+export type PhoneOptInStartRequest = z.infer<typeof phoneOptInStartRequestSchema>;
+export type PhoneOptInVerifyRequest = z.infer<typeof phoneOptInVerifyRequestSchema>;
+export type PhoneOptInResponse = z.infer<typeof phoneOptInResponseSchema>;
 
 export const productActivityRequestSchema = requestComponent(z.strictObject({ event: z.enum(["visit", "interaction"]) }), { id: "ProductActivityRequest", description: "A foreground visit or deliberate product interaction; the server records its own timestamp." });
