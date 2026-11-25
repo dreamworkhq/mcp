@@ -138,6 +138,11 @@ export type MatchJob = {
   search: MatchSearchProgress | null;
   candidates: MatchCandidate[];
   counts: MatchJobCounts;
+  /**
+   * Questions asked of each candidate's agent on this job, by candidate id.
+   * Null while the candidate agent is switched off.
+   */
+  agentQuestions: Record<string, MatchAgentExchange[]> | null;
   autopilot: MatchAutopilot;
 };
 
@@ -359,6 +364,8 @@ export type MatchMe = {
   setupCompletedAt: string | null;
   idChecked: boolean;
   outline: MatchOutline | null;
+  /** The candidate agent is on (`MATCH_CANDIDATE_AGENT_ENABLED`). */
+  agentEnabled: boolean;
   /** The profile note is on (`MATCH_PROFILE_CHAT_ENABLED`). */
   noteEnabled: boolean;
   /** Null when the note is off or none is saved. */
@@ -429,3 +436,44 @@ export type MatchPoolAnswer = { candidateId: string; relevance: number; line: st
 
 /** The page's cards in the order the question ranks them, most relevant first. */
 export type MatchPoolQuestionResponse = { question: string; answers: MatchPoolAnswer[] };
+
+/**
+ * Where a question asked of a person's agent stands. `agent` was answered
+ * from the profile. `pending` was not, and waits on the person, who answers
+ * it (`answered`) or dismisses it (`dismissed`).
+ */
+export type MatchAgentQuestionStatus = "agent" | "pending" | "answered" | "dismissed";
+
+/** A company's question to one anonymous candidate's agent, as the company sees it. */
+export type MatchAgentExchange = {
+  id: string;
+  question: string;
+  /**
+   * The agent's answer, or "Not in their profile". Once the person answers a
+   * pending question, an anonymous third-person summary of their reply,
+   * scrubbed like the card.
+   */
+  answer: string;
+  byPerson: boolean;
+  askedAt: string;
+};
+
+export type MatchAgentAskRequest = { question: string };
+
+/** A question asked of the person's agent, as the person sees it. */
+export type MatchAgentQuestion = {
+  id: string;
+  status: MatchAgentQuestionStatus;
+  company: MatchCompany;
+  jobTitle: string | null;
+  question: string;
+  /** What the agent told the company. */
+  agentAnswer: string;
+  /** Anonymized summary of the person's own answer to a pending question. */
+  answer: string | null;
+  askedAt: string;
+};
+
+export type MatchAgentQuestionsResponse = { questions: MatchAgentQuestion[] };
+
+export type MatchAgentAnswerRequest = { answer: string };

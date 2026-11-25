@@ -410,6 +410,12 @@ export type {
 } from "./recruit.js";
 
 export type {
+  MatchAgentAnswerRequest,
+  MatchAgentAskRequest,
+  MatchAgentExchange,
+  MatchAgentQuestion,
+  MatchAgentQuestionStatus,
+  MatchAgentQuestionsResponse,
   MatchAnswerRequest,
   MatchAsk,
   MatchAskSender,
