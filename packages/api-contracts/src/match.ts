@@ -156,7 +156,8 @@ export type MatchJobSummary = {
 
 export type MatchJobsResponse = { jobs: MatchJobSummary[] };
 
-export type MatchCreateJobRequest = { jobText: string };
+/** A job's text, or a public preview whose posting becomes the job (`docs/MATCH.md`, "Public preview"). */
+export type MatchCreateJobRequest = { jobText: string } | { previewId: string };
 
 export type MatchUpdateJobRequest = {
   payMin?: number | null;
@@ -424,6 +425,32 @@ export type MatchIdCheckResponse =
   | { status: "verified" }
   | { status: "not_required" }
   | { status: "started"; url: string };
+
+/** Where a public preview stands: `reading` fetches the posting, then the run's own stages. */
+export type MatchPreviewStage = "reading" | RecruitSearchStage;
+
+/** The anonymous card a signed-in company sees before a yes, with no vote or intro. */
+export type MatchPreviewCard = Omit<RecruitCandidate, "vote" | "intro">;
+
+export type MatchPreviewStartRequest = { url: string };
+
+export type MatchPreviewStarted = { id: string };
+
+/** A signed-out visitor's look at who fits a pasted job link. */
+export type MatchPreview = {
+  id: string;
+  status: RecruitSearchStatus;
+  stage: MatchPreviewStage;
+  scored: number;
+  poolSize: number;
+  corpusSize: number | null;
+  job: RecruitJobCard | null;
+  /** People scored a strong fit; null until the preview completes. */
+  strongCount: number | null;
+  /** The best few strong fits, at most five. */
+  candidates: MatchPreviewCard[];
+  error: string | null;
+};
 
 /** A question the company asks of every card on a job's page, answered from each resume. */
 export type MatchPoolQuestionRequest = { question: string };
