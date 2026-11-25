@@ -239,3 +239,35 @@ export const resumeLineRewordResponseSchema = responseComponent(
       "A rewording for the review screen, or why none was used. Nothing is stored; it reaches the resume only as one of the person's edits when they apply.",
   },
 );
+
+export const resumeEditorMatchSchema = responseComponent(
+  z.object({
+    listingId: uuidString,
+    title: z.string(),
+    company: z.string(),
+    companyDomain: z.string().nullable(),
+    logoUrl: z.string().nullable(),
+    location: z.string().nullable().describe("`Remote`, the listing's place, or null when it states none."),
+    score: z.number().int().describe("The match percentage the feed shows for this job."),
+  }),
+  {
+    id: "ResumeEditorMatch",
+    description: "One job the resume fits, for the resume editor's review screen.",
+  },
+);
+
+export const resumeEditorMatchesResponseSchema = responseComponent(
+  z.object({
+    status: z
+      .enum(["ready", "pending", "none"])
+      .describe(
+        "`ready`: `jobs` holds three to five jobs. `pending`: the resume is still being read; ask again shortly. `none`: there are too few good matches to show, and asking again will not change that.",
+      ),
+    jobs: z.array(resumeEditorMatchSchema),
+  }),
+  {
+    id: "ResumeEditorMatchesResponse",
+    description:
+      "A few jobs the profile's stored resume fits. Nothing is stored: the caller keeps the answer and does not ask again for the same profile.",
+  },
+);

@@ -37,6 +37,7 @@ import {
 } from "./schemas/application-needs-info.js";
 import { applicationTimelineResponseSchema } from "./schemas/application-timeline.js";
 import {
+  resumeEditorMatchesResponseSchema,
   resumeImprovementApplyRequestSchema,
   resumeImprovementRefusalSchema,
   resumeImprovementResponseSchema,
@@ -2079,6 +2080,45 @@ export const operations: readonly OperationDescriptor[] = [
       },
       "502": {
         description: "The run could not be verified against the resume and was thrown away. The resume is unchanged.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "findResumeEditorMatches",
+    method: "post",
+    path: "/profile/resume/improvement/matches",
+    fastifyPath: "/profile/resume/improvement/matches",
+    summary: "Find a few jobs the default resume fits",
+    description:
+      "Rank the nearest 50 live listings against the profile's stored resume, ask the fit judge about the top 15, and return up to five it scored well. Stores nothing and records no impressions. Returns `none` when the resume has no job function the corpus covers or fewer than three listings score well.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    responses: {
+      "200": {
+        description: "The jobs, or why there are none to show.",
+        schema: resumeEditorMatchesResponseSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No profile configured for this user.",
+        schema: errorResponseSchema,
+      },
+      "409": {
+        description: "A profile identity reset is in progress.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "429": {
+        description: "Too many match requests from this caller today.",
+        schema: errorResponseSchema,
+      },
+      "502": {
+        description: "The match could not be run.",
         schema: resumeImprovementRefusalSchema,
       },
     },
