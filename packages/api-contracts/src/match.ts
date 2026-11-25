@@ -203,6 +203,40 @@ export type MatchPerson = {
 
 export type MatchPeopleResponse = { people: MatchPerson[] };
 
+/**
+ * A count of people on the pay curve. Any count under ten is
+ * `fewer_than_10`, never a number; counts of ten or more are rounded down to
+ * multiples of ten, and curve steps advance only when at least ten more
+ * people are reached, so neither a total nor a step difference points at a
+ * small group.
+ */
+export type MatchCurveCount = { kind: "count"; people: number } | { kind: "fewer_than_10" };
+
+/** Strong fits whose pay floor is at or under `pay`, at the job's other terms. */
+export type MatchPayStep = { pay: number; people: MatchCurveCount };
+
+/**
+ * How many strong fits the job reaches at each pay level, from the current
+ * run's scores (`docs/MATCH.md`, "Pay curve"). Counts only: no floor or
+ * person is ever named.
+ */
+export type MatchPayCurve = {
+  /** Yearly USD, $10k apart, lowest first. */
+  steps: MatchPayStep[];
+  /** The pay the job is held to (its top, or its lowest when that is all it states). */
+  pay: number;
+  /** Strong fits at the job's terms as they stand. */
+  reached: MatchCurveCount;
+  /**
+   * The strong fits dropping each term would add at the job's pay; null when
+   * the job does not set that term.
+   */
+  loosen: { workSetting: MatchCurveCount | null; usWorkAuthorization: MatchCurveCount | null };
+};
+
+/** `curve` is null until the job states pay and its current run finished as a pay-curve run. */
+export type MatchPayCurveResponse = { curve: MatchPayCurve | null };
+
 export type MatchPersonDecisionRequest = { decision: "meet" | "pass" };
 
 /**
