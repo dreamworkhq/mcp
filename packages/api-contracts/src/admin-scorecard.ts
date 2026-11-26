@@ -21,6 +21,9 @@ export type ScorecardCountMetric = {
   prior7: number;
 };
 
+/** Visits sent by one AI assistant in the scorecard's headline week. */
+export type ScorecardAiEngineShare = { engine: string; visits: number };
+
 /** AI landings by complete Monday-to-Sunday UTC week, as on `/admin/traffic`. */
 export type ScorecardAiLandings = {
   /** Monday of the last complete week. */
@@ -32,6 +35,11 @@ export type ScorecardAiLandings = {
    * 2026-10-19, oldest first; empty while that read is pending or failed.
    */
   weeks: Array<{ weekStart: string; value: number }>;
+  /**
+   * Assistant mix for `weekStart` (non-zero entries sorted descending by
+   * visits); empty while the engines read is pending or failed.
+   */
+  engines: ScorecardAiEngineShare[];
 };
 
 /** A percentage per day. */
@@ -41,6 +49,34 @@ export type ScorecardRateMetric = {
   prior7Pct: number | null;
   last7Numerator: number;
   last7Denominator: number;
+};
+
+/**
+ * Lane and failure breakdown for the trailing 7-day application-success window.
+ *
+ * Lane counts partition `last7Numerator` (`appliedDreamBreaker +
+ * appliedSimpleApply + appliedManual + appliedOther === last7Numerator`).
+ * Outcome counts partition `last7Denominator` (`last7Numerator + systemFailed
+ * + needsUserAction + unknownOutcome === last7Denominator`). `userCanceled`
+ * and `skippedUnavailable` sit outside the rate denominator.
+ */
+export type ScorecardApplicationBreakdown = {
+  appliedDreamBreaker: number;
+  appliedSimpleApply: number;
+  appliedManual: number;
+  appliedOther: number;
+  systemFailed: number;
+  needsUserAction: number;
+  unknownOutcome: number;
+  userCanceled: number;
+  skippedUnavailable: number;
+  /** Whole-number percent excluding `needsUserAction` from the denominator, or null when empty. */
+  automatableSuccessRatePct: number | null;
+};
+
+/** Application success rate with its trailing 7-day lane and failure breakdown. */
+export type ScorecardApplicationSuccessMetric = ScorecardRateMetric & {
+  breakdown: ScorecardApplicationBreakdown;
 };
 
 /** An end-of-day level. MRR is in US cents. */
@@ -176,7 +212,7 @@ export type AdminScorecard = {
   mrrMoves: ScorecardMrrMove[] | null;
   payingUsers: ScorecardStockMetric | null;
   /** Each day's value is the rate over the 7 days ending that day. */
-  applicationSuccess: ScorecardRateMetric | null;
+  applicationSuccess: ScorecardApplicationSuccessMetric | null;
   /**
    * The AI traffic page's headline: AI landings in the last complete
    * Monday-to-Sunday UTC week. Null until that read lands, or when it failed.

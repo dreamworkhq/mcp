@@ -397,7 +397,10 @@ export type {
 export type {
   AdminScorecard,
   AdminScorecardCorpus,
+  ScorecardAiEngineShare,
   ScorecardAiLandings,
+  ScorecardApplicationBreakdown,
+  ScorecardApplicationSuccessMetric,
   ScorecardCorpusDay,
   ScorecardCorpusFeed,
   ScorecardCorpusLane,
