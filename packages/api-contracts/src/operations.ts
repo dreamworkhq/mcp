@@ -1494,6 +1494,14 @@ export const operations: readonly OperationDescriptor[] = [
         schema: recommendedListingsQuery.aiRole,
       },
       {
+        name: "startup",
+        in: "query",
+        required: false,
+        description:
+          "Restrict to listings from the job boards of companies at Pre-Seed through Series C.",
+        schema: recommendedListingsQuery.startup,
+      },
+      {
         name: "function",
         in: "query",
         required: false,

@@ -455,6 +455,7 @@ export const recommendedListingsQuery = {
     .describe("Page size, clamped to 1-250. Defaults to 200."),
   offset: z.int().min(0).default(0).describe("Row offset. Defaults to 0."),
   aiRole: z.string().describe(`AI roles only. ${truthy}`),
+  startup: listListingsQuery.startup,
   function: z.string().describe(csv("function_primary")),
   seniority: z.string().describe(csv("seniority chip label")),
   remote: z.string().describe(`Remote-only filter. ${truthy}`),
