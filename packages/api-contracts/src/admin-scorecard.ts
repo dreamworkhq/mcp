@@ -24,7 +24,7 @@ export type ScorecardCountMetric = {
 /** Visits sent by one AI assistant in the scorecard's headline week. */
 export type ScorecardAiEngineShare = { engine: string; visits: number };
 
-/** AI landings by complete Monday-to-Sunday UTC week, as on `/admin/traffic`. */
+/** AI landings by complete Monday-to-Sunday UTC week, as on the Growth AI traffic tab. */
 export type ScorecardAiLandings = {
   /** Monday of the last complete week. */
   weekStart: string;
