@@ -4,7 +4,8 @@ import { isoDateTime, uuidString } from "./common.js";
 
 /**
  * Wire shapes of the resume improver: `GET` and `POST
- * /profile/resume/improvement`, and its apply and undo.
+ * /profile/resume/improvement`, its apply and undo, and the questions it asks
+ * the person.
  *
  * An improvement is the profile's resume laid out line by line plus the lines
  * the improver would reword. Nothing here carries a number, a name or a claim
@@ -82,6 +83,22 @@ export const resumeAuditSchema = responseComponent(
   },
 );
 
+export const resumeQuestionScopeSchema = sharedComponent(z.enum(["line", "role"]), {
+  id: "ResumeQuestionScope",
+  description:
+    "Where an answer lands: `line` rewrites one line, `role` adds a bullet at the end of a role. Mirrors RESUME_QUESTION_SCOPES in @jobless/shared.",
+});
+
+export const resumeQuestionKindSchema = sharedComponent(z.enum(["number", "sentence"]), {
+  id: "ResumeQuestionKind",
+  description: "How a question is answered: one figure, or a sentence or two. Mirrors RESUME_QUESTION_KINDS in @jobless/shared.",
+});
+
+const lineAddition = z.object({
+  after: z.number().int().nonnegative().describe("The line the new bullet follows."),
+  text: z.string().min(1).max(600),
+});
+
 export const resumeImprovementSchema = responseComponent(
   z.object({
     id: uuidString,
@@ -111,6 +128,28 @@ export const resumeImprovementSchema = responseComponent(
       }),
     ),
     edits: z.array(lineEdit),
+    additions: z.array(lineAddition).describe("Bullets the person added by answering questions, on an applied improvement."),
+    questions: z
+      .array(
+        z.object({
+          scope: resumeQuestionScopeSchema,
+          kind: resumeQuestionKindSchema,
+          question: z.string(),
+          line: z
+            .number()
+            .int()
+            .nonnegative()
+            .describe("For `line`, the line the answer rewrites. For `role`, the role's last line, which the new bullet follows."),
+          text: z.string().describe("For `line`, the line as it read when the question was written. Empty for `role`."),
+          context: z.string().nullable().describe("Employer and title of the role the question is about."),
+          template: z
+            .string()
+            .nullable()
+            .describe("For a `line` count, the line with `{n}` where the figure goes, to fill in without a request while the line still reads as `text`."),
+        }),
+      )
+      .max(8)
+      .describe("Questions for the person, best first, written with the changes. Empty once applied."),
     audit: resumeAuditSchema,
     keptAsWritten: count.nonnegative(),
     pages: count.positive(),
@@ -153,6 +192,11 @@ const reviewChoices = {
     .max(1000)
     .optional()
     .describe("Lines the person wrote themselves."),
+  additions: z
+    .array(lineAddition)
+    .max(8)
+    .optional()
+    .describe("Bullets the person added by answering questions."),
 };
 
 export const resumeImprovementApplyRequestSchema = requestComponent(
@@ -237,6 +281,46 @@ export const resumeLineRewordResponseSchema = responseComponent(
     id: "ResumeLineRewordResponse",
     description:
       "A rewording for the review screen, or why none was used. Nothing is stored; it reaches the resume only as one of the person's edits when they apply.",
+  },
+);
+
+export const resumeQuestionAnswerRequestSchema = requestComponent(
+  z
+    .object({
+      answer: z.string().min(1).max(600).describe("What the person answered, in their own words."),
+      text: z
+        .string()
+        .max(600)
+        .describe("For a `line` question, the line as it reads on the person's screen. Empty for a `role` question."),
+      followUp: z
+        .string()
+        .min(2)
+        .max(240)
+        .optional()
+        .describe("The follow-up question this answers, when it answers one. No further follow-up is asked."),
+    })
+    .strict(),
+  {
+    id: "ResumeQuestionAnswerRequest",
+    description: "Answer one of an improvement's questions. A `line` answer rewrites that line; a `role` answer writes a new bullet.",
+  },
+);
+
+export const resumeQuestionAnswerResponseSchema = responseComponent(
+  z.object({
+    status: z
+      .enum(["rewritten", "follow_up", "skipped", "refused"])
+      .describe(
+        "`rewritten`: `text` is the line, or for a `role` question the new bullet, stating the answer. `follow_up`: the answer gave nothing to state, and `followUp` is one sharper question. `skipped`: the person did not know. `refused`: nothing written passed the checks, and the resume is unchanged.",
+      ),
+    text: z.string().nullable(),
+    segments: diffSegments,
+    followUp: z.string().nullable(),
+  }),
+  {
+    id: "ResumeQuestionAnswerResponse",
+    description:
+      "What an answer did to its line. Nothing is stored; a rewrite reaches the resume only as one of the person's edits when they apply.",
   },
 );
 

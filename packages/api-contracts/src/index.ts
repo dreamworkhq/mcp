@@ -122,6 +122,10 @@ export {
   resumeLineKindSchema,
   resumeLineRewordRequestSchema,
   resumeLineRewordResponseSchema,
+  resumeQuestionAnswerRequestSchema,
+  resumeQuestionAnswerResponseSchema,
+  resumeQuestionKindSchema,
+  resumeQuestionScopeSchema,
 } from "./schemas/resume-improvement.js";
 import type {
   resumeEditorMatchSchema as ResumeEditorMatchSchema,
@@ -131,8 +135,11 @@ import type {
   resumeImprovementResponseSchema as ResumeImprovementResponseSchema,
   resumeImprovementSchema as ResumeImprovementSchema,
   resumeLineRewordResponseSchema as ResumeLineRewordResponseSchema,
+  resumeQuestionAnswerResponseSchema as ResumeQuestionAnswerResponseSchema,
 } from "./schemas/resume-improvement.js";
 export type ResumeLineRewordResponse = z.infer<typeof ResumeLineRewordResponseSchema>;
+export type ResumeQuestion = z.infer<typeof ResumeImprovementSchema>["questions"][number];
+export type ResumeQuestionAnswerResponse = z.infer<typeof ResumeQuestionAnswerResponseSchema>;
 export type ResumeEditorMatch = z.infer<typeof ResumeEditorMatchSchema>;
 export type ResumeEditorMatchesResponse = z.infer<typeof ResumeEditorMatchesResponseSchema>;
 export type ResumeImprovement = z.infer<typeof ResumeImprovementSchema>;

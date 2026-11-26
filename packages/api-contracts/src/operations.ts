@@ -44,6 +44,8 @@ import {
   resumeImprovementUndoRequestSchema,
   resumeLineRewordRequestSchema,
   resumeLineRewordResponseSchema,
+  resumeQuestionAnswerRequestSchema,
+  resumeQuestionAnswerResponseSchema,
 } from "./schemas/resume-improvement.js";
 import {
   assistantHypothesisConfirmResponseSchema,
@@ -2221,6 +2223,63 @@ export const operations: readonly OperationDescriptor[] = [
       },
       "400": {
         description: "Body validation failed, or the resume has no such line.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No improvement with that id belongs to the caller.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "502": {
+        description: "The model call failed. Nothing was changed.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "answerResumeImprovementQuestion",
+    method: "post",
+    path: "/profile/resume/improvement/{id}/questions/{index}/answer",
+    fastifyPath: "/profile/resume/improvement/:id/questions/:index/answer",
+    summary: "Answer one of an improvement's questions",
+    description:
+      "Write the person's answer into the resume: a `line` question rewrites its line, a `role` question writes a new bullet. What is written may state only what the line and the person said; code holds figures, names and the person's part, and a second reader holds meaning. Nothing is stored.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned improvement id.",
+        schema: uuidString,
+      },
+      {
+        name: "index",
+        in: "path",
+        required: true,
+        description: "The question's position in the improvement's `questions`.",
+        schema: z.number().int().nonnegative(),
+      },
+    ],
+    requestBody: {
+      description: "The question, the answer and the line as it reads now.",
+      contentType: "application/json",
+      required: true,
+      schema: resumeQuestionAnswerRequestSchema,
+    },
+    responses: {
+      "200": {
+        description: "The rewritten line, a follow-up question, a skip, or a refusal.",
+        schema: resumeQuestionAnswerResponseSchema,
+      },
+      "400": {
+        description: "Body validation failed, or the improvement has no such question.",
         schema: resumeImprovementRefusalSchema,
       },
       "401": unauthorized,
