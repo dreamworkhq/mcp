@@ -166,7 +166,7 @@ export const applicationTimelineResponseSchema = responseComponent(
      * spellings of the same state.
      */
     status: submissionStatusSchema,
-    /** True only for a status in SUBMITTED_STATUSES. Never inferred from mail. */
+    /** True only for a status in POST_SUBMISSION_STATUSES. Never inferred from mail. */
     submitted: z.boolean(),
     /** True only when `employer_confirmed_at` is set. Never inferred from status. */
     received: z.boolean(),
