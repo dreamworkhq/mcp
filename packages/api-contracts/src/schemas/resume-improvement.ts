@@ -67,22 +67,6 @@ const lineEdit = z.object({
   text: z.string().min(1).max(600),
 });
 
-export const resumeAuditSchema = responseComponent(
-  z.object({
-    dutyOpeners: count,
-    fillerPhrases: count,
-    buzzwords: count,
-    firstPerson: count,
-    longBullets: count,
-    words: count,
-  }),
-  {
-    id: "ResumeAudit",
-    description:
-      "Pattern counts over the lines the improver may reword. On an improvement it is the resume before any change; on a change it is what that change adds to each count, so a negative number is fewer.",
-  },
-);
-
 export const resumeQuestionScopeSchema = sharedComponent(z.enum(["line", "role"]), {
   id: "ResumeQuestionScope",
   description:
@@ -123,7 +107,6 @@ export const resumeImprovementSchema = responseComponent(
         depth: z
           .union([z.literal(1), z.literal(2), z.literal(3)])
           .describe("How far the change moves from the person's wording: 1 touch-up, 2 standard, 3 deeper."),
-        effect: resumeAuditSchema,
         accepted: z.boolean(),
       }),
     ),
@@ -150,8 +133,6 @@ export const resumeImprovementSchema = responseComponent(
       )
       .max(8)
       .describe("Questions for the person, best first, written with the changes. Empty once applied."),
-    audit: resumeAuditSchema,
-    keptAsWritten: count.nonnegative(),
     pages: count.positive(),
     advice: z.array(
       z.object({

@@ -25,7 +25,7 @@ importers:
         version: link:../../packages/assistant-contracts
       '@types/node':
         specifier: ^25.6.0
-        version: 25.9.9
+        version: 25.9.10
       esbuild:
         specifier: 0.28.1
         version: 0.28.1
@@ -222,8 +222,8 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@types/node@25.9.9':
-    resolution: {integrity: sha512-b4e2xxj/yMeT2hNlD6x7zNFiQK2Dlmkb9CQ6v3/1G2RezKN4YS2lcEv8lzGm1mhs4f2lM4yNAMI/zUDBZBBt7w==}
+  '@types/node@25.9.10':
+    resolution: {integrity: sha512-vNjzbf3gOlO91fEfXCex403DoqITNlhqGr3ALh0JaC+wAWYeDiR21m2e5k+JSl8pboDuQCWQ/9dQduKqLxU3dw==}
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -708,7 +708,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@types/node@25.9.9':
+  '@types/node@25.9.10':
     dependencies:
       undici-types: 7.24.6
 

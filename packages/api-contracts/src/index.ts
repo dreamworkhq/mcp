@@ -110,7 +110,6 @@ export {
 } from "./schemas/assistant-memory.js";
 export {
   resumeAdviceCodeSchema,
-  resumeAuditSchema,
   resumeChangeCategorySchema,
   resumeEditorMatchSchema,
   resumeEditorMatchesResponseSchema,
