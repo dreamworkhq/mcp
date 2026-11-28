@@ -112,6 +112,9 @@ export const resumeImprovementSchema = responseComponent(
     ),
     edits: z.array(lineEdit),
     additions: z.array(lineAddition).describe("Bullets the person added by answering questions, on an applied improvement."),
+    removals: z
+      .array(z.number().int().nonnegative())
+      .describe("Line ordinals the person took out, on an applied improvement."),
     questions: z
       .array(
         z.object({
@@ -178,6 +181,11 @@ const reviewChoices = {
     .max(8)
     .optional()
     .describe("Bullets the person added by answering questions."),
+  removedLines: z
+    .array(z.number().int().nonnegative())
+    .max(1000)
+    .optional()
+    .describe("Bullets and paragraphs the person took out."),
 };
 
 export const resumeImprovementApplyRequestSchema = requestComponent(
@@ -262,6 +270,20 @@ export const resumeLineRewordResponseSchema = responseComponent(
     id: "ResumeLineRewordResponse",
     description:
       "A rewording for the review screen, or why none was used. Nothing is stored; it reaches the resume only as one of the person's edits when they apply.",
+  },
+);
+
+export const resumeRoleTrimResponseSchema = responseComponent(
+  z.object({
+    status: z.enum(["trimmed", "refused"]),
+    lines: z
+      .array(z.number().int().nonnegative())
+      .describe("The bullets to take out, in page order, so the role keeps its strongest five. Empty when refused."),
+  }),
+  {
+    id: "ResumeRoleTrimResponse",
+    description:
+      "The bullets a crowded role could drop. Nothing is stored; they leave the resume only as lines the person removed when they apply.",
   },
 );
 

@@ -44,6 +44,7 @@ import {
   resumeImprovementUndoRequestSchema,
   resumeLineRewordRequestSchema,
   resumeLineRewordResponseSchema,
+  resumeRoleTrimResponseSchema,
   resumeQuestionAnswerRequestSchema,
   resumeQuestionAnswerResponseSchema,
 } from "./schemas/resume-improvement.js";
@@ -2280,6 +2281,57 @@ export const operations: readonly OperationDescriptor[] = [
       },
       "400": {
         description: "Body validation failed, or the improvement has no such question.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "401": unauthorized,
+      "403": {
+        description: "The improver is not available to this account.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "404": {
+        description: "No improvement with that id belongs to the caller.",
+        schema: resumeImprovementRefusalSchema,
+      },
+      "502": {
+        description: "The model call failed. Nothing was changed.",
+        schema: resumeImprovementRefusalSchema,
+      },
+    },
+  },
+  {
+    operationId: "trimResumeImprovementRole",
+    method: "post",
+    path: "/profile/resume/improvement/{id}/roles/{line}/trim",
+    fastifyPath: "/profile/resume/improvement/:id/roles/:line/trim",
+    summary: "Pick the bullets a crowded role could drop",
+    description:
+      "For a role that lists more than six bullets, name the ones that tell a recruiter least, so the role keeps its strongest five. Nothing is reworded or stored.",
+    tags: ["profile"],
+    auth: "user-session",
+    contractMaturity: "handler-verified",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        description: "Owned improvement id.",
+        schema: uuidString,
+      },
+      {
+        name: "line",
+        in: "path",
+        required: true,
+        description: "The ordinal of the role's employer line.",
+        schema: z.number().int().nonnegative(),
+      },
+    ],
+    responses: {
+      "200": {
+        description: "The bullets to take out, or a refusal when none could be picked.",
+        schema: resumeRoleTrimResponseSchema,
+      },
+      "400": {
+        description: "The line does not open a role.",
         schema: resumeImprovementRefusalSchema,
       },
       "401": unauthorized,
