@@ -279,6 +279,12 @@ export const resumeQuestionAnswerRequestSchema = requestComponent(
         .max(240)
         .optional()
         .describe("The follow-up question this answers, when it answers one. No further follow-up is asked."),
+      previousAnswer: z
+        .string()
+        .min(1)
+        .max(600)
+        .optional()
+        .describe("With `followUp`: what the person answered to the question first. The line is written from both answers."),
     })
     .strict(),
   {
