@@ -415,6 +415,7 @@ export type {
   ScorecardCountMetric,
   ScorecardDay,
   ScorecardMrrMove,
+  ScorecardMrrProjection,
   ScorecardNewUsersDay,
   ScorecardRateMetric,
   ScorecardSignupMix,

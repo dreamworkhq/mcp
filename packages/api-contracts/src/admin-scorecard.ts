@@ -111,6 +111,31 @@ export type ScorecardMrrMove = {
 };
 
 /**
+ * Projected MRR from active uncanceled free trials, valued at each trial's
+ * post-coupon monthly rate at `trial_end` and weighted by the trailing 4
+ * complete Monday-to-Sunday weeks' trial conversion rate (internal accounts
+ * excluded).
+ */
+export type ScorecardMrrProjection = {
+  /** 31 points matching `mrr.days`: actual MRR + expected trial MRR in US cents, or null when no conversion baseline exists. */
+  days: ScorecardDay[];
+  /** Live projected total MRR (`mrr.current + expectedTrialMrrCents`), or null when no conversion baseline exists. */
+  current: number | null;
+  /** Expected monthly revenue in US cents from currently active uncanceled trials, or null when no conversion baseline exists. */
+  expectedTrialMrrCents: number | null;
+  /** Active uncanceled non-internal trial subscriptions right now. */
+  activeTrials: number;
+  /** Gross discounted monthly value of those active uncanceled trials at `trial_end`, in US cents. */
+  activeTrialMrrCents: number;
+  /** Trailing 4-complete-week trial-to-paid conversion rate in percent (one decimal), or null when no trials ended. */
+  conversionRatePct: number | null;
+  /** Resolved trials in the trailing 4-complete-week conversion baseline. */
+  conversionSampleEnded: number;
+  /** Converted trials in the trailing 4-complete-week conversion baseline. */
+  conversionSampleConverted: number;
+};
+
+/**
  * One day of corpus intake health, one row per lane.
  * INTERNAL = our own crawlers (company_sources registry). EXTERNAL = the
  * SourceStack vendor feed (single lane, automated daily delivery).
@@ -210,6 +235,8 @@ export type AdminScorecard = {
   mrr: ScorecardStockMetric | null;
   /** One per `mrr.days` point after the first, for the same day. */
   mrrMoves: ScorecardMrrMove[] | null;
+  /** Projected MRR including expected conversions from active uncanceled trials. */
+  mrrProjection?: ScorecardMrrProjection | null;
   payingUsers: ScorecardStockMetric | null;
   /** Each day's value is the rate over the 7 days ending that day. */
   applicationSuccess: ScorecardApplicationSuccessMetric | null;
